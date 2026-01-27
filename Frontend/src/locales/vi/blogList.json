@@ -1,0 +1,29 @@
+{
+  "header": {
+    "titlePart1": "Câu Chuyện & Trải Nghiệm",
+    "titlePart2": "Về phương pháp học Tiếng Anh",
+    "subtitle": "Khám phá những câu chuyện thực tế, lời khuyên và góc nhìn từ cộng đồng trong hành trình học Tiếng Anh."
+  },
+  "searchFilter": {
+    "placeholder": "Tìm kiếm bài viết..."
+  },
+  "tabs": {
+    "blogsTitle": "Bài Viết",
+    "allBlogs": "Tất Cả Bài Viết",
+    "myBlogs": "Bài Viết Của Tôi",
+    "createBlog": "Tạo Bài Viết",
+    "myPublished": "Đã Đăng",
+    "myDrafts": "Bản Nháp",
+    "myPending": "Chờ Duyệt"
+  },
+  "noBlogsFound": {
+    "message": "Không tìm thấy bài viết nào phù hợp với tiêu chí."
+  },
+  "sidebar": {
+    "commonTypesTitle": "Chủ Đề Phổ Biến",
+    "popularBlogsTitle": "Bài Viết Nổi Bật",
+    "favoriteTagsTitle": "Thẻ Ưa Thích"
+  },
+  "ageGroupMessage": "Bạn cần cập nhật thông tin cá nhân để đọc nhiều bài blog phù hợp với độ tuổi của mình",
+  "clearFilters": "Xóa Bộ Lọc"
+}

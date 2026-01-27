@@ -1,0 +1,36 @@
+{
+  "searchPlaceholder": "Tìm kiếm theo từ khóa...",
+  "chooseAgeGroup": "Chọn Nhóm Tuổi",
+  "chooseTopic": "Chọn Chủ Đề",
+  "chooseType": "Chọn Loại",
+  "duration": "Thời lượng",
+  "chooseStatus" : "Chọn Trạng Thái",
+  "filterButton": "Lọc",
+  "ageGroupOptions": {
+    "toddler": "Trẻ mới biết đi (1-3)",
+    "preschool": "Mẫu giáo (3-5)",
+    "school_age": "Tuổi đi học (6-12)",
+    "teenager": "Thanh thiếu niên (13-18)"
+  },
+  "topicOptions": {
+    "nutrition": "Dinh dưỡng",
+    "exercise": "Tập luyện",
+    "mental_health": "Sức khỏe tinh thần",
+    "education": "Giáo dục"
+  },
+  "durationOptions": {
+    "short": "Ngắn (< 30 phút)",
+    "medium": "Trung bình (30-60 phút)",
+    "long": "Dài (> 60 phút)"
+  },
+  "typeOptions": {
+    "blog": "Bài đăng",
+    "course": "Khóa học",
+    "event": "Sự kiện",
+    "PERSONAL": "Cá nhân",
+    "NICHE": "Chuyên sâu",
+    "NEWS": "Tin tức",
+    "EDUCATIONAL": "Giáo dục",
+    "GENERAL": "Tổng hợp"
+  }
+}

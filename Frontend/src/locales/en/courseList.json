@@ -1,0 +1,27 @@
+{
+    "noCoursesFound": {
+        "code": "📘",
+        "title": "No Courses Found",
+        "message": "We are really sorry for this inconvenience.",
+        "backText": "Back Home"
+    },
+    "header": {
+        "title": "Training Courses",
+        "subtitle": "Explore an inspiring learning journey with us"
+    },
+    "searchFilter": {
+        "placeholder": "Search courses..."
+    },
+    "coursesSection": {
+        "title": "Courses",
+        "showingCourses": "Showing {{start}}-{{end}} of {{total}} courses",
+        "noMatchingCourses": "No courses found matching your criteria.",
+        "clearFilters": "Clear Filters"
+    },
+    "durationOptions": {
+        "lessThan10Mins": "Less than 10 mins",
+        "lessThan20Mins": "Less than 20 mins",
+        "lessThan30Mins": "Less than 30 mins",
+        "moreThan30Mins": "More than 30 mins"
+    }
+}

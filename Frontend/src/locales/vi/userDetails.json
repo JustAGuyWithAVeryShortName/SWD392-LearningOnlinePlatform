@@ -1,0 +1,44 @@
+{
+  "title": "Thông Tin Người Dùng",
+  "fullName": "Họ và Tên",
+  "gender": "Giới Tính",
+  "dateOfBirth": "Ngày Sinh",
+  "phoneNumber": "Số Điện Thoại",
+  "email": "Email",
+  "address": "Địa Chỉ",
+  "job": "Nghề Nghiệp",
+  "editButton": "Chỉnh Sửa",
+  "modal": {
+    "title": "Chỉnh Sửa Thông Tin",
+    "cancelButton": "Hủy",
+    "saveChangesButton": "Lưu Thay Đổi"
+  },
+  "form": {
+    "fullNameLabel": "Họ và Tên",
+    "fullNamePlaceholder": "Nhập họ và tên của bạn",
+    "genderLabel": "Giới Tính",
+    "selectGenderPlaceholder": "Chọn giới tính",
+    "dateOfBirthLabel": "Ngày Sinh",
+    "phoneNumberLabel": "Số Điện Thoại",
+    "phoneNumberPlaceholder": "Nhập số điện thoại của bạn",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Nhập email của bạn",
+    "jobLabel": "Nghề Nghiệp",
+    "jobPlaceholder": "Nhập chức danh công việc của bạn",
+    "addressLabel": "Địa Chỉ",
+    "addressPlaceholder": "Nhập địa chỉ của bạn",
+    "validation": {
+      "fullNameRequired": "Vui lòng nhập họ và tên",
+      "phoneNumberRequired": "Vui lòng nhập số điện thoại",
+      "dobRequired": "Vui lòng chọn ngày sinh",
+      "genderRequired": "Vui lòng chọn giới tính",
+      "emailRequired": "Vui lòng nhập email",
+      "jobTitleRequired": "Vui lòng nhập chức danh công việc",
+      "addressRequired": "Vui lòng nhập địa chỉ"
+    },
+    "alert": {
+      "success": "Cập nhật thông tin người dùng thành công!",
+      "failure": "Cập nhật thông tin người dùng thất bại."
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "projectName": "E-Learning",
+  "home": "Trang Chủ",
+  "blogs": "Bài Viết",
+  "events": "Sự Kiện",
+  "courses": "Khóa Học",
+  "assessment": "Đánh Giá",
+  "myProfile": "Hồ Sơ Của Tôi",
+  "logout": "Đăng Xuất",
+  "login": "Đăng Nhập",
+  "register": "Đăng Ký",
+  "userPlaceholder": "Người Dùng",
+  "dashboard": "Trang Chủ",
+  "users": "Quản Lý Người Dùng",
+  "system": "Hệ thống",
+  "chat": "Trò Chuyện"
+}

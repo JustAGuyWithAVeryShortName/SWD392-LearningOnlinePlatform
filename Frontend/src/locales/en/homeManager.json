@@ -1,0 +1,23 @@
+{
+  "totalMembers": "Total Members",
+  "staffMembers": "Staff Members",
+  "consultants": "Consultants",
+  "monthlyConsultations": "Monthly Consultations",
+  "activeCourses": "Active Courses",
+  "blogs": "Blogs",
+  "events": "Events",
+  "courses": "Courses",
+  "pendingBlogs": "Pending Blogs",
+  "pendingCourses": "Pending Courses",
+  "pendingEvents": "Pending Events",
+  "viewAllBlogs": "View All Blogs",
+  "viewAllCourses": "View All Courses",
+  "viewAllEvents": "View All Events",
+  "userManagement": "User Management",
+  "manageUsersDescription": "Oversee and manage user accounts, including staff, consultants, and members.",
+  "accessDashboard": "Access Dashboard",
+  "successfullyApproved": "{type} successfully approved!",
+  "failedToApprove": "Failed to approve {type}. Please try again.",
+  "successfullyRejected": "{type} successfully rejected!",
+  "failedToReject": "Failed to reject {type}. Please try again."
+}

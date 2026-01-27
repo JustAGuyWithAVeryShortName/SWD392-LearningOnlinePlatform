@@ -1,0 +1,124 @@
+package com.hsp302.shared_english_e_learning_path.controllers;
+
+import com.hsp302.shared_english_e_learning_path.domain.dtos.requests.CreateQualificationRequest;
+import com.hsp302.shared_english_e_learning_path.domain.dtos.requests.UpdateQualificationRequest;
+import com.hsp302.shared_english_e_learning_path.domain.dtos.responses.ApiResponse;
+import com.hsp302.shared_english_e_learning_path.domain.dtos.responses.QualificationResponse;
+import com.hsp302.shared_english_e_learning_path.domain.enums.CourseStatus;
+import com.hsp302.shared_english_e_learning_path.domain.enums.Degree;
+import com.hsp302.shared_english_e_learning_path.services.ExcelService;
+import com.hsp302.shared_english_e_learning_path.services.QualificationService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/qualification")
+@RequiredArgsConstructor
+public class QualificationController {
+
+    private final QualificationService qualificationService;
+    private final ExcelService excelService;
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<QualificationResponse>> createQualification(@Valid @RequestBody CreateQualificationRequest request) {
+        QualificationResponse response = qualificationService.createQualification(request);
+        ApiResponse<QualificationResponse> apiResponse = ApiResponse.<QualificationResponse>builder()
+                .data(response)
+                .status(HttpStatus.CREATED.value())
+                .build();
+        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<QualificationResponse>>> getAllQualifications() {
+        List<QualificationResponse> responses = qualificationService.getAllQualifications();
+        ApiResponse<List<QualificationResponse>> apiResponse = ApiResponse.<List<QualificationResponse>>builder()
+                .data(responses)
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @GetMapping("/my-list/{username}")
+    public ResponseEntity<ApiResponse<List<QualificationResponse>>> getConsultantQualifications(@PathVariable String username) {
+        List<QualificationResponse> responses = qualificationService.getConsultantQualifications(username);
+        ApiResponse<List<QualificationResponse>> apiResponse = ApiResponse.<List<QualificationResponse>>builder()
+                .data(responses)
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<QualificationResponse>> getQualification(@PathVariable UUID id) {
+        QualificationResponse response = qualificationService.getQualification(id);
+        ApiResponse<QualificationResponse> apiResponse = ApiResponse.<QualificationResponse>builder()
+                .data(response)
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<QualificationResponse>> updateQualification(@PathVariable UUID id,
+                                                                                  @Valid @RequestBody UpdateQualificationRequest request) {
+        QualificationResponse response = qualificationService.updateQualification(id, request);
+        ApiResponse<QualificationResponse> apiResponse = ApiResponse.<QualificationResponse>builder()
+                .data(response)
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @PutMapping("/status/{id}")
+    public ResponseEntity<ApiResponse<QualificationResponse>> deleteQualification(@PathVariable UUID id) {
+        QualificationResponse response = qualificationService.deleteQualification(id);
+        ApiResponse<QualificationResponse> apiResponse = ApiResponse.<QualificationResponse>builder()
+                .data(response)
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @PostMapping(value = "/import", consumes = "multipart/form-data")
+    public ResponseEntity<String> importUserDetails(@RequestParam("file") MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("File is empty!");
+        }
+        excelService.importQualificationsFromExcel(file.getInputStream());
+        return ResponseEntity.ok("Excel file data saved Qualifications into DB");
+    }
+
+    @GetMapping("/degree")
+    public ResponseEntity<ApiResponse<List<String>>> getAllQualificationDegrees() {
+        List<String> degrees = Arrays.stream(Degree.values())
+                .map(Enum::name)
+                .toList();
+        ApiResponse<List<String>> apiResponse = ApiResponse.<List<String>>builder()
+                .status(HttpStatus.OK.value())
+                .data(degrees)
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<ApiResponse<List<String>>> getAllQualificationStatuses() {
+        List<String> statuses = Arrays.stream(CourseStatus.values())
+                .map(Enum::name)
+                .toList();
+        ApiResponse<List<String>> apiResponse = ApiResponse.<List<String>>builder()
+                .status(HttpStatus.OK.value())
+                .data(statuses)
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
+}

@@ -1,0 +1,49 @@
+{
+  "backButton": "Cancel",
+  "courseDetails": {
+    "courseNamePlaceholder": "Enter Course Name",
+    "descriptionPlaceholder": "Enter Course Description",
+    "ageGroupSelect": "Select Age Group",
+    "createButton": "Create Course",
+    "saveButton": "Save Course",
+    "validation": {
+      "courseNameRequired": "Please enter a course name.",
+      "descriptionRequired": "Please enter a course description.",
+      "ageGroupRequired": "Please select an age group.",
+      "imageRequired": "Please upload an image for the course."
+    },
+    "toastMessages": {
+      "imageUploading": "Image is uploading, please wait..."
+    }
+  },
+  "form": {
+    "imageUpload": {
+      "altText": "Course preview image",
+      "clickToUpload": "Click to upload image",
+      "clickToChange": "Click to change image",
+      "uploading": "Uploading image...",
+      "error": "Image upload failed: {{error}}"
+    }
+  },
+  "modulesSection": {
+    "addModuleButton": "Add Module",
+    "markUnavailableButton": "Mark Selected Unavailable",
+    "noModules": "No modules found. Click 'Add Module' to create one.",
+    "unavailableBadge": "Unavailable",
+    "toastMessages": {
+      "fetchError": "Failed to fetch data. Please try again.",
+      "createSuccess": "Course created successfully!",
+      "createError": "Failed to create course. Please try again.",
+      "saveSuccess": "Course saved successfully!",
+      "saveError": "Failed to save course. Please try again.",
+      "noCourseIdForModule": "Please create/save the course first to add modules.",
+      "selectModulesInfo": "Please select at least one module to mark as unavailable.",
+      "confirmUnavailable": "Are you sure you want to mark {{count}} selected modules as unavailable?",
+      "updateModulesStatusSuccess": "Modules status updated successfully!",
+      "updateModulesStatusError": "Failed to update modules status. Please try again.",
+      "unexpectedError": "An unexpected error occurred. Please try again."
+    },
+    "confirmButton": "Confirm",
+    "cancelButton": "Cancel"
+  }
+}

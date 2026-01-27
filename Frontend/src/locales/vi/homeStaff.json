@@ -1,0 +1,20 @@
+{
+  "courseManagement": "Quản lý khóa học",
+  "eventManagement": "Quản lý sự kiện",
+  "blogManagement": "Quản lý bài viết",
+  "viewAllCourses": "Xem tất cả khóa học",
+  "viewAllEvents": "Xem tất cả sự kiện",
+  "viewAllBlogs": "Xem tất cả bài viết",
+  "whereYouLeftOff": "Nơi bạn đã dừng lại",
+  "upcomingEventsResponsibilities": "Sự kiện sắp tới và trách nhiệm",
+  "understandingPeerPressureInTeens": "Tìm hiểu áp lực từ bạn bè ở tuổi thiếu niên",
+  "peerPressureDescription": "Đây là bài viết mới nhất của bạn về áp lực từ bạn bè ở tuổi thiếu niên, hãy xem qua.",
+  "lastEdited": "Chỉnh sửa lần cuối {time}",
+  "hoursAgo": "giờ trước",
+  "continue": "Tiếp tục",
+  "youthAwarenessWorkshop": "Hội thảo nâng cao nhận thức thanh thiếu niên",
+  "parentEducationSeminar": "Hội thảo giáo dục phụ huynh",
+  "teacherTrainingSession": "Buổi tập huấn giáo viên",
+  "successfullyApproved": "{type} đã được duyệt thành công!",
+  "failedToApprove": "Duyệt {type} thất bại. Vui lòng thử lại."
+}

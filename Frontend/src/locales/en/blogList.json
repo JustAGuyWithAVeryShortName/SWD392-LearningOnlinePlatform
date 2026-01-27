@@ -1,0 +1,29 @@
+{
+    "header": {
+        "titlePart1": "Stories & Experiences",
+        "titlePart2": "On Learning English",
+        "subtitle": "Explore real-life experiences, advice, and perspective\nfrom the community in the journey of learning English."
+    },
+    "searchFilter": {
+        "placeholder": "Search blogs..."
+    },
+    "tabs": {
+        "blogsTitle": "Blogs",
+        "allBlogs": "All Blogs",
+        "myBlogs": "My Blogs",
+        "createBlog": "Create",
+        "myPublished": "My Published",
+        "myDrafts": "My Drafts",
+        "myPending": "My Pending"
+    },
+    "noBlogsFound": {
+        "message": "No blogs found matching your criteria."
+    },
+    "sidebar": {
+        "commonTypesTitle": "Common Types",
+        "popularBlogsTitle": "Popular Blogs",
+        "favoriteTagsTitle": "Favorite Tags"
+    },
+    "ageGroupMessage": "You need to update your personal information to get more relevant age blogs",
+    "clearFilters": "Clear Filters"
+}

@@ -1,0 +1,17 @@
+{
+    "projectName": "E-Learning",
+    "home": "Home",
+    "blogs": "Blogs",
+    "events": "Events",
+    "courses": "Courses",
+    "assessment": "Assessments",
+    "myProfile": "My Profile",
+    "logout": "Logout",
+    "login": "Log In",
+    "register": "Register",
+    "userPlaceholder": "User",
+    "dashboard": "Dashboard",
+    "users": "User Management",
+    "system": "System",
+    "chat": "Chat"
+}

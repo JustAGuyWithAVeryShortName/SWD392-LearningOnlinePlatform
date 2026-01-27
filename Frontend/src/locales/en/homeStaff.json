@@ -1,0 +1,20 @@
+{
+  "courseManagement": "Course Management",
+  "eventManagement": "Event Management",
+  "blogManagement": "Blog Management",
+  "viewAllCourses": "View All Courses",
+  "viewAllEvents": "View All Events",
+  "viewAllBlogs": "View All Blogs",
+  "whereYouLeftOff": "Where You Left Off",
+  "upcomingEventsResponsibilities": "Upcoming Events & Responsibilities",
+  "understandingPeerPressureInTeens": "Understanding Peer Pressure in Teens",
+  "peerPressureDescription": "This is your latest draft on understanding peer pressure in teens, let's take a look.",
+  "lastEdited": "Last edited {time}",
+  "hoursAgo": "hours ago",
+  "continue": "Continue",
+  "youthAwarenessWorkshop": "Youth Awareness Workshop",
+  "parentEducationSeminar": "Parent Education Seminar",
+  "teacherTrainingSession": "Teacher Training Session",
+  "successfullyApproved": "{type} successfully approved!",
+  "failedToApprove": "Failed to approve {type}. Please try again."
+}

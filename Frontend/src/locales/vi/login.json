@@ -1,0 +1,33 @@
+{
+  "loading": "Đang tải...",
+  "backButton": "Quay lại",
+  "brand": {
+    "title": "E-FPT",
+    "subtitle": "Hệ thống hỗ trợ cộng đồng trau dồi Tiếng Anh"
+  },
+  "tabs": {
+    "login": "Đăng nhập",
+    "register": "Đăng ký"
+  },
+  "googleLoginButton": "Tiếp tục với Google",
+  "dividerText": "hoặc",
+  "loginForm": {
+    "usernameLabel": "Tên người dùng",
+    "usernamePlaceholder": "Nhập tên người dùng",
+    "passwordLabel": "Mật khẩu",
+    "passwordPlaceholder": "Nhập mật khẩu",
+    "rememberMe": "Ghi nhớ đăng nhập",
+    "submitButton": "Đăng nhập",
+    "forgotPassword": "Quên mật khẩu?"
+  },
+  "registerForm": {
+    "usernameLabel": "Tên người dùng",
+    "usernamePlaceholder": "Nhập tên người dùng",
+    "passwordLabel": "Mật khẩu",
+    "passwordPlaceholder": "Nhập mật khẩu",
+    "confirmPasswordLabel": "Xác nhận mật khẩu",
+    "confirmPasswordPlaceholder": "Nhập lại mật khẩu",
+    "submitButton": "Đăng ký",
+    "passwordMismatch": "Mật khẩu không khớp!"
+  }
+}

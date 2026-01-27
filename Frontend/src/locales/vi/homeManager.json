@@ -1,0 +1,23 @@
+{
+  "totalMembers": "Tổng số thành viên",
+  "staffMembers": "Thành viên Ban Tổ Chức",
+  "consultants": "Tư vấn viên",
+  "monthlyConsultations": "Tư vấn hàng tháng",
+  "activeCourses": "Khóa học đang hoạt động",
+  "blogs": "Bài viết",
+  "events": "Sự kiện",
+  "courses": "Khóa học",
+  "pendingBlogs": "Bài viết đang chờ duyệt",
+  "pendingCourses": "Khóa học đang chờ duyệt",
+  "pendingEvents": "Sự kiện đang chờ duyệt",
+  "viewAllBlogs": "Xem tất cả bài viết",
+  "viewAllCourses": "Xem tất cả khóa học",
+  "viewAllEvents": "Xem tất cả sự kiện",
+  "userManagement": "Quản lý người dùng",
+  "manageUsersDescription": "Kiểm soát và quản lý tài khoản người dùng, bao gồm nhân viên, tư vấn viên và thành viên.",
+  "accessDashboard": "Truy cập bảng điều khiển",
+  "successfullyApproved": "{type} đã được duyệt thành công!",
+  "failedToApprove": "Duyệt {type} thất bại. Vui lòng thử lại.",
+  "successfullyRejected": "{type} đã bị từ chối thành công!",
+  "failedToReject": "Từ chối {type} thất bại. Vui lòng thử lại."
+}

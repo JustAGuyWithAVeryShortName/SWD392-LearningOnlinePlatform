@@ -1,0 +1,49 @@
+{
+  "backButton": "Hủy",
+  "courseDetails": {
+    "courseNamePlaceholder": "Nhập tên khóa học",
+    "descriptionPlaceholder": "Nhập mô tả khóa học",
+    "ageGroupSelect": "Chọn nhóm tuổi",
+    "createButton": "Tạo khóa học",
+    "saveButton": "Lưu khóa học",
+    "validation": {
+      "courseNameRequired": "Vui lòng nhập tên khóa học.",
+      "descriptionRequired": "Vui lòng nhập mô tả khóa học.",
+      "ageGroupRequired": "Vui lòng chọn một nhóm tuổi.",
+      "imageRequired": "Vui lòng tải lên một hình ảnh cho khóa học."
+    },
+    "toastMessages": {
+      "imageUploading": "Ảnh đang được tải lên, vui lòng đợi..."
+    }
+  },
+  "form": {
+    "imageUpload": {
+      "altText": "Ảnh xem trước khóa học",
+      "clickToUpload": "Nhấp để tải ảnh lên",
+      "clickToChange": "Nhấp để thay đổi ảnh",
+      "uploading": "Đang tải ảnh lên...",
+      "error": "Tải ảnh lên thất bại: {{error}}"
+    }
+  },
+  "modulesSection": {
+    "addModuleButton": "Thêm Module",
+    "markUnavailableButton": "Đánh dấu đã chọn không khả dụng",
+    "noModules": "Không tìm thấy module nào. Nhấp vào 'Thêm Module' để tạo.",
+    "unavailableBadge": "Không khả dụng",
+    "toastMessages": {
+      "fetchError": "Lấy dữ liệu thất bại. Vui lòng thử lại.",
+      "createSuccess": "Khóa học đã được tạo thành công!",
+      "createError": "Không thể tạo khóa học. Vui lòng thử lại.",
+      "saveSuccess": "Khóa học đã được lưu thành công!",
+      "saveError": "Không thể lưu khóa học. Vui lòng thử lại.",
+      "noCourseIdForModule": "Vui lòng tạo/lưu khóa học trước để thêm module.",
+      "selectModulesInfo": "Vui lòng chọn ít nhất một module để đánh dấu không khả dụng.",
+      "confirmUnavailable": "Bạn có chắc chắn muốn đánh dấu {{count}} module đã chọn là không khả dụng không?",
+      "updateModulesStatusSuccess": "Trạng thái module đã được cập nhật thành công!",
+      "updateModulesStatusError": "Không thể cập nhật trạng thái module. Vui lòng thử lại.",
+      "unexpectedError": "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại."
+    },
+    "confirmButton": "Xác nhận",
+    "cancelButton": "Hủy"
+  }
+}
