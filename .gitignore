@@ -1,0 +1,11 @@
+# Root level sensitive files
+tokens/
+StoredCredential
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -31,3 +31,12 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Sensitive Configuration Files ###
+# OAuth tokens and credentials
+tokens/
+src/main/resources/credentials.json
+src/main/resources/application.properties
+
+# Keep application.properties template
+!src/main/resources/application.properties.example
