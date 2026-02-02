@@ -1,6 +1,6 @@
 /* Home Page Styles */
 .home-page {
-  padding-bottom: 100px; /* Add space at bottom to prevent overlap */
+  padding-bottom: 30px; /* Add space at bottom to prevent overlap */
 }
 
 /* Hero Section Styles */
@@ -252,4 +252,15 @@
     width: 20px;
     height: 20px;
   }
+
+  .instructor-avatar {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border: 4px solid #e7f1ff;
+}
+
+.home-page h2 {
+  letter-spacing: -0.5px;
+}
 }

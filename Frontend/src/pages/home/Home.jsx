@@ -2,15 +2,13 @@ import { useEffect, useState } from "react";
 import { Container, Row, Col, Spinner, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import useFetch from "../../hooks/useFetch";
-import BlogCard from "../../components/card/BlogCard";
-import CourseCard from "../../components/card/CourseCard";
 import AppointmentCard from "../../components/card/AppointmentCard";
 import "./Home.css";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../hooks/useAuth";
 import { jwtDecode } from "jwt-decode";
-
-
+import HomeCourseCard from "../../components/home/HomeCourseCard";
+import HomeBlogCard from "../../components/home/HomeBlogCard";
 // Helper function moved from HomeExplore
 const getRandomItems = (array, count) => {
   const shuffled = [...array].sort(() => 0.5 - Math.random());
@@ -116,40 +114,83 @@ const Home = () => {
         </Container>
       )}
 
-      {/* Blogs Section (from HomeExplore) */}
-      <Container className="mb-5">
-        <div className="bg-light rounded-4 p-4">
-          <h3 className="fw-bold text-dark mb-4">{t("newBlogsTitle")}</h3>
-          <Row>
-            {randomBlogs.map((blog) => (
-              <Col md={6} key={blog.blogID} className="mb-4">
-                <BlogCard
-                  blog={blog}
-                  onReadClick={() => handleReadMore(blog.blogID)}
-                />
-              </Col>
-            ))}
-          </Row>
-        </div>
-      </Container>
+      {/* Featured Courses */}
+<Container className="mb-5">
+  <div className="d-flex justify-content-between align-items-end mb-4">
+    <div>
+      <h2 className="fw-bold">{t("featuredCourses.title")}</h2>
+      <p className="text-muted">{t("featuredCourses.subtitle")}</p>
+    </div>
+    <Button
+      variant="link"
+      className="fw-semibold"
+      onClick={() => navigate("/courses")}
+    >
+      {t("viewAllCourses")}
+    </Button>
+  </div>
 
-      {/* Courses Section (from HomeExplore) */}
-      <Container className="mb-5">
-        <div className="bg-light rounded-4 p-4">
-          <h3 className="fw-bold text-dark mb-4">{t("popularCoursesTitle")}</h3>
-          <Row>
-            {randomCourses.map((course) => (
-              <Col md={4} key={course.courseID} className="mb-4">
-                <CourseCard
-                  course={course}
-                  onEnrollClick={handleCoursesClick}
-                  onDetailsClick={handleCoursesClick}
-                />
-              </Col>
-            ))}
-          </Row>
-        </div>
-      </Container>
+  <Row className="g-4">
+    <Col md={4}><HomeCourseCard /></Col>
+    <Col md={4}><HomeCourseCard /></Col>
+    <Col md={4}><HomeCourseCard /></Col>
+    {/*{randomCourses.map((course) => (
+      <Col key={course.courseID} xs={12} md={6} lg={4}>
+        <HomeCourseCard
+          course={course}
+          onClick={() => handleCoursesClick(course.courseID)}
+        />
+      </Col>
+    ))}*/}
+  </Row>
+</Container>
+
+{/* Instructors */}
+<section className="bg-light py-5 mb-5">
+  <Container>
+    <div className="text-center mb-5">
+      <h2 className="fw-bold">{t("instructors.title")}</h2>
+      <p className="text-muted">{t("instructors.subtitle")}</p>
+    </div>
+
+    <Row className="g-4 justify-content-center">
+      {[
+        { name: "Dr. Alex Rivers", role: "Senior Web Architect", avatar: "src/images/4.jpg" },
+        { name: "Sarah Jenkins", role: "Lead UI Designer", avatar: "src/images/4.jpg" },
+        { name: "Michael Chen", role: "Data Scientist", avatar: "src/images/4.jpg" },
+        { name: "Elena Rodriguez", role: "Business Strategist", avatar: "src/images/4.jpg" },
+      ].map((ins, index) => (
+        <Col key={index} xs={6} md={3} className="text-center">
+          <img
+            src={ins.avatar}
+            alt={ins.name}
+            className="rounded-circle mb-3 instructor-avatar"
+          />
+          <h6 className="fw-bold mb-0">{ins.name}</h6>
+          <small className="text-muted">{ins.role}</small>
+        </Col>
+      ))}
+    </Row>
+  </Container>
+</section>
+{/* Latest Blogs */}
+<Container className="mb-5">
+  <h2 className="fw-bold mb-4">{t("latestBlogs.title")}</h2>
+
+  <Row className="g-4">
+    {/*{randomBlogs.map((blog) => (
+      <Col key={blog.blogID} xs={12} md={6}>
+        <HomeBlogCard
+          blog={blog}
+          onReadMore={() => handleReadMore(blog.blogID)}
+        />
+      </Col>
+    ))}*/}
+    <Col md={6}><HomeBlogCard /></Col>
+    <Col md={6}><HomeBlogCard /></Col>
+  </Row>
+</Container>
+
     </div>
   );
 };
