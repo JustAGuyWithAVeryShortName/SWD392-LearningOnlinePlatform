@@ -5,5 +5,19 @@
   },
   "bookAppointmentButton": "Đặt Lịch Hẹn",
   "newBlogsTitle": "Bài Viết Mới",
-  "popularCoursesTitle": "Khóa Học Phổ Biến"
+  "popularCoursesTitle": "Khóa Học Phổ Biến",
+  "viewAllCourses": "Xem tất cả khóa học",
+  "featuredCourses": {
+    "title": "Khóa học nổi bật",
+    "subtitle": "Khám phá những khóa học tiếng Anh được yêu thích nhất"
+  },
+  "instructors": {
+    "title": "Giảng viên nổi bật trong tháng",
+    "subtitle": "Những giảng viên giàu kinh nghiệm và được đánh giá cao nhất"
+  },
+  "latestBlogs": {
+    "title": "Bài viết mới nhất"
+  }
+
+
 }

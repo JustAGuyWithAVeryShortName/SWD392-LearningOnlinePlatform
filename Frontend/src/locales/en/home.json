@@ -5,5 +5,18 @@
   },
   "bookAppointmentButton": "Book an Appointment",
   "newBlogsTitle": "New Blogs",
-  "popularCoursesTitle": "Popular Courses"
+  "popularCoursesTitle": "Popular Courses",
+     
+  "viewAllCourses": "View All Courses",
+  "featuredCourses": {
+    "title": "Featured Courses",
+    "subtitle": "Explore our most popular English courses"
+  },
+  "instructors": {
+  "title": "Top Instructors of the Month",
+  "subtitle": "Meet our most experienced and highly rated instructors"
+},
+"latestBlogs":{
+  "title": "Latest Blogs"
+}
 }
