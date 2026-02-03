@@ -70,9 +70,11 @@ export default function Navbar() {
           className="d-flex align-items-center"
         >
           <div className="logo-icon me-2">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-              
-            </svg>
+            <img
+              src="/src/images/6.png"
+              alt="EnglishPath"
+              className="logo-img"
+            />
           </div>
           <span className="fw-bold fs-4 text-dark">{t("projectName")}</span>
         </BootstrapNavbar.Brand>
@@ -85,8 +87,9 @@ export default function Navbar() {
                 key={item.name}
                 as={Link}
                 to={item.path}
-                className={`nav-item-custom mx-2 ${location.pathname === item.path ? "active" : ""
-                  }`}
+                className={`nav-item-custom mx-2 ${
+                  location.pathname === item.path ? "active" : ""
+                }`}
               >
                 {item.name}
               </Nav.Link>
@@ -99,8 +102,6 @@ export default function Navbar() {
           </Nav>
 
           <div className="d-flex align-items-center">
-            
-
             {isAuthenticated ? (
               <Dropdown align="end">
                 <Dropdown.Toggle

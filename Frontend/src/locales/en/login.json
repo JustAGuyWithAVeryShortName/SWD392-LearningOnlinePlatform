@@ -2,8 +2,8 @@
     "loading": "Loading...",
     "backButton": "Back",
     "brand": {
-        "title": "E-FPT",
-        "subtitle": "Community English Learning Support System"
+        "title": "EnglishPath",
+        "subtitle": "Community English Learning Platform"
     },
     "tabs": {
         "login": "Login",

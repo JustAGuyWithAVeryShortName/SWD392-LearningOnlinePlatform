@@ -1,3 +1,18 @@
+.form-check.text-muted {
+  display: flex;
+  align-items: center;
+  padding-left: 0 !important;
+}
+
+.form-check.text-muted .form-check-input {
+  position: static !important;
+  margin: 0;
+}
+
+.form-check.text-muted .form-check-label {
+  margin-left: 6px;
+}
+
 .login-page {
     height: 100vh;
     width: 100vw;
@@ -15,10 +30,10 @@
 }
 
 .login-brand-section {
-    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+    background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%);
     padding: 40px;
-    border-top-left-radius: 20px;
-    border-bottom-left-radius: 20px;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -40,6 +55,7 @@
     font-size: 1.1rem;
     line-height: 1.6;
     opacity: 0.9;
+     text-shadow: 0 4px 12px rgba(0,0,0,0.25);
 }
 
 .login-form-section {
