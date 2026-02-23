@@ -27,6 +27,8 @@ public class Course {
     Integer quantity;
     Integer duration;
     String image;
+
+    @Column(columnDefinition = "NVARCHAR(2000)")
     String description;
     @Enumerated(EnumType.STRING)
     AgeGroup ageGroup;

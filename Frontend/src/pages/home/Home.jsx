@@ -7,8 +7,9 @@ import "./Home.css";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../hooks/useAuth";
 import { jwtDecode } from "jwt-decode";
-import HomeCourseCard from "../../components/home/HomeCourseCard";
+
 import HomeBlogCard from "../../components/home/HomeBlogCard";
+import CourseCard from "../../components/card/CourseCard";
 // Helper function moved from HomeExplore
 const getRandomItems = (array, count) => {
   const shuffled = [...array].sort(() => 0.5 - Math.random());
@@ -115,34 +116,35 @@ const Home = () => {
       )}
 
       {/* Featured Courses */}
+{/* Courses Section */}
 <Container className="mb-5">
-  <div className="d-flex justify-content-between align-items-end mb-4">
-    <div>
-      <h2 className="fw-bold">{t("featuredCourses.title")}</h2>
-      <p className="text-muted">{t("featuredCourses.subtitle")}</p>
+  <div className="bg-light rounded-4 p-4">
+    <div className="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 className="fw-bold">{t("featuredCourses.title")}</h2>
+        <p className="text-muted">{t("featuredCourses.subtitle")}</p>
+      </div>
+      <Button
+        variant="link"
+        className="fw-semibold"
+        onClick={() => navigate("/courses")}
+      >
+        {t("viewAllCourses")}
+      </Button>
     </div>
-    <Button
-      variant="link"
-      className="fw-semibold"
-      onClick={() => navigate("/courses")}
-    >
-      {t("viewAllCourses")}
-    </Button>
-  </div>
 
-  <Row className="g-4">
-    <Col md={4}><HomeCourseCard /></Col>
-    <Col md={4}><HomeCourseCard /></Col>
-    <Col md={4}><HomeCourseCard /></Col>
-    {/*{randomCourses.map((course) => (
-      <Col key={course.courseID} xs={12} md={6} lg={4}>
-        <HomeCourseCard
-          course={course}
-          onClick={() => handleCoursesClick(course.courseID)}
-        />
-      </Col>
-    ))}*/}
-  </Row>
+    <Row>
+      {randomCourses.map((course) => (
+        <Col md={4} key={course.courseID} className="mb-4">
+          <CourseCard
+            course={course}
+            onEnrollClick={() => handleCoursesClick(course.courseID)}
+            onDetailsClick={() => handleCoursesClick(course.courseID)}
+          />
+        </Col>
+      ))}
+    </Row>
+  </div>
 </Container>
 
 {/* Instructors */}

@@ -9,12 +9,12 @@ const HomeCourseCard = () => {
       />
 
       <div className="course-body">
-        <span className="course-tag">Development</span>
+        <span className="course-tag">Beginner</span>
         <h5 className="course-title">
-          Full-stack Web Development
+          Tiếng Anh Giao Tiếp Cho Người Lớn Tuổi
         </h5>
         <p className="course-desc">
-          Learn HTML, CSS, React and Spring Boot from scratch.
+          Học giao tiếp tiếng Anh cơ bản, dễ hiểu, phù hợp cho người mới bắt
         </p>
 
         <div className="course-footer">
