@@ -24,8 +24,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 
@@ -61,8 +61,9 @@ public class AuthenticationService {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new BadCredentialsException("Incorrect username or password!"));
 
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        //PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        //boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        boolean authenticated = request.getPassword().equals(user.getPassword());
         if (!authenticated) throw new BadCredentialsException("Incorrect username or password!");
         // Check user status
         if (user.getStatus() != UserStatus.ACTIVE) {

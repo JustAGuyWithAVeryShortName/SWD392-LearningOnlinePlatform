@@ -18,7 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Slf4j
 public class ApplicationInitConfig {
 
-    private final PasswordEncoder passwordEncoder;
+    //private final PasswordEncoder passwordEncoder;
 
     @Bean
     ApplicationRunner applicationRunner(UserRepository userRepository) {
@@ -26,7 +26,7 @@ public class ApplicationInitConfig {
             if (userRepository.findByUsername("admin").isEmpty()) {
                 User user = User.builder()
                         .username("admin")
-                        .password(passwordEncoder.encode("StrongPassword!"))
+                        .password(("StrongPassword!"))
                         .role(Role.ADMIN)
                         .status(UserStatus.ACTIVE)
                         .build();

@@ -1,7 +1,49 @@
 ﻿create database E_LEARNING
 --USERS
 --INSERT INTO user tự tạo do đang encode
-  
+  INSERT INTO Users (
+    username,
+    password,
+    email,
+    full_name,
+    dob,
+    gender,
+    phone_number,
+    job,
+    address,
+    created_at,
+    updated_at,
+    role,
+    status,
+    age_group
+)
+VALUES
+-- MEMBER
+('member02', '123456', 'member01@gmail.com', 'Member User',
+ '2000-05-10', 'MALE', '0900000001', 'Student', 'Hanoi',
+ GETDATE(), GETDATE(), 'MEMBER', 'ACTIVE', 'ADULT'),
+
+-- STAFF
+('staff01', '123456', 'staff01@gmail.com', 'Staff User',
+ '1998-03-15', 'FEMALE', '0900000002', 'Staff', 'HCM',
+ GETDATE(), GETDATE(), 'STAFF', 'ACTIVE', 'ADULT'),
+
+-- CONSULTANT
+('consultant01', '123456', 'consultant01@gmail.com', 'Consultant User',
+ '1995-08-20', 'MALE', '0900000003', 'Consultant', 'Da Nang',
+ GETDATE(), GETDATE(), 'CONSULTANT', 'ACTIVE', 'ADULT'),
+
+-- MANAGER
+('manager01', '123456', 'manager01@gmail.com', 'Manager User',
+ '1990-01-01', 'FEMALE', '0900000004', 'Manager', 'Hanoi',
+ GETDATE(), GETDATE(), 'MANAGER', 'ACTIVE', 'ADULT'),
+
+-- ADMIN
+('admin01', '123456', 'admin01@gmail.com', 'Admin User',
+ '1988-12-12', 'MALE', '0900000005', 'Admin', 'HCM',
+ GETDATE(), GETDATE(), 'ADMIN', 'ACTIVE', 'ADULT');
+
+
 --COURSE
 INSERT INTO course (
     course_id, course_name, quantity, duration,

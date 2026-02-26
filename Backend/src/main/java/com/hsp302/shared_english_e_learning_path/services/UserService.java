@@ -20,7 +20,7 @@ import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -40,14 +40,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final AppointmentRepository appointmentRepository;
-    private final PasswordEncoder passwordEncoder;
+   // private final PasswordEncoder passwordEncoder;
 
     public UserResponse register(CreateUserRequest request) {
         String username = request.getUsername();
         if (userRepository.existsByUsername(username))
             throw new RuntimeException("Username existed with: " + username);
         User newUser = userMapper.toEntity(request);
-        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+//        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        newUser.setPassword(newUser.getPassword());
+
         newUser.setRole(null);
         newUser.setStatus(UserStatus.ACTIVE);
         newUser.setRole(Role.MEMBER);
@@ -165,7 +167,8 @@ public class UserService {
 
     public boolean changePassword(String username, String newPassword) {
         User user = getUserEntity(username);
-        user.setPassword(passwordEncoder.encode(newPassword));
+//        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPassword(newPassword);
         userRepository.save(user);
         return true;
     }
@@ -231,7 +234,8 @@ public class UserService {
 
         User newUser = userMapper.toEntity(request);
 
-        newUser.setPassword(passwordEncoder.encode(request.getPassword()));
+//        newUser.setPassword(passwordEncoder.encode(request.getPassword()));
+        newUser.setPassword(request.getPassword());
         newUser.setStatus(UserStatus.ACTIVE);
 
         userRepository.save(newUser);
