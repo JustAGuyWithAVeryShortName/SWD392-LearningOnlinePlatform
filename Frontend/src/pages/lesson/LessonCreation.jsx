@@ -8,7 +8,7 @@ import { toast } from "react-toastify"
 import { useNavigate, useParams } from "react-router-dom"
 import BackButton from "../../components/BackButton"
 import { useTranslation } from "react-i18next"; // Import useTranslation
-
+import QuizList from "../course/QuizList"
 const LessonCreation = () => {
   const { t } = useTranslation("lessonCreation"); // Khai báo useTranslation
 
@@ -30,6 +30,21 @@ const LessonCreation = () => {
     resource: "",
     content: ""
   })
+  const [quizzes, setQuizzes] = useState([]);
+const handleAddQuiz = () => {
+  setQuizzes(prev => [
+    ...prev,
+    {
+      question: "",
+      options: [
+        { content: "", isCorrect: true },
+        { content: "", isCorrect: false },
+        { content: "", isCorrect: false },
+        { content: "", isCorrect: false }
+      ]
+    }
+  ]);
+};
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,7 +56,14 @@ const LessonCreation = () => {
 
         if (lessonID) {
           const lessonData = await getLesson(`http://localhost:8080/api/lesson/${lessonID}`)
-          setFormData(lessonData)
+           setFormData({
+    lessonName: lessonData.lessonName,
+    objective: lessonData.objective,
+    resource: lessonData.resource,
+    content: lessonData.content
+  });
+
+  setQuizzes(lessonData.quizzes || []);
         }
       } catch (error) {
         console.error("Fetch error in Lesson Creation:", error);
@@ -90,6 +112,7 @@ const LessonCreation = () => {
         objective: formData.objective,
         resource: formData.resource,
         content: formData.content,
+        quizzes,
         moduleID
       }
       console.log(lessonData);
@@ -115,7 +138,9 @@ const LessonCreation = () => {
         objective: formData.objective,
         resource: formData.resource,
         content: formData.content,
+        quizzes,
         moduleID
+
       }
       console.log(lessonData);
 
@@ -147,7 +172,9 @@ const LessonCreation = () => {
           <BackButton label={t("backButton")} />
           {/* Module Header */}
           <div className="module-header-section">
-            <h1 className="module-title">{t("moduleHeader", { moduleName: module.moduleName })}</h1>
+            <h1 className="module-title">
+              {t("moduleHeader", { moduleName: module.moduleName })}
+            </h1>
           </div>
 
           {/* Lesson Creation Form */}
@@ -158,7 +185,9 @@ const LessonCreation = () => {
                 type="text"
                 placeholder={t("form.lessonNamePlaceholder")}
                 value={formData.lessonName}
-                onChange={(e) => handleInputChange("lessonName", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("lessonName", e.target.value)
+                }
                 className="lesson-name-input"
               />
             </Form.Group>
@@ -190,12 +219,16 @@ const LessonCreation = () => {
             {/* Lesson Content Section */}
             <div className="lesson-content-section">
               <div className="mb-4">
-                <Form.Label className="section-title-new">{t("form.contentLabel")}</Form.Label>
+                <Form.Label className="section-title-new">
+                  {t("form.contentLabel")}
+                </Form.Label>
                 <div className="quill-container-new">
                   <ReactQuill
                     theme="snow"
                     value={formData.content}
-                    onChange={(content) => handleInputChange("content", content)}
+                    onChange={(content) =>
+                      handleInputChange("content", content)
+                    }
                     modules={quillModules}
                     formats={quillFormats}
                     placeholder={t("form.contentPlaceholder")}
@@ -204,7 +237,71 @@ const LessonCreation = () => {
                 </div>
               </div>
             </div>
+{/* ===== QUIZ SECTION ===== */}
+<div className="lesson-quiz-section mt-5">
+  <h4>Quiz</h4>
 
+  {quizzes.map((quiz, qIndex) => (
+    <div key={qIndex} className="mb-3 p-3 border rounded">
+
+      {/* QUESTION */}
+      <Form.Control
+        className="mb-2"
+        placeholder={`Question ${qIndex + 1}`}
+        value={quiz.question}
+        onChange={(e) => {
+          const copy = [...quizzes];
+          copy[qIndex].question = e.target.value;
+          setQuizzes(copy);
+        }}
+      />
+
+      {/* OPTIONS */}
+      {quiz.options.map((opt, oIndex) => (
+        <Form.Control
+          key={oIndex}
+          className="mb-1"
+          placeholder={`Option ${oIndex + 1}`}
+          value={opt.content}
+          onChange={(e) => {
+            const copy = [...quizzes];
+            copy[qIndex].options[oIndex].content = e.target.value;
+            setQuizzes(copy);
+          }}
+        />
+      ))}
+
+      {/* CORRECT ANSWER */}
+      <Form.Select
+        className="mt-2"
+        value={quiz.options.findIndex(o => o.isCorrect)}
+        onChange={(e) => {
+          const selected = Number(e.target.value);
+          const copy = [...quizzes];
+
+          copy[qIndex].options.forEach((o, i) => {
+            o.isCorrect = i === selected;
+          });
+
+          setQuizzes(copy);
+        }}
+      >
+        {quiz.options.map((_, i) => (
+          <option key={i} value={i}>
+            Correct option {i + 1}
+          </option>
+        ))}
+      </Form.Select>
+    </div>
+  ))}
+
+  {/* ADD QUIZ BUTTON */}
+  <Button variant="outline-primary" onClick={handleAddQuiz}>
+    <Plus size={16} className="me-1" />
+    Add Quiz
+  </Button>
+</div>
+          
             {/* Save Button */}
             <div className="save-section">
               {lessonID?.trim() !== "" ? (
@@ -213,7 +310,10 @@ const LessonCreation = () => {
                   {t("form.saveButton")}
                 </Button>
               ) : (
-                <Button className="save-lesson-btn" onClick={handleCreateLesson}>
+                <Button
+                  className="save-lesson-btn"
+                  onClick={handleCreateLesson}
+                >
                   <Plus size={16} className="me-2" />
                   {t("form.createButton")}
                 </Button>
@@ -223,7 +323,9 @@ const LessonCreation = () => {
         </Col>
       </Row>
     </Container>
-  )
+    
+  );
+  
 }
 
 export default LessonCreation

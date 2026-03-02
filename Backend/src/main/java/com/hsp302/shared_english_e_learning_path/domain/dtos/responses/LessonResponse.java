@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -24,4 +25,6 @@ public class LessonResponse {
     String createdAt;
     String updatedAt;
     ModuleResponse module;
+    List<QuizResponse> quizzes; // ⭐ QUAN TRỌNG
+
 }

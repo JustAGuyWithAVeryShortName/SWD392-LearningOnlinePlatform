@@ -6,10 +6,14 @@ import com.hsp302.shared_english_e_learning_path.domain.dtos.requests.UpdateLess
 import com.hsp302.shared_english_e_learning_path.domain.dtos.responses.LessonResponse;
 import com.hsp302.shared_english_e_learning_path.domain.entities.Lesson;
 import com.hsp302.shared_english_e_learning_path.domain.entities.Module;
+import com.hsp302.shared_english_e_learning_path.domain.entities.Quiz;
+import com.hsp302.shared_english_e_learning_path.domain.entities.QuizOption;
 import com.hsp302.shared_english_e_learning_path.domain.enums.CourseStatus;
 import com.hsp302.shared_english_e_learning_path.mappers.LessonMapper;
 import com.hsp302.shared_english_e_learning_path.repositories.LessonRepository;
+import com.hsp302.shared_english_e_learning_path.repositories.QuizRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +29,7 @@ public class LessonService {
     private final LessonMapper lessonMapper;
     private final ModuleService moduleService;
     private final BlogService blogService;
+    private final QuizRepository quizRepository;
 
     public LessonResponse createLesson(CreateLessonRequest request) {
         Lesson lesson = lessonMapper.toEntity(request);
@@ -35,6 +40,27 @@ public class LessonService {
         Module module = moduleService.getModelEntity(moduleID);
         lesson.setModule(module);
         lessonRepository.save(lesson);
+        if (request.getQuizzes() != null && !request.getQuizzes().isEmpty()) {
+            request.getQuizzes().forEach(q -> {
+
+                Quiz quiz = Quiz.builder()
+                        .question(q.getQuestion())
+                        .lesson(lesson)
+                        .build();
+
+                List<QuizOption> options = q.getOptions().stream()
+                        .map(o -> QuizOption.builder()
+                                .content(o.getContent())
+                                .isCorrect(o.getIsCorrect())
+                                .quiz(quiz)
+                                .build())
+                        .toList();
+
+                quiz.setOptions(options);
+
+                quizRepository.save(quiz);
+            });
+        }
         return lessonMapper.toDto(lesson);
     }
 
@@ -63,13 +89,41 @@ public class LessonService {
         return lessonMapper.toDto(lesson);
     }
 
-    public LessonResponse updateLesson(UUID lessonID,
-                                       UpdateLessonRequest request) {
+    @Transactional
+    public LessonResponse updateLesson(UUID lessonID, UpdateLessonRequest request) {
         Lesson lesson = getLessonEntity(lessonID);
+
         lesson.setLessonName(request.getLessonName());
         lesson.setDuration(calculateDuration(request.getContent()));
         lesson.setObjective(request.getObjective());
         lesson.setContent(request.getContent());
+
+        // ❌ Xoá quiz cũ
+        lesson.getQuizzes().clear();
+
+        // ✅ Add quiz mới
+        if (request.getQuizzes() != null) {
+            List<Quiz> quizzes = request.getQuizzes().stream().map(q -> {
+                Quiz quiz = Quiz.builder()
+                        .question(q.getQuestion())
+                        .lesson(lesson)
+                        .build();
+
+                List<QuizOption> options = q.getOptions().stream()
+                        .map(o -> QuizOption.builder()
+                                .content(o.getContent())
+                                .isCorrect(o.getIsCorrect())
+                                .quiz(quiz)
+                                .build())
+                        .toList();
+
+                quiz.setOptions(options);
+                return quiz;
+            }).toList();
+
+            lesson.getQuizzes().addAll(quizzes);
+        }
+
         lessonRepository.save(lesson);
         return lessonMapper.toDto(lesson);
     }

@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -35,6 +36,13 @@ public class Lesson {
     @JoinColumn(name = "module_id", nullable = false)
     Module module;
 
+    @OneToMany(
+            mappedBy = "lesson",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    List<Quiz> quizzes;
     @PrePersist
     protected void onCreate() {
         Instant now = Instant.now();

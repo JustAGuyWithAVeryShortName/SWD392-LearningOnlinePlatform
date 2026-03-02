@@ -4,6 +4,8 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,4 +25,5 @@ public class UpdateLessonRequest {
 
     @NotEmpty(message = "Resource is required")
     String resource;
+    private List<QuizRequest> quizzes;
 }

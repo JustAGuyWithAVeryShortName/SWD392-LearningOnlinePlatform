@@ -4,6 +4,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -28,4 +29,6 @@ public class CreateLessonRequest {
 
     @NotNull(message = "Module ID is required")
     UUID moduleID;
+
+    List<QuizRequest> quizzes;
 }
