@@ -7,8 +7,9 @@ import useFetch from "../../hooks/useFetch"
 import { toast } from "react-toastify"
 import { useNavigate, useParams } from "react-router-dom"
 import BackButton from "../../components/BackButton"
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next"
 import QuizList from "../course/QuizList"
+import VideoUploadForm from "../../components/video/VideoUploadForm"
 const LessonCreation = () => {
   const { t } = useTranslation("lessonCreation"); // Khai báo useTranslation
 
@@ -301,6 +302,9 @@ const handleAddQuiz = () => {
     Add Quiz
   </Button>
 </div>
+
+{/* ===== VIDEO UPLOAD SECTION ===== */}
+<VideoUploadForm lessonID={lessonID} onVideoAdded={() => {}} />
           
             {/* Save Button */}
             <div className="save-section">

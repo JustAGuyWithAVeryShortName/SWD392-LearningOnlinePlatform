@@ -8,6 +8,7 @@ import BackButton from "../../components/BackButton";
 import ErrorMessage from "../../components/ErrorMessage";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import NotFound from "../not-found/NotFound";
+import VideoPlayerDisplay from "../../components/VideoPlayerDisplay";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 
@@ -371,6 +372,11 @@ const CourseLesson = () => {
                     />
                     <p>Resources: <a href={selectedLesson.resource} target="_blank" rel="noopener noreferrer">{selectedLesson.resource}</a></p>
                   </div>
+
+                  {/* Video Player */}
+                  {selectedLessonID && (
+                    <VideoPlayerDisplay lessonID={selectedLessonID} />
+                  )}
 
                   {/* Mark as Read Button */}
                   <div className="mark-read-section">
