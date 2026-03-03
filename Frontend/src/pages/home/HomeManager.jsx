@@ -11,8 +11,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next'; // Import useTranslation
+import StaffRequestManagement from '../home/Staffrequestmanagement'; // Import StaffRequestManagement component
 
 function HomeManager() {
+
+  const [pendingStaffRequests, setPendingStaffRequests] = useState([]);
+const { get: getPendingStaffRequests } = useFetch();
   const { t } = useTranslation('homeManager'); // Initialize useTranslation with the 'homeManager' namespace
   const [activeTab, setActiveTab] = useState('dashboard');
   const { user } = useAuth()
@@ -40,6 +44,7 @@ function HomeManager() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+
         const statData = await getStat("http://localhost:8080/api/report")
         setStat(statData)
 
@@ -53,6 +58,10 @@ function HomeManager() {
 
         const pendingEventsData = await getPendingEvents("http://localhost:8080/api/event/status/PENDING_APPROVAL");
         setPendingEvents(pendingEventsData || []);
+        
+        //staff pending requests
+        const staffRequests =await getPendingStaffRequests("http://localhost:8080/api/staff-request/status/PENDING");
+         setPendingStaffRequests(staffRequests || []);
       } catch (error) {
         console.error("Fetch error in HomeManager:", error);
       }
@@ -195,6 +204,25 @@ function HomeManager() {
                   gradientClass="icon-gradient-warning"
                 />
               </Col>
+              <Col xs={3} lg={6}>
+  <div
+    role="button"
+    tabIndex={0}
+    onClick={() => navigate("/staffrequest-management")}
+    onKeyDown={(e) => {
+      if (e.key === "Enter") navigate("/staffrequest-management");
+    }}
+    className="status-card-clickable"
+  >
+    <StatusCard
+      title={t("staffPending")}
+      value={pendingStaffRequests.length}
+      change={0}
+      icon={UserCheck}
+      gradientClass="icon-gradient-warning"
+    />
+  </div>
+</Col>
             </Row>
           </Col>
         </Row>

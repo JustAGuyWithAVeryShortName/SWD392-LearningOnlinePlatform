@@ -27,4 +27,6 @@ public class QuizController {
     public List<Quiz> getQuizzesByLesson(@PathVariable UUID lessonId) {
         return quizService.getQuizzesByLesson(lessonId);
     }
+
+
 }

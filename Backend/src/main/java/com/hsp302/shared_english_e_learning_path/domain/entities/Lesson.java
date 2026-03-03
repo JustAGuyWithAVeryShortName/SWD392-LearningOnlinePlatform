@@ -43,6 +43,11 @@ public class Lesson {
             fetch = FetchType.LAZY
     )
     List<Quiz> quizzes;
+    @Transient
+    public boolean isHasQuiz() {
+        return quizzes != null && !quizzes.isEmpty();
+    }
+
     @PrePersist
     protected void onCreate() {
         Instant now = Instant.now();

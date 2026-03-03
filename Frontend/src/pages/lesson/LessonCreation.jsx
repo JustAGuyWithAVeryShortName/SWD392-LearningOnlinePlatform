@@ -112,8 +112,17 @@ const handleAddQuiz = () => {
         objective: formData.objective,
         resource: formData.resource,
         content: formData.content,
-        quizzes,
-        moduleID
+        moduleID,
+
+          quizzes: quizzes.map(q => ({
+        question: q.question,
+        type: q.type, // nếu có
+        options: q.options.map(o => ({
+          content: o.content,
+          isCorrect: o.isCorrect === true // ⭐ CỰC QUAN TRỌNG
+        }))
+      }))
+    
       }
       console.log(lessonData);
 
@@ -138,9 +147,16 @@ const handleAddQuiz = () => {
         objective: formData.objective,
         resource: formData.resource,
         content: formData.content,
-        quizzes,
-        moduleID
+        moduleID,
 
+         quizzes: quizzes.map(q => ({
+        question: q.question,
+        type: q.type,
+        options: q.options.map(o => ({
+          content: o.content,
+          isCorrect: o.isCorrect === true
+        }))
+      }))
       }
       console.log(lessonData);
 

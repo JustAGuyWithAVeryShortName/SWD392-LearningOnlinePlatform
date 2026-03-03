@@ -24,6 +24,7 @@ public interface LessonMapper {
                .content(lesson.getContent())
                .resource(lesson.getResource())
                .duration(lesson.getDuration())
+               .hasQuiz(lesson.getQuizzes() != null && !lesson.getQuizzes().isEmpty())
                .quizzes(
                        lesson.getQuizzes() == null ? List.of() :
                                lesson.getQuizzes().stream().map(q ->
@@ -35,6 +36,7 @@ public interface LessonMapper {
                                                                QuizOptionResponse.builder()
                                                                        .optionId(o.getOptionId())
                                                                        .content(o.getContent())
+                                                                       .isCorrect(o.getIsCorrect())
                                                                        .build()
                                                        ).toList()
                                                )
