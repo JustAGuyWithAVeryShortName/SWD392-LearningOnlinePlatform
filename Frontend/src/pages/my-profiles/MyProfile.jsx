@@ -16,8 +16,22 @@ import Reports from "../../components/member/Reports";
 import { useTranslation } from "react-i18next";
 import Qualifications from "../../components/member/Qualifications";
 import { useAuth } from "../../hooks/useAuth";
+import api from "../../api";
+import { toast } from "react-toastify";
 
 const MyProfile = () => {
+
+  const handleRegisterStaff = async () => {
+  try {
+    await api.post("/api/staff-requests");
+    toast.success("Đã gửi yêu cầu đăng ký làm staff. Vui lòng chờ duyệt.");
+  } catch (error) {
+    toast.error(
+      error?.response?.data?.message || "Không thể gửi yêu cầu."
+    );
+  }
+};
+
   const { t } = useTranslation("myProfile");
   const { user } = useAuth();
   const userRole = user?.role;
@@ -138,6 +152,17 @@ const MyProfile = () => {
                   {item.link && <ArrowLeft size={16} className="ms-auto" />}
                 </div>
               ))}
+               {/* 👇 THÊM NÚT Ở ĐÂY */}
+  {userRole === "MEMBER" && (
+    <div
+      className="sidebar-nav-item d-flex align-items-center mt-2 staff-register-btn"
+      onClick={handleRegisterStaff}
+    >
+      <Award size={18} className="me-2" />
+      <span>Đăng ký làm Staff</span>
+    </div>
+  )}
+
             </div>
           </Col>
 

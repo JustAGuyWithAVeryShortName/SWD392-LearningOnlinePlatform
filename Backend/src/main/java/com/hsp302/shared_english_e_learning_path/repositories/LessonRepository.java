@@ -10,8 +10,11 @@ import java.util.UUID;
 
 public interface LessonRepository extends JpaRepository<Lesson, UUID> {
 
-    @Query("SELECT COUNT(l) FROM Lesson l JOIN l.module m JOIN m.course c WHERE c.id = :courseID")
+    @Query("SELECT COUNT(l) FROM Lesson l JOIN l.module m JOIN m.course c WHERE c.courseID = :courseID")
     int countLessonsByCourseId(UUID courseID);
 
+
     List<Lesson> findByModuleModuleIDAndStatus(UUID moduleID, CourseStatus status);
+
+
 }

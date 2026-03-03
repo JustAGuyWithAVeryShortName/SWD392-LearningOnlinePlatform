@@ -42,6 +42,12 @@ public class UserService {
     private final AppointmentRepository appointmentRepository;
    // private final PasswordEncoder passwordEncoder;
 
+    public User getCurrentUser() {
+        String username = getLoginUsername();
+        return getUserEntity(username);
+    }
+
+
     public UserResponse register(CreateUserRequest request) {
         String username = request.getUsername();
         if (userRepository.existsByUsername(username))

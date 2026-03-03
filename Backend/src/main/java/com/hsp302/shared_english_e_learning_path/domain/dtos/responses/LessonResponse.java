@@ -25,6 +25,7 @@ public class LessonResponse {
     String createdAt;
     String updatedAt;
     ModuleResponse module;
-    List<QuizResponse> quizzes; // ⭐ QUAN TRỌNG
+    List<QuizResponse> quizzes;
+    boolean hasQuiz;
 
 }

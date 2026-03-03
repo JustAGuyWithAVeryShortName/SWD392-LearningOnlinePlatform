@@ -10,4 +10,5 @@ import java.util.UUID;
 public class QuizOptionResponse {
     UUID optionId;
     String content;
+    Boolean isCorrect;
 }
