@@ -16,6 +16,11 @@
             "markAsRead": "Mark as Read"
         }
     },
+    "videoPlayer": {
+        "noVideosAvailable": "No videos available for this lesson",
+        "browserNotSupport": "Your browser does not support HTML5 video",
+        "playlist": "Video Playlist"
+    },
     "lessonNotFound": {
         "code": "📘",
         "title": "Lesson Not Found",

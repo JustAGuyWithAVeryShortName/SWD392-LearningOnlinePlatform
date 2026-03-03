@@ -5,6 +5,9 @@ import com.hsp302.shared_english_e_learning_path.domain.dtos.requests.DeleteLess
 import com.hsp302.shared_english_e_learning_path.domain.dtos.requests.UpdateLessonRequest;
 import com.hsp302.shared_english_e_learning_path.domain.dtos.responses.ApiResponse;
 import com.hsp302.shared_english_e_learning_path.domain.dtos.responses.LessonResponse;
+import com.hsp302.shared_english_e_learning_path.domain.entities.Lesson;
+import com.hsp302.shared_english_e_learning_path.domain.entities.Video;
+import com.hsp302.shared_english_e_learning_path.repositories.LessonRepository;
 import com.hsp302.shared_english_e_learning_path.services.ExcelService;
 import com.hsp302.shared_english_e_learning_path.services.LessonService;
 import jakarta.validation.Valid;

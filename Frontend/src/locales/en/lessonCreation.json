@@ -16,5 +16,32 @@
         "createError": "Failed to create lesson. Please try again.",
         "saveSuccess": "Lesson saved successfully!",
         "saveError": "Failed to save lesson. Please try again."
+    },
+    "video": {
+        "title": "📹 Lesson Videos",
+        "videoTitle": "Video Title",
+        "titlePlaceholder": "Enter video title...",
+        "selectVideo": "Select Video File",
+        "supportedFormats": "Supported formats",
+        "maxSize": "Maximum size",
+        "selectedFile": "Selected file",
+        "uploading": "Uploading video...",
+        "uploadBtn": "Upload Video",
+        "uploadingBtn": "Uploading...",
+        "uploadSuccess": "Video uploaded successfully!",
+        "uploadError": "Failed to upload video. Please try again.",
+        "selectFile": "Please select a video file",
+        "enterTitle": "Please enter a video title",
+        "lessonRequired": "Please create the lesson first before uploading videos",
+        "invalidType": "Invalid file type. Please select a video file.",
+        "fileTooLarge": "Video file is too large. Maximum size: 100MB",
+        "uploadedVideos": "Uploaded Videos",
+        "duration": "Duration",
+        "watchVideo": "Watch video",
+        "delete": "Delete video",
+        "confirmDelete": "Are you sure you want to delete this video?",
+        "deleteSuccess": "Video deleted successfully!",
+        "deleteError": "Failed to delete video. Please try again.",
+        "noVideos": "No videos uploaded yet. Upload your first video to get started!"
     }
 }

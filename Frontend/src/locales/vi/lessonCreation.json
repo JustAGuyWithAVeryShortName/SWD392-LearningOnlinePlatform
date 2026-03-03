@@ -16,5 +16,32 @@
     "createError": "Không thể tạo bài học. Vui lòng thử lại.",
     "saveSuccess": "Lưu bài học thành công!",
     "saveError": "Không thể lưu bài học. Vui lòng thử lại."
+  },
+  "video": {
+    "title": "📹 Video Bài Học",
+    "videoTitle": "Tiêu Đề Video",
+    "titlePlaceholder": "Nhập tiêu đề video...",
+    "selectVideo": "Chọn Tệp Video",
+    "supportedFormats": "Định dạng được hỗ trợ",
+    "maxSize": "Kích thước tối đa",
+    "selectedFile": "Tệp được chọn",
+    "uploading": "Đang tải video lên...",
+    "uploadBtn": "Tải Video Lên",
+    "uploadingBtn": "Đang Tải...",
+    "uploadSuccess": "Video được tải lên thành công!",
+    "uploadError": "Không thể tải video lên. Vui lòng thử lại.",
+    "selectFile": "Vui lòng chọn một tệp video",
+    "enterTitle": "Vui lòng nhập tiêu đề video",
+    "lessonRequired": "Vui lòng tạo bài học trước khi tải video",
+    "invalidType": "Loại tệp không hợp lệ. Vui lòng chọn tệp video.",
+    "fileTooLarge": "Tệp video quá lớn. Kích thước tối đa: 100MB",
+    "uploadedVideos": "Video Đã Tải Lên",
+    "duration": "Thời lượng",
+    "watchVideo": "Xem video",
+    "delete": "Xóa video",
+    "confirmDelete": "Bạn có chắc chắn muốn xóa video này?",
+    "deleteSuccess": "Xóa video thành công!",
+    "deleteError": "Không thể xóa video. Vui lòng thử lại.",
+    "noVideos": "Chưa có video nào được tải lên. Tải video đầu tiên của bạn để bắt đầu!"
   }
 }

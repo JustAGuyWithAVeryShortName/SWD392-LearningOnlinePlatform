@@ -16,6 +16,11 @@
       "markAsRead": "Đánh dấu đã đọc"
     }
   },
+  "videoPlayer": {
+    "noVideosAvailable": "Không có video nào cho bài học này",
+    "browserNotSupport": "Trình duyệt của bạn không hỗ trợ video HTML5",
+    "playlist": "Danh sách video"
+  },
   "lessonNotFound": {
     "code": "📘",
     "title": "Không tìm thấy bài học",

@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+
 const useFetch = (defaultUrl) => {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
@@ -11,6 +13,9 @@ const useFetch = (defaultUrl) => {
 
     try {
       const token = localStorage.getItem("token");
+      // Build full URL - if url is relative, prepend API_BASE_URL
+      const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
+      
       const options = {
         method,
         headers: {
@@ -33,7 +38,7 @@ const useFetch = (defaultUrl) => {
         }
       }
 
-      const response = await fetch(url, options);
+      const response = await fetch(fullUrl, options);
 
       if (!response.ok) {
         let errorText;
@@ -91,7 +96,8 @@ const useFetch = (defaultUrl) => {
   const get = useCallback((url = defaultUrl) => request(url, 'GET'), [request, defaultUrl]);
   const post = useCallback((body, headers, url = defaultUrl) => request(url, 'POST', body, headers), [request, defaultUrl]);
   const put = useCallback((body, headers, url = defaultUrl) => request(url, 'PUT', body, headers), [request, defaultUrl]);
-  return { data, error, loading, get, post, put };
+  const delete_ = useCallback((body, headers, url = defaultUrl) => request(url, 'DELETE', body, headers), [request, defaultUrl]);
+  return { data, error, loading, get, post, put, delete: delete_ };
 };
 
 export default useFetch;

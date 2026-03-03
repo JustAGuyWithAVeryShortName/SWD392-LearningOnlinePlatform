@@ -4,10 +4,8 @@ import com.hsp302.shared_english_e_learning_path.domain.dtos.requests.CreateLess
 import com.hsp302.shared_english_e_learning_path.domain.dtos.requests.DeleteLessonsRequest;
 import com.hsp302.shared_english_e_learning_path.domain.dtos.requests.UpdateLessonRequest;
 import com.hsp302.shared_english_e_learning_path.domain.dtos.responses.LessonResponse;
-import com.hsp302.shared_english_e_learning_path.domain.entities.Lesson;
+import com.hsp302.shared_english_e_learning_path.domain.entities.*;
 import com.hsp302.shared_english_e_learning_path.domain.entities.Module;
-import com.hsp302.shared_english_e_learning_path.domain.entities.Quiz;
-import com.hsp302.shared_english_e_learning_path.domain.entities.QuizOption;
 import com.hsp302.shared_english_e_learning_path.domain.enums.CourseStatus;
 import com.hsp302.shared_english_e_learning_path.mappers.LessonMapper;
 import com.hsp302.shared_english_e_learning_path.repositories.LessonRepository;
@@ -16,7 +14,10 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

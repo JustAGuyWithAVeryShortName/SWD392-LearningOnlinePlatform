@@ -1,0 +1,196 @@
+.video-upload-section {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.video-upload-section .section-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.upload-form-container {
+  background: #ffffff;
+  border: 1px solid #e0e0e0 !important;
+}
+
+.upload-form-container .video-title-input {
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+
+.upload-form-container .video-title-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.upload-form-container .video-file-input {
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+
+.upload-form-container .form-text {
+  font-size: 0.875rem;
+}
+
+.upload-btn {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-weight: 500;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.upload-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.upload-btn:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.videos-list {
+  margin-top: 30px;
+}
+
+.videos-list h5 {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.videos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 15px;
+}
+
+.video-card {
+  background: white;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 6px;
+  padding: 15px !important;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.video-card:hover {
+  border-color: #007bff !important;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+}
+
+.video-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.video-title-display {
+  font-weight: 600;
+  color: #333;
+  word-break: break-word;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.video-card .text-muted {
+  font-size: 0.85rem;
+  color: #6c757d !important;
+}
+
+.video-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.video-actions .btn {
+  padding: 6px 10px;
+  font-size: 0.875rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.video-actions .btn-outline-primary {
+  color: #007bff;
+  border-color: #007bff;
+}
+
+.video-actions .btn-outline-primary:hover {
+  background: #007bff;
+  border-color: #007bff;
+}
+
+.video-actions .btn-outline-danger {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.video-actions .btn-outline-danger:hover {
+  background: #dc3545;
+  border-color: #dc3545;
+}
+
+.video-actions svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Progress bar styling */
+.progress {
+  height: 25px;
+  border-radius: 4px;
+  background-color: #e9ecef;
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
+  font-weight: 600;
+}
+
+/* Alert styling */
+.alert {
+  border-radius: 4px;
+  border: none;
+  padding: 12px 15px;
+}
+
+.alert-info {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .videos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .video-header {
+    flex-direction: column;
+  }
+
+  .video-actions {
+    width: 100%;
+  }
+
+  .video-actions .btn {
+    flex: 1;
+  }
+
+  .upload-form-container {
+    padding: 15px !important;
+  }
+}
