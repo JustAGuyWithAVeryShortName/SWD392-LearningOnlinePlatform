@@ -1,15 +1,32 @@
-/* Home Page Styles */
+/* ================================
+   Home Page Layout
+================================ */
+
 .home-page {
-  padding-bottom: 30px; /* Add space at bottom to prevent overlap */
+  padding-bottom: 60px;
+  background: var(--bg-light);
 }
 
-/* Hero Section Styles */
+/* ================================
+   HERO SECTION
+================================ */
+
 .hero-section {
-  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
-  min-height: 200px;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+  border-radius: 20px;
+  min-height: 260px;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  box-shadow: var(--shadow-soft);
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(255,255,255,0.15), transparent);
 }
 
 .hero-content {
@@ -17,250 +34,232 @@
   z-index: 2;
 }
 
-/* Tab Navigation Styles for Logged-in Users */
-.tab-navigation {
-  margin-bottom: 2rem;
+.hero-section h1 {
+  letter-spacing: -0.5px;
 }
 
-.tab-nav-button {
-  border-radius: 2rem !important;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  min-width: 120px;
+.hero-section p {
+  opacity: 0.9;
 }
 
-.tab-nav-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+/* ================================
+   SECTION HEADERS
+================================ */
+
+.home-page h2 {
+  font-weight: 700;
+  letter-spacing: -0.3px;
 }
 
-/* Single Explore Button for Non-logged-in Users */
-.logged-out-explore-button {
-  border-radius: 2rem !important;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  min-width: 200px;
-  background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
-  border: none;
-}
-
-.logged-out-explore-button:hover {
-  background: linear-gradient(135deg, #0770c7 0%, #5fa8ff 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(9, 132, 227, 0.3);
-}
-
-/* Explore Section Styles for Non-Members */
-.explore-section-underline {
-  width: 60px;
+.home-page h2::after {
+  content: "";
+  display: block;
+  width: 50px;
   height: 3px;
-  background: linear-gradient(90deg, #74b9ff, #0984e3);
   margin-top: 10px;
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
+  border-radius: 2px;
 }
 
-/* Floating Chat Button Styles */
+/* ================================
+   COURSES SECTION
+================================ */
+
+.bg-light {
+  background: var(--bg-card) !important;
+  border-radius: 18px;
+  box-shadow: var(--shadow-soft);
+  transition: all 0.25s ease;
+}
+
+.bg-light:hover {
+  transform: translateY(-2px);
+}
+
+/* ================================
+   INSTRUCTORS
+================================ */
+
+.instructor-avatar {
+  width: 110px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 5px solid var(--bg-card);
+  box-shadow: var(--shadow-soft);
+  transition: all 0.3s ease;
+}
+
+.instructor-avatar:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: var(--shadow-strong);
+}
+
+.instructor-card h6 {
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+/* ================================
+   BLOG SECTION
+================================ */
+
+.blog-card-home {
+  background: var(--bg-card);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  transition: all 0.25s ease;
+}
+
+.blog-card-home:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-strong);
+}
+
+/* ================================
+   APPOINTMENT SECTION
+================================ */
+
+.custom-button {
+  border-radius: 999px !important;
+  padding: 8px 18px !important;
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+  border: none;
+  transition: all 0.25s ease;
+}
+
+.custom-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+}
+
+/* ================================
+   FLOATING CHAT BUTTON
+================================ */
+
 .floating-chat-container {
   position: fixed;
-  bottom: 2rem;
-  right: 2rem;
+  bottom: 28px;
+  right: 28px;
   z-index: 1000;
-  animation: fadeInUp 0.5s ease-out;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .chat-float-button {
   width: 60px;
   height: 60px;
   border-radius: 50% !important;
-  background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%) !important;
+  background: linear-gradient(135deg, var(--primary-hover), var(--primary-color));
   border: none !important;
-  box-shadow: 0 4px 20px rgba(9, 132, 227, 0.4);
-  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .chat-float-button:hover {
-  background: linear-gradient(135deg, #0770c7 0%, #5fa8ff 100%) !important;
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 6px 25px rgba(9, 132, 227, 0.5);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
 }
 
-.chat-float-button:active {
-  transform: translateY(0) scale(0.98);
-}
+/* pulse animation */
 
-.chat-float-button:focus {
-  outline: none;
-  box-shadow: 0 4px 20px rgba(9, 132, 227, 0.4), 0 0 0 3px rgba(9, 132, 227, 0.2);
-}
-
-/* Pulse animation for attention */
 .chat-float-button::before {
   content: "";
   position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
+  inset: -4px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
-  z-index: -1;
+  background: linear-gradient(135deg, var(--primary-hover), var(--primary-color));
+  opacity: 0.35;
   animation: pulse 2s infinite;
-  opacity: 0.7;
 }
 
 @keyframes pulse {
   0% {
     transform: scale(1);
-    opacity: 0.7;
+    opacity: .5;
   }
+
   50% {
-    transform: scale(1.1);
-    opacity: 0.3;
+    transform: scale(1.2);
+    opacity: .2;
   }
+
   100% {
     transform: scale(1);
-    opacity: 0.7;
+    opacity: .5;
   }
 }
 
-/* Global Button Styles */
-.btn-dark {
-  background-color: #343a40;
-  border-color: #343a40;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.btn-dark:hover {
-  background-color: #0984e3;
-  border-color: #0984e3;
-  transform: translateY(-1px);
-}
+/* ================================
+   BUTTON SYSTEM
+================================ */
 
 .btn-primary {
-  background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
   border: none;
-  font-weight: 500;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 10px;
   transition: all 0.2s ease;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #0770c7 0%, #5fa8ff 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(9, 132, 227, 0.3);
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-dark {
+  border-radius: 10px;
 }
 
 .btn-outline-secondary {
-  border-color: #6c757d;
-  color: #6c757d;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  border-radius: 10px;
 }
 
-.btn-outline-secondary:hover {
-  background-color: #6c757d;
-  border-color: #6c757d;
-  color: white;
-  transform: translateY(-1px);
-}
+/* ================================
+   RESPONSIVE
+================================ */
 
-/* Responsive Design for Home */
-@media (max-width: 768px) {
-  .home-page {
-    padding-bottom: 80px;
-  }
+@media (max-width: 992px) {
 
   .hero-section {
-    padding: 2rem 1rem;
+    min-height: 220px;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .hero-section {
+    padding: 2rem;
   }
 
   .display-4 {
     font-size: 2rem;
   }
 
-  .tab-navigation {
-    flex-direction: column;
-    align-items: center;
+  .instructor-avatar {
+    width: 90px;
+    height: 90px;
   }
 
-  .tab-nav-button {
-    width: 200px;
-    margin-bottom: 0.5rem;
-  }
-
-  .logged-out-explore-button {
-    width: 200px;
-  }
-
-  /* Adjust floating button for mobile */
-  .floating-chat-container {
-    bottom: 1.5rem;
-    right: 1.5rem;
-  }
-
-  .chat-float-button {
-    width: 55px;
-    height: 55px;
-  }
 }
 
 @media (max-width: 576px) {
+
   .hero-section {
-    padding: 1.5rem 1rem;
+    padding: 1.5rem;
   }
 
   .display-4 {
-    font-size: 1.75rem;
+    font-size: 1.7rem;
   }
 
   .lead {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
-  .tab-nav-button,
-  .logged-out-explore-button {
-    width: 180px;
-    font-size: 0.9rem;
-  }
-
-  /* Further adjust floating button for small screens */
-  .floating-chat-container {
-    bottom: 1rem;
-    right: 1rem;
-  }
-
-  .chat-float-button {
-    width: 50px;
-    height: 50px;
-  }
-
-  .chat-float-button svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  .instructor-avatar {
-  width: 96px;
-  height: 96px;
-  object-fit: cover;
-  border: 4px solid #e7f1ff;
-}
-
-.home-page h2 {
-  letter-spacing: -0.5px;
-}
 }

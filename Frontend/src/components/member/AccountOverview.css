@@ -69,16 +69,16 @@
 }
 
 .password-toggle:hover {
-  color: #0984e3;
+  color: var(--primary-hover);
 }
 
 .password-toggle:focus {
   box-shadow: none;
-  color: #0984e3;
+  color: var(--primary-hover);
 }
 
 .change-password-btn {
-  background-color: #74b9ff;
+  background-color: var(--primary-color);
   border: none;
   padding: 0.375rem 1.5rem;
   font-weight: 500;
@@ -87,13 +87,13 @@
 }
 
 .change-password-btn:hover {
-  background-color: #0984e3;
+  background-color: var(--primary-hover);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(9, 132, 227, 0.3);
 }
 
 .change-password-btn:focus {
-  background-color: #0984e3;
+  background-color: var(--primary-hover);
   box-shadow: 0 0 0 0.2rem rgba(9, 132, 227, 0.25);
 }
 
@@ -106,22 +106,22 @@
 
 /* Link Button Styles */
 .btn-outline-primary {
-  border-color: #0984e3;
-  color: #0984e3;
+  border-color: var(--primary-hover);
+  color: var(--primary-hover);
   transition: all 0.2s ease;
   font-weight: 500;
 }
 
 .btn-outline-primary:hover {
-  background-color: #0984e3;
-  border-color: #0984e3;
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
   color: white;
   transform: translateY(-1px);
 }
 
 .btn-outline-primary:focus {
-  background-color: #0984e3;
-  border-color: #0984e3;
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
   color: white;
   box-shadow: 0 0 0 0.2rem rgba(9, 132, 227, 0.25);
 }

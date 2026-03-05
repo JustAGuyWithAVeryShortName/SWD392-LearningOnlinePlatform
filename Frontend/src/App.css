@@ -16,24 +16,24 @@
 
 /* Global Button Styles */
 .btn-primary {
-  background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
+  background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-color) 100%);
   border: none;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #0770c7 0%, #5fa8ff 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
   transform: translateY(-1px);
   transition: all 0.2s ease;
 }
 
 .btn-outline-primary {
-  border-color: #0984e3;
-  color: #0984e3;
+  border-color: var(--primary-hover);
+  color: var(--primary-hover);
 }
 
 .btn-outline-primary:hover {
-  background-color: #0984e3;
-  border-color: #0984e3;
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
 }
 
 .btn-outline-secondary {
@@ -53,8 +53,8 @@
 }
 
 .btn-dark:hover {
-  background-color: #0984e3;
-  border-color: #0984e3;
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
   transform: translateY(-1px);
   transition: all 0.2s ease;
 }

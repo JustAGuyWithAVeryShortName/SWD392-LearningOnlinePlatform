@@ -1,0 +1,13 @@
+:root {
+
+  --bs-primary: var(--primary-color);
+  --bs-primary-rgb: 100, 30, 138;
+
+  --bs-secondary: var(--text-secondary);
+
+  --bs-success: #10b981;
+  --bs-danger: #ef4444;
+  --bs-warning: #f59e0b;
+  --bs-info: #06b6d4;
+
+}

@@ -1,4 +1,3 @@
-import { Container, Row, Col, Button } from "react-bootstrap"
 import { Calendar, User, Clock, PencilLine, Trash } from "lucide-react"
 import "./BlogDetails.css"
 import useFetch from "../../hooks/useFetch"
@@ -10,71 +9,70 @@ import BackButton from "../../components/BackButton"
 import NotFound from "../not-found/NotFound"
 import LoadingSpinner from "../../components/LoadingSpinner"
 import { toast } from "react-toastify"
-import { useTranslation } from "react-i18next" // Import useTranslation
+import { useTranslation } from "react-i18next"
 import { useAuth } from "../../hooks/useAuth"
 
 const BlogDetails = () => {
     const { user } = useAuth()
-    const { t } = useTranslation("blogDetails");// Khai báo useTranslation với namespace 'blogDetails'
+    const { t } = useTranslation("blogDetails")
 
     const { id } = useParams()
     const [blogDetails, setBlogDetails] = useState(null)
+
     const { loading: loadingBlogDetails, error: errorBlogDetails, get: getBlogDetails } = useFetch()
-    const { loading: loadingBlogStatus, error: errorBlogStatus, put: putBlogStatus } = useFetch()
+    const { put: putBlogStatus } = useFetch()
+
     const navigate = useNavigate()
 
     useEffect(() => {
-        const fetchBLogs = async () => {
+        const fetchBlogs = async () => {
             try {
                 if (id) {
-                    const blogDetailsData = await getBlogDetails(`http://localhost:8080/api/blog/${id}`)
-                    setBlogDetails(blogDetailsData)
+                    const data = await getBlogDetails(`http://localhost:8080/api/blog/${id}`)
+                    setBlogDetails(data)
                 }
             } catch (error) {
-                console.error("Fetch error in BlogsDetails:", error)
+                console.error("Fetch error:", error)
             }
         }
 
-        fetchBLogs()
-    }, [id, getBlogDetails]) // Thêm getBlogDetails vào dependency array
-    console.log(blogDetails);
+        fetchBlogs()
+    }, [id, getBlogDetails])
 
     const handleEditBlog = () => {
-        navigate(`/blogs/create/${id}`);
-    };
+        navigate(`/blogs/create/${id}`)
+    }
 
     const handleDeleteBlog = async () => {
         try {
             const blogID = blogDetails?.blogID
-            console.log(blogID);
+
             if (blogID) {
-                const response = await putBlogStatus({}, {}, `http://localhost:8080/api/blog/${blogID}/UNAVAILABLE`);
-                console.log("Blog status updated to unavailable:", response);
-                toast.success(t("toastMessages.deleteSuccess"), "success");
+                await putBlogStatus({}, {}, `http://localhost:8080/api/blog/${blogID}/UNAVAILABLE`)
+                toast.success(t("toastMessages.deleteSuccess"))
                 navigate("/blogs")
             } else {
-                console.warn("Cannot delete: Blog ID is undefined or null.");
-                toast.error(t("toastMessages.blogIdNotFound"), "warning");
+                toast.error(t("toastMessages.blogIdNotFound"))
             }
+
         } catch (error) {
-            toast.error(t("toastMessages.deleteError"), "danger")
-            console.log("Error in handleDeleteBlog:", error);
+            toast.error(t("toastMessages.deleteError"))
         }
-    };
+    }
 
     if (loadingBlogDetails) {
         return (
-            <Container className="py-5">
+            <div className="container-new">
                 <LoadingSpinner loading={loadingBlogDetails} />
-            </Container>
+            </div>
         )
     }
 
     if (errorBlogDetails) {
         return (
-            <Container className="py-5">
+            <div className="container-new">
                 <ErrorMessage error={errorBlogDetails} />
-            </Container>
+            </div>
         )
     }
 
@@ -92,86 +90,130 @@ const BlogDetails = () => {
 
     return (
         <div className="blog-details-page">
-            <Container className="blog-details-container py-5">
-                <Row className="justify-content-center">
-                    <Col lg={8} md={10}>
-                        <div className="d-flex justify-content-between align-items-center">
-                            <BackButton label={t("backButton")} />
-                            {user?.username === blogDetails?.member?.username && (
-                                <div className="d-flex gap-2">
-                                    <Button className="rounded-pill shadow-sm custom-button-action" onClick={handleEditBlog}>
-                                        <PencilLine className="me-1" size={18} /> {t("editButton")}
-                                    </Button>
-                                    <Button variant="danger" className="rounded-pill shadow-sm custom-button-action" onClick={handleDeleteBlog}>
-                                        <Trash className="me-1" size={18} /> {t("deleteButton")}
-                                    </Button>
-                                </div>
-                            )}
+
+            <div className="container-new">
+
+                {/* Top bar */}
+                <div className="blog-topbar">
+
+                    <BackButton label={t("backButton")} />
+
+                    {user?.username === blogDetails?.member?.username && (
+                        <div className="action-buttons">
+
+                            <button
+                                className="action-btn edit-btn"
+                                onClick={handleEditBlog}
+                            >
+                                <PencilLine size={18} />
+                                {t("editButton")}
+                            </button>
+
+                            <button
+                                className="action-btn delete-btn"
+                                onClick={handleDeleteBlog}
+                            >
+                                <Trash size={18} />
+                                {t("deleteButton")}
+                            </button>
+
                         </div>
+                    )}
 
-                        {/* Blog Header */}
-                        <div className="blog-header text-center mb-5">
-                            <h1 className="blog-detail-title mb-3">{blogDetails.blogName}</h1>
-                            <p className="blog-author mb-4">{t("byPrefix")} {blogDetails.member.username}</p>
+                </div>
 
-                            {/* Meta Information */}
-                            <div className="blog-meta d-flex justify-content-center align-items-center mb-4">
-                                <span className="category-badge me-4">{blogDetails.blogType}</span>
-                                <span className="meta-info">
-                                    <Clock size={16} className="meta-icon" />
-                                    {blogDetails.readingTime} {t("minsReading")}
-                                </span>
-                                <span className="meta-info me-3">
-                                    <Calendar size={16} className="meta-icon me-1" />
-                                    {blogDetails.createdAt}
-                                </span>
-                                <span className="meta-info">
-                                    <User size={16} className="meta-icon me-1" />
-                                    {blogDetails.member.username}
-                                </span>
-                            </div>
-                        </div>
+                {/* Header */}
+                <div className="blog-header">
 
-                        {/* Hashtags */}
-                        <div className="hashtags-container mt-4">
-                            <span className="hashtag">{t("hashtags.recovery")}</span>
-                            <span className="hashtag">{t("hashtags.trueStory")}</span>
-                            <span className="hashtag">{t("hashtags.detox")}</span>
-                            <span className="hashtag">{t("hashtags.hope")}</span>
-                            <span className="hashtag">{t("hashtags.lifeJourney")}</span>
-                        </div>
+                    <h1 className="blog-detail-title">
+                        {blogDetails.blogName}
+                    </h1>
 
-                        {/* Featured Image */}
-                        <div className="featured-image-container mb-5">
-                            <img
-                                src={blogDetails.image}
-                                alt={blogDetails.blogName}
-                                className="featured-image"
-                            />
-                        </div>
+                    <p className="blog-author">
+                        {t("byPrefix")} {blogDetails.member.username}
+                    </p>
 
-                        {/* Blog Content */}
-                        <div className="blog-content">
-                            {/* Introduction Section */}
-                            <section className="content-section mb-5">
-                                <h2 className="section-title mb-3">{t("sections.introductionTitle")}</h2>
-                                <p className="section-text">{blogDetails.description}</p>
-                            </section>
+                    <div className="blog-meta">
 
-                            {/* Main Content - You can expand this based on your blog structure */}
-                            <section className="content-section mb-5">
-                                <h2 className="section-title mb-3">{t("sections.mainContentTitle")}</h2>
-                                <div
-                                    className="section-text quill-content"
-                                    dangerouslySetInnerHTML={{ __html: blogDetails.content }}
-                                />
-                            </section>
-                        </div>
-                    </Col>
-                </Row>
-            </Container>
-            {/* Related Blogs Section */}
+                        <span className="category-badge">
+                            {blogDetails.blogType}
+                        </span>
+
+                        <span className="meta-info">
+                            <Clock size={16} />
+                            {blogDetails.readingTime} {t("minsReading")}
+                        </span>
+
+                        <span className="meta-info">
+                            <Calendar size={16} />
+                            {blogDetails.createdAt}
+                        </span>
+
+                        <span className="meta-info">
+                            <User size={16} />
+                            {blogDetails.member.username}
+                        </span>
+
+                    </div>
+
+                </div>
+
+                {/* hashtags */}
+                <div className="hashtags-container">
+                    <span className="hashtag">{t("hashtags.recovery")}</span>
+                    <span className="hashtag">{t("hashtags.trueStory")}</span>
+                    <span className="hashtag">{t("hashtags.detox")}</span>
+                    <span className="hashtag">{t("hashtags.hope")}</span>
+                    <span className="hashtag">{t("hashtags.lifeJourney")}</span>
+                </div>
+
+                {/* Image */}
+                <div className="featured-image-container">
+
+                    <img
+                        src={blogDetails.image}
+                        alt={blogDetails.blogName}
+                        className="featured-image"
+                    />
+
+                </div>
+
+                {/* Content */}
+                <div className="blog-content">
+
+                    <section className="content-section">
+
+                        <h2 className="section-title">
+                            {t("sections.introductionTitle")}
+                        </h2>
+
+                        <p className="section-text">
+                            {blogDetails.description}
+                        </p>
+
+                    </section>
+
+                    <section className="content-section">
+
+                        <h2 className="section-title">
+                            {t("sections.mainContentTitle")}
+                        </h2>
+
+                        <div
+                            className="section-text quill-content"
+                            dangerouslySetInnerHTML={{
+                                __html: blogDetails.content
+                            }}
+                        />
+
+                    </section>
+
+                </div>
+
+            </div>
+
             <Recommendation type="blog" />
+
         </div>
     )
 }

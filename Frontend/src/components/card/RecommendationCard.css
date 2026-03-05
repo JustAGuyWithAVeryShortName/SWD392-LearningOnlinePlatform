@@ -59,3 +59,54 @@
     max-width: 100%;
   }
 }
+
+/* Fixed card size */
+.recommendation-card {
+  width: 100%;
+  height: 420px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+}
+
+/* Hover effect */
+.recommendation-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Image fixed */
+.card-img-fixed {
+  height: 180px;
+  object-fit: cover;
+}
+
+/* Body layout */
+.card-body-fixed {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+/* Title max 2 lines */
+.card-title-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Description max 3 lines */
+.card-text-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  margin-top: 10px;
+}

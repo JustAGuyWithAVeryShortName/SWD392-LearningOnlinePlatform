@@ -1,9 +1,10 @@
-/* Blog Details Page Styles */
+/* Blog Page */
 .blog-details-page {
-  background-color: #f8f9fa;
+  background: var(--bg-light);
   min-height: 100vh;
 }
 
+/* Header */
 .blog-header {
   margin-bottom: 3rem;
 }
@@ -11,19 +12,20 @@
 .blog-detail-title {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--text-primary);
   line-height: 1.2;
-  margin-bottom: 1rem;
 }
 
 .blog-author {
   font-style: italic;
-  color: #6c757d;
+  color: var(--text-secondary);
   font-size: 1.1rem;
-  margin-bottom: 1.5rem;
 }
 
+/* Meta info */
 .blog-meta {
+  display: flex;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 1rem;
 }
@@ -31,14 +33,15 @@
 .meta-info {
   display: flex;
   align-items: center;
-  color: #6c757d;
   font-size: 0.9rem;
+  color: var(--text-secondary);
 }
 
 .meta-icon {
-  margin-right: 0.25rem;
+  margin-right: 4px;
 }
 
+/* Image */
 .featured-image-container {
   text-align: center;
   margin: 3rem 0;
@@ -46,19 +49,20 @@
 
 .featured-image {
   width: 100%;
-  max-width: 600px;
-  height: auto;
+  max-width: 650px;
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-strong);
 }
 
+/* Content Card */
 .blog-content {
-  background: white;
+  background: var(--bg-card);
   padding: 3rem;
   border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-soft);
 }
 
+/* Section */
 .content-section {
   margin-bottom: 2.5rem;
 }
@@ -66,28 +70,22 @@
 .section-title {
   font-size: 1.8rem;
   font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 1rem;
-  border-bottom: 2px solid #e9ecef;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border-color);
   padding-bottom: 0.5rem;
 }
 
 .section-text {
   font-size: 1.1rem;
   line-height: 1.8;
-  color: #495057;
-  margin-bottom: 1.5rem;
+  color: var(--text-secondary);
   text-align: justify;
 }
 
-.section-text:last-child {
-  margin-bottom: 0;
-}
-
-/* Custom button for actions (Edit, Delete) */
+/* Buttons */
 .custom-button-action {
-  background-color: #007bff !important; /* Primary blue */
-  border-color: #007bff !important;
+  background: var(--primary-color) !important;
+  border: none !important;
   color: white !important;
   font-weight: 600;
   padding: 0.5rem 1.25rem;
@@ -95,25 +93,48 @@
 }
 
 .custom-button-action:hover {
-  background-color: #0056b3 !important; /* Darker blue on hover */
-  border-color: #0056b3 !important;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+  background: var(--primary-hover) !important;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
 }
 
-/* Specific styling for the danger button (Delete) */
+/* Delete */
 .custom-button-action.btn-danger {
-  background-color: #dc3545 !important; /* Bootstrap danger red */
-  border-color: #dc3545 !important;
+  background: var(--danger-color) !important;
 }
 
 .custom-button-action.btn-danger:hover {
-  background-color: #c82333 !important; /* Darker red on hover */
-  border-color: #bd2130 !important;
+  background: var(--danger-hover) !important;
 }
 
-/* Responsive Design */
+/* Hashtags */
+.hashtags-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.hashtag {
+  background: var(--bg-light);
+  color: var(--primary-color);
+  border: 1px solid var(--border-color);
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.hashtag:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
+
   .blog-detail-title {
     font-size: 2rem;
   }
@@ -132,41 +153,18 @@
 
   .blog-meta {
     flex-direction: column;
-    align-items: center;
   }
+
 }
 
 @media (max-width: 576px) {
+
   .blog-detail-title {
-    font-size: 1.75rem;
+    font-size: 1.7rem;
   }
 
   .blog-content {
     padding: 1.5rem 1rem;
   }
-}
 
-/* Hashtags */
-.hashtags-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: center; /* Center hashtags on small screens */
-  margin-bottom: 2rem; /* Add margin below hashtags */
-}
-
-.hashtag {
-  background-color: #e9f5ff; /* Light blue background for hashtags */
-  color: #007bff; /* Primary blue text */
-  padding: 0.3rem 0.8rem;
-  border-radius: 15px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  white-space: nowrap; /* Prevent hashtags from breaking */
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.hashtag:hover {
-  background-color: #007bff;
-  color: white;
 }

@@ -34,12 +34,12 @@
 
 .sidebar-nav-item:hover {
   background-color: #f8f9fa;
-  color: #0984e3;
+  color: var(--primary-hover);
 }
 
 .sidebar-nav-item.active {
   background-color: #e8f4f8;
-  color: #0984e3;
+  color: var(--primary-hover);
   font-weight: 500;
 }
 

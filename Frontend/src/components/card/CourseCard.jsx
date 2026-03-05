@@ -1,10 +1,15 @@
-import { Button, Card } from "react-bootstrap";
 import { Clock, Calendar } from "lucide-react";
 import "./CourseCard.css";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
 
-const CourseCard = ({ course, onEnrollClick, onDetailsClick, onContinueClick, status }) => {
-  const { t } = useTranslation("courseCard"); // Initialize useTranslation
+const CourseCard = ({
+  course,
+  onEnrollClick,
+  onDetailsClick,
+  onContinueClick,
+  status,
+}) => {
+  const { t } = useTranslation("courseCard");
 
   const getAgeGroupColor = (ageGroup) => {
     const colors = {
@@ -17,72 +22,75 @@ const CourseCard = ({ course, onEnrollClick, onDetailsClick, onContinueClick, st
   };
 
   return (
-    <Card
-      className="course-card mb-4"
+    <div
+      className="course-card-2"
       style={{
         backgroundImage: `url(${course.image})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="course-card-overlay">
-        <div className="course-card-content">
-          {/* Top Section */}
-          <div className="course-header">
-            <span className={`ageGroup-tag ${getAgeGroupColor(course.ageGroup)}`}>
+      <div className="course-card-overlay-2">
+        <div className="course-card-content-2">
+
+          <div className="course-header-2">
+            <span className={`ageGroup-tag-2 ${getAgeGroupColor(course.ageGroup)}`}>
               {t(`ageGroup.${course.ageGroup}`)}
             </span>
-            <div className="course-meta-info">
-              <Clock size={16} className="meta-icon" />
-              <span className="meta-text">{course.duration} {t("durationSuffix")}</span>
+
+            <div className="course-meta-info-2">
+              <Clock size={16} className="meta-icon-2" />
+              <span className="meta-text-2">
+                {course.duration} {t("durationSuffix")}
+              </span>
             </div>
           </div>
 
-          {/* Main Title */}
-          <h3 className="course-title">{course.courseName}</h3>
+          <h3 className="course-title-2">{course.courseName}</h3>
 
-          {/* Description */}
-          <p className="course-description">{course.description}</p>
+          <p className="course-description-2">
+            {course.description}
+          </p>
 
-          {/* Date and Author */}
-          <div className="course-details">
-            <div className="detail-item">
-              <Calendar size={14} className="detail-icon" />
-              <span className="detail-text">{new Date(course.createdAt).toLocaleDateString()}</span>
+          <div className="course-details-2">
+            <div className="detail-item-2">
+              <Calendar size={14} className="detail-icon-2" />
+              <span className="detail-text-2">
+                {new Date(course.createdAt).toLocaleDateString()}
+              </span>
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="course-actions">
+          <div className="course-actions-2">
             {status === "learning" ? (
-              <Button
-                className="details-button"
+              <button
+                className="details-button-2"
                 onClick={() => onContinueClick(course.courseID)}
               >
                 {t("continueButton")}
-              </Button>
+              </button>
             ) : (
               <>
-                <Button
-                  className="enroll-button"
+                <button
+                  className="enroll-button-2"
                   onClick={() => onEnrollClick(course.courseID)}
                 >
                   {t("enrollButton")}
-                </Button>
-                <Button
-                  variant="outline-secondary"
-                  className="details-button"
+                </button>
+
+                <button
+                  className="details-button-2"
                   onClick={() => onDetailsClick(course.courseID)}
                 >
                   {t("detailsButton")}
-                </Button>
+                </button>
               </>
             )}
           </div>
+
         </div>
       </div>
-    </Card>
+    </div>
   );
 };
 

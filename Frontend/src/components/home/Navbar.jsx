@@ -62,7 +62,7 @@ export default function Navbar() {
   );
 
   return (
-    <BootstrapNavbar bg="light" expand="lg" className="py-3">
+    <BootstrapNavbar expand="lg" className="navbar-custom py-3">
       <Container>
         <BootstrapNavbar.Brand
           as={Link}
@@ -87,9 +87,8 @@ export default function Navbar() {
                 key={item.name}
                 as={Link}
                 to={item.path}
-                className={`nav-item-custom mx-2 ${
-                  location.pathname === item.path ? "active" : ""
-                }`}
+                className={`nav-item-custom mx-2 ${location.pathname === item.path ? "active" : ""
+                  }`}
               >
                 {item.name}
               </Nav.Link>
@@ -140,17 +139,18 @@ export default function Navbar() {
               </Dropdown>
             ) : (
               <div className="d-flex gap-2">
-                <Button
-                  variant="outline-primary"
-                  size="sm"
-                  as={Link}
+                <Link
                   to="/login"
+                  className="btn-outline-primary-custom"
                 >
                   {t("login")}
-                </Button>
-                <Button variant="primary" size="sm" as={Link} to="/login">
+                </Link>
+                <Link
+                  to="/login"
+                  className="btn-primary-custom"
+                >
                   {t("register")}
-                </Button>
+                </Link>
               </div>
             )}
           </div>

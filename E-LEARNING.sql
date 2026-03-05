@@ -1,4 +1,4 @@
-﻿create database E_LEARNING
+﻿use E_LEARNING
 --USERS
 --INSERT INTO user tự tạo do đang encode
   INSERT INTO Users (
@@ -121,7 +121,7 @@ VALUES (
     2019,
     'AVAILABLE',
     GETUTCDATE(), GETUTCDATE(),
-    'consult01'
+    'consultant01'
 );
 --BLOG
 INSERT INTO blog (
@@ -152,7 +152,7 @@ VALUES
     'ADULT',
     GETUTCDATE(),
     GETUTCDATE(),
-    'member01'
+    'member02'
 ),
 -- 2
 (
@@ -167,7 +167,7 @@ VALUES
     'ADULT',
     GETUTCDATE(),
     GETUTCDATE(),
-    'member01'
+    'member02'
 ),
 -- 3
 (
@@ -182,7 +182,7 @@ VALUES
     'ADULT',
     GETUTCDATE(),
     GETUTCDATE(),
-    'member01'
+    'member02'
 ),
 -- 4
 (
@@ -197,7 +197,7 @@ VALUES
     'ADULT',
     GETUTCDATE(),
     GETUTCDATE(),
-    'member01'
+    'member02'
 ),
 -- 5
 (
@@ -212,5 +212,5 @@ VALUES
     'ADULT',
     GETUTCDATE(),
     GETUTCDATE(),
-    'member01'
+    'member02'
 );

@@ -64,7 +64,7 @@
 .stat-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: #0984e3;
+  border-color: var(--primary-hover);
 }
 
 .stat-card h4 {
@@ -88,7 +88,7 @@
   font-size: 1.1rem;
   margin-bottom: 1rem;
   padding-left: 0.5rem;
-  border-left: 3px solid #0984e3;
+  border-left: 3px solid var(--primary-hover);
 }
 
 /* Activity Item Styles */
@@ -101,7 +101,7 @@
 
 .activity-item:hover {
   background-color: #f1f3f4;
-  border-color: #0984e3;
+  border-color: var(--primary-hover);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(9, 132, 227, 0.15);
 }
@@ -159,7 +159,7 @@
 
 .progress-bar {
   border-radius: 0.5rem;
-  background: linear-gradient(90deg, #0984e3, #74b9ff);
+  background: linear-gradient(90deg, var(--primary-hover), var(--primary-color));
 }
 
 /* Recommendations Styles */
@@ -183,7 +183,7 @@
 
 .recommendation-item::before {
   content: "•";
-  color: #0984e3;
+  color: var(--primary-hover);
   font-weight: bold;
   position: absolute;
   left: 0;
@@ -191,15 +191,15 @@
 
 /* Button Styles */
 .btn-outline-primary {
-  border-color: #0984e3;
-  color: #0984e3;
+  border-color: var(--primary-hover);
+  color: var(--primary-hover);
   transition: all 0.2s ease;
   font-weight: 500;
 }
 
 .btn-outline-primary:hover {
-  background-color: #0984e3;
-  border-color: #0984e3;
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
   color: white;
   transform: translateY(-1px);
 }
@@ -309,7 +309,7 @@
 
 /* Hover Effects */
 .activity-item:hover .activity-title {
-  color: #0984e3;
+  color: var(--primary-hover);
 }
 
 .activity-item:hover .badge {
@@ -317,5 +317,5 @@
 }
 
 .stat-card:hover h4 {
-  color: #0984e3;
+  color: var(--primary-hover);
 }

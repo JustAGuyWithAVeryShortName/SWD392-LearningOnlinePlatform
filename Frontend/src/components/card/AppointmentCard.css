@@ -1,11 +1,12 @@
 /* Appointment Card Styles */
+
 .appointment-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .appointment-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
 }
 
 .card-header-custom {
@@ -15,15 +16,15 @@
 }
 
 .appointment-info {
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border-color);
   padding: 1rem;
   border-radius: 0.75rem;
-  background-color: #f8f9fa;
+  background-color: var(--bg-light);
   margin-bottom: 1rem;
 }
 
 .appointment-time {
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--border-color);
   padding-top: 0.75rem;
 }
 
@@ -35,7 +36,11 @@
 }
 
 .btn-custom.btn-primary-custom {
-  background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary-hover) 0%,
+    var(--primary-color) 100%
+  );
   border: none;
   font-weight: 500;
   transition: all 0.2s ease;
@@ -43,28 +48,41 @@
 }
 
 .btn-custom.btn-primary-custom:hover {
-  background: linear-gradient(135deg, #0770c7 0%, #5fa8ff 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    var(--primary-hover) 100%
+  );
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(9, 132, 227, 0.3);
+  box-shadow: 0 4px 12px rgba(161, 33, 204, 0.35);
 }
 
 .bg-primary {
-  background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%) !important;
+  background: linear-gradient(
+    135deg,
+    var(--primary-hover) 0%,
+    var(--primary-color) 100%
+  ) !important;
 }
 
 .bg-warning {
-  background: linear-gradient(135deg, #ffc107 0%, #ffeb3b 100%) !important;
+  background: linear-gradient(
+    135deg,
+    #facc15 0%,
+    #fde047 100%
+  ) !important;
 }
 
 .text-dark {
-  color: #343a40 !important;
+  color: var(--text-primary);
 }
 
 .text-primary {
-  color: #007bff !important;
+  color: var(--primary-color);
 }
 
-/* Responsive adjustments (optional) */
+/* Responsive */
+
 @media (max-width: 576px) {
   .card-header-custom h5 {
     font-size: 1rem;

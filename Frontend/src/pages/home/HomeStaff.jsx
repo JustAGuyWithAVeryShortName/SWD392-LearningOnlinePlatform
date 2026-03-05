@@ -128,15 +128,17 @@ function HomeStaff() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
-      <Container fluid className="px-4 py-4">
-        <Row className="g-4">
+    <div className="staff-page">
+      <div className="staff-container">
+
+        <div className="staff-grid">
+
           {/* Course Management */}
-          <Col lg={6} className="d-flex flex-column">
+          <div className="staff-col">
             <ManagementCard
               title={t('courseManagement')}
               icon={BookOpen}
-              iconBgClass="bg-primary bg-opacity-10 text-primary"
+              iconBgClass="icon-course"
               data={{ [courseActiveTab]: currentCourseItems }}
               activeTab={courseActiveTab}
               setActiveTab={handleCourseTabChange}
@@ -149,19 +151,20 @@ function HomeStaff() {
               onView={(id) => handleView(id, 'course')}
               onAdd={() => handleAdd('courses')}
             />
-            <Link to="/course-management">
-              <button className="btn btn-primary mt-3">
+
+            <Link to="/course-management" className="staff-link">
+              <button className="staff-button">
                 {t('viewAllCourses')}
               </button>
             </Link>
-          </Col>
+          </div>
 
           {/* Blog Management */}
-          <Col lg={6} className="d-flex flex-column">
+          <div className="staff-col">
             <ManagementCard
               title={t('blogManagement')}
               icon={FileText}
-              iconBgClass="bg-success bg-opacity-10 text-success"
+              iconBgClass="icon-blog"
               data={{
                 [blogActiveTab]: {
                   [blogSubTab]: currentBlogItems,
@@ -187,14 +190,17 @@ function HomeStaff() {
               onViewClick={(id, type) => handleView(id, type)}
               onAdd={() => handleAdd('blogs')}
             />
-            <Link to="/blog-management">
-              <button className="btn btn-primary mt-3">
+
+            <Link to="/blog-management" className="staff-link">
+              <button className="staff-button">
                 {t('viewAllBlogs')}
               </button>
             </Link>
-          </Col>
-        </Row>
-      </Container>
+          </div>
+
+        </div>
+
+      </div>
     </div>
   );
 }

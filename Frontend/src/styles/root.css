@@ -1,0 +1,29 @@
+:root {
+
+  /* Primary */
+  --primary-color: #81A6C6;
+  --primary-hover: #81A6C6;
+
+  /* Text */
+  --text-primary: #D2C4B4;
+  --text-secondary: #D2C4B4;
+
+  /* Background */
+  --bg-light: #f9fafb;
+  --bg-card: #ffffff;
+
+  /* Border */
+  --border-color: #e5e7eb;
+
+  /* Status */
+  --danger-color: #dc3545;
+  --danger-hover: #c82333;
+
+  /* Shadow */
+  --shadow-soft: 0 5px 15px rgba(0,0,0,0.08);
+  --shadow-strong: 0 10px 30px rgba(0,0,0,0.1);
+
+  /* Bootstrap Override */
+  --bs-primary: var(--primary-color);
+  --bs-primary-rgb: 100, 30, 138;
+}

@@ -1,207 +1,251 @@
-.form-check.text-muted {
-  display: flex;
-  align-items: center;
-  padding-left: 0 !important;
-}
-
-.form-check.text-muted .form-check-input {
-  position: static !important;
-  margin: 0;
-}
-
-.form-check.text-muted .form-check-label {
-  margin-left: 6px;
-}
-
 .login-page {
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px; /* Add some padding for smaller screens */
+
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  background:var(--bg-light);
 }
 
-.login-card {
-    border-radius: 20px;
-    overflow: hidden;
-    height: 100%; /* Ensure card takes full height of its column */
-    max-height: 800px; /* Limit max height for very tall screens */
+.login-card{
+
+  display:flex;
+
+  width:900px;
+  max-width:95%;
+
+  border-radius:20px;
+
+  overflow:hidden;
+
+  background:var(--bg-card);
+
+  box-shadow:0 20px 40px rgba(0,0,0,0.08);
 }
 
-.login-brand-section {
-    background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%);
-    padding: 40px;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    color: white;
+
+/* LEFT */
+
+.login-brand{
+
+  flex:1;
+
+  padding:40px;
+
+  color:white;
+
+  background:linear-gradient(
+    135deg,
+    var(--primary-hover),
+    var(--primary-color)
+  );
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
 }
 
-.brand-logo svg {
-    margin-bottom: 20px;
+.brand-title{
+
+  font-size:2.5rem;
+  margin-bottom:10px;
 }
 
-.brand-title {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
+
+/* RIGHT */
+
+.login-form{
+
+  flex:1;
+
+  padding:40px;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
 }
 
-.brand-subtitle {
-    font-size: 1.1rem;
-    line-height: 1.6;
-    opacity: 0.9;
-     text-shadow: 0 4px 12px rgba(0,0,0,0.25);
+.login-logo{
+
+  width:120px;
+  margin:auto;
+  margin-bottom:20px;
+  cursor:pointer;
 }
 
-.login-form-section {
-    background-color: #ffffff;
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 20px;
+
+/* TABS */
+
+.tabs{
+
+  display:flex;
+  gap:10px;
+
+  margin-bottom:25px;
 }
 
-.login-tabs .btn {
-    border-radius: 10px;
-    font-weight: 600;
-    transition: all 0.3s ease;
+.tab{
+
+  flex:1;
+
+  padding:10px;
+
+  border-radius:8px;
+
+  border:1px solid var(--border-color);
+
+  background:white;
+
+  cursor:pointer;
+
+  font-weight:600;
 }
 
-.login-tabs .btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
+.active-tab{
+
+  background:var(--primary-color);
+
+  color:white;
+
+  border-color:var(--primary-color);
 }
 
-.login-tabs .btn-outline-secondary {
-    color: #6c757d;
-    border-color: #dee2e6;
+
+/* FORM */
+
+.form{
+
+  display:flex;
+  flex-direction:column;
+
+  gap:10px;
 }
 
-.login-tabs .btn-outline-secondary:hover {
-    background-color: #f8f9fa;
-    color: #007bff;
-    border-color: #007bff;
+.form input{
+
+  padding:12px;
+
+  border-radius:8px;
+
+  border:1px solid var(--border-color);
 }
 
-.google-login-btn {
-    padding: 12px;
-    border-radius: 10px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
+.form input:focus{
+
+  border-color:var(--primary-color);
+
+  outline:none;
 }
 
-.google-login-btn svg {
-    margin-right: 10px;
+
+/* PASSWORD */
+
+.password-input{
+
+  display:flex;
 }
 
-.divider {
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: #adb5bd;
+.password-input input{
+
+  flex:1;
+  border-right:none;
 }
 
-.divider::before,
-.divider::after {
-    content: '';
-    flex: 1;
-    border-bottom: 1px solid #dee2e6;
+.password-input button{
+
+  border:1px solid var(--border-color);
+
+  background:var(--bg-light);
+
+  padding:0 12px;
+
+  cursor:pointer;
 }
 
-.divider:not(:empty)::before {
-    margin-right: .25em;
+
+/* REMEMBER */
+
+.remember{
+
+  display:flex;
+  align-items:center;
+
+  gap:6px;
+
+  font-size:14px;
+
+  color:var(--text-secondary);
 }
 
-.divider:not(:empty)::after {
-    margin-left: .25em;
+
+/* SUBMIT */
+
+.submit-btn{
+
+  margin-top:10px;
+
+  padding:12px;
+
+  border:none;
+
+  border-radius:8px;
+
+  font-weight:600;
+
+  color:white;
+
+  background:linear-gradient(
+    135deg,
+    var(--primary-hover),
+    var(--primary-color)
+  );
+
+  cursor:pointer;
 }
 
-.divider-text {
-    padding: 0 10px;
-    background-color: #ffffff;
-    position: relative;
-    z-index: 1;
+.submit-btn:hover{
+
+  transform:translateY(-2px);
+
+  box-shadow:0 8px 20px rgba(0,0,0,0.15);
 }
 
-.form-control-custom {
-    border-radius: 10px;
-    padding: 12px 15px;
-    border: 1px solid #ced4da;
-    box-shadow: none !important; /* Remove default focus shadow */
+
+/* DIVIDER */
+
+.divider{
+
+  margin:20px 0;
+
+  text-align:center;
+
+  position:relative;
 }
 
-/* Styles for form controls when they are part of an InputGroup with a toggle */
-.form-control-custom-with-toggle {
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    padding: 12px 15px;
-    border: 1px solid #ced4da;
-    box-shadow: none !important; /* Remove default focus shadow */
+.divider span{
+
+  background:white;
+
+  padding:0 10px;
+
+  color:var(--text-secondary);
 }
 
-.password-toggle-btn {
-    background-color: #f8f9fa;
-    border: 1px solid #ced4da;
-    border-left: none;
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    padding: 0 15px;
-}
 
-.login-submit-btn {
-    padding: 12px;
-    border-radius: 10px;
-    font-weight: 600;
-}
+/* GOOGLE */
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .login-card {
-        height: auto;
-    }
+.google-btn{
 
-    .login-brand-section {
-        border-bottom-left-radius: 0;
-        border-top-right-radius: 20px;
-        padding: 30px;
-    }
+  padding:12px;
 
-    .login-form-section {
-        border-top-right-radius: 0;
-        border-bottom-left-radius: 20px;
-        padding: 30px;
-    }
+  border-radius:8px;
 
-    .brand-title {
-        font-size: 2rem;
-    }
+  border:1px solid var(--border-color);
 
-    .brand-subtitle {
-        font-size: 1rem;
-    }
-}
+  background:white;
 
-@media (max-width: 576px) {
-    .login-form-section, .login-brand-section {
-        padding: 20px;
-    }
-
-    .brand-title {
-        font-size: 1.8rem;
-    }
-
-    .brand-subtitle {
-        font-size: 0.9rem;
-    }
+  cursor:pointer;
 }

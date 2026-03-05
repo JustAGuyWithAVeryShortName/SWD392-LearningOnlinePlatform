@@ -18,7 +18,7 @@
 .course-tag {
   display: inline-block;
   background: #e0edff;
-  color: #2563eb;
+  color: var(--primary-color);
   font-size: 12px;
   font-weight: 600;
   padding: 4px 10px;
@@ -46,11 +46,11 @@
 .course-price {
   font-size: 20px;
   font-weight: 700;
-  color: #2563eb;
+  color: var(--primary-color);
 }
 
 .course-btn {
-  background: #2563eb;
+  background: var(--primary-color);
   color: #fff;
   border: none;
   border-radius: 50%;
@@ -94,7 +94,7 @@
   padding: 4px 10px;
   border-radius: 12px;
   background: #e7f1ff;
-  color: #2563eb;
+  color: var(--primary-color);
 }
 
 .course-rating {
@@ -123,12 +123,12 @@
 .course-price {
   font-weight: 700;
   font-size: 18px;
-  color: #2563eb;
+  color: var(--primary-color);
 }
 
 .cart-btn {
   border: none;
-  background: #2563eb;
+  background: var(--primary-color);
   color: #fff;
   width: 36px;
   height: 36px;

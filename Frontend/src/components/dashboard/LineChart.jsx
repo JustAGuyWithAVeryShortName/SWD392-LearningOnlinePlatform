@@ -29,7 +29,7 @@ const LineChart = () => {
   const { t } = useTranslation("lineChart"); // Use the new namespace
 
   const lineConfigs = useMemo(() => ({
-    totalMembers: { color: '#3b82f6', name: t('totalMembers') },
+    totalMembers: { color: 'var(--primary-hover)', name: t('totalMembers') },
     staffMembers: { color: '#10b981', name: t('staffMembers') },
     consultants: { color: '#8b5cf6', name: t('consultants') },
     monthlyConsultations: { color: '#f59e0b', name: t('monthlyConsultations') },

@@ -33,40 +33,41 @@ const BlogList = () => {
   const { error: errorBlogTypes, loading: loadingBlogTypes, get: getBlogTypes } = useFetch();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchBlogs = async () => {
       try {
-        // Fetch blog types always
         const typesData = await getBlogTypes("http://localhost:8080/api/blog/type");
         setTypes(typesData);
 
         if (mainTabKey === "all") {
-          const blogsData = await getBlogs(`http://localhost:8080/api/blog/status/PUBLISHED`);
-          setBlogs(blogsData);
-        } else if (mainTabKey === "myBlogs" && user) {
-          let userBlogsData = [];
-          if (myBlogsSubTabKey === "published") {
-            userBlogsData = await getMyBlogs(
-              `http://localhost:8080/api/blog/my-list/${user.username}/status/PUBLISHED`
-            );
-          } else if (myBlogsSubTabKey === "drafts") {
-            userBlogsData = await getMyDrafts(
-              `http://localhost:8080/api/blog/my-list/${user.username}/status/DRAFT`
-            );
-          } else if (myBlogsSubTabKey === "pending") {
-            userBlogsData = await getMyPending(
-              `http://localhost:8080/api/blog/my-list/${user.username}/status/PENDING`
-            );
-          }
-          setBlogs(userBlogsData);
+          const data = await getBlogs("/api/blog/status/PUBLISHED");
+          setBlogs(data);
+          return;
         }
-      } catch (error) {
-        console.error("Fetch error in BlogList:", error);
-        // Optionally set error to a state to display ErrorMessage component
+
+        if (!user) return;
+
+        const statusMap = {
+          published: "PUBLISHED",
+          drafts: "DRAFT",
+          pending: "PENDING",
+        };
+
+        const status = statusMap[myBlogsSubTabKey];
+
+        const data = await getMyBlogs(
+          `/api/blog/my-list/${user.username}/status/${status}`
+        );
+
+        setBlogs(data);
+
+      } catch (err) {
+        console.error("Blog fetch error:", err);
       }
     };
 
-    fetchData();
-  }, [user, mainTabKey, myBlogsSubTabKey, getBlogs, getMyBlogs, getMyDrafts, getMyPending, getBlogTypes]);
+    fetchBlogs();
+
+  }, [mainTabKey, myBlogsSubTabKey, user]);
   console.log(blogs);
 
   // Filter options
@@ -83,11 +84,16 @@ const BlogList = () => {
   // Filter blogs based on search criteria
   const filteredBlogs = useMemo(() => {
     return blogs.filter((blog) => {
-      return (
-        blog.blogName &&
-        blog.blogName.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (selectedType === "" || blog.blogType === selectedType)
-      );
+
+      const matchSearch =
+        !searchTerm ||
+        blog.blogName?.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchType =
+        !selectedType || blog.blogType === selectedType;
+
+      return matchSearch && matchType;
+
     });
   }, [blogs, searchTerm, selectedType]);
 
@@ -99,8 +105,10 @@ const BlogList = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    // Scroll to top of blogs section
-    document.querySelector(".blogs-section")?.scrollIntoView({ behavior: "smooth" });
+
+    document.querySelector(".blogs-section")?.scrollIntoView({
+      behavior: "smooth",
+    });
   };
 
   // Reset to first page when filters change
@@ -123,6 +131,7 @@ const BlogList = () => {
     navigate("/blogs/create");
   };
 
+
   const clearAllFilters = () => {
     setSearchTerm("");
     setSelectedType("");
@@ -131,13 +140,10 @@ const BlogList = () => {
 
   // Centralized loading and error handling for main content
   const isLoading =
-    loadingBlogs ||
-    loadingBlogTypes ||
-    (mainTabKey === "myBlogs" && (loadingMyBlogs || loadingMyDrafts || loadingMyPending));
+    loadingBlogs || loadingMyBlogs || loadingBlogTypes;
+
   const hasError =
-    errorBlogs ||
-    errorBlogTypes ||
-    (mainTabKey === "myBlogs" && (errorMyBlogs || errorMyDrafts || errorMyPending));
+    errorBlogs || errorMyBlogs || errorBlogTypes;
 
   if (isLoading) {
     return (
@@ -163,7 +169,7 @@ const BlogList = () => {
       <Container className="my-5">
         {/* Header Section */}
         <div className="blog-header text-center mb-5">
-          <h1 className="display-5 fw-bold text-primary mb-3">
+          <h1 className="display-5 fw-bold mb-3">
             {t("header.titlePart1")}
             <br />
             {t("header.titlePart2")}
@@ -291,15 +297,24 @@ const BlogList = () => {
                     </div>
                   ) : (
                     <>
-                      {currentBlogs.map((blog) => (
-                        <BlogCard key={blog.blogID} blog={blog} onReadClick={handleReadMore} />
-                      ))}
-                      <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChange}
-                        itemsPerPage={itemsPerPage}
-                      />
+                      <Row className="g-4">
+                        {currentBlogs.map((blog) => (
+                          <Col md={6} lg={4} key={blog.blogID}>
+                            <BlogCard
+                              blog={blog}
+                              onReadClick={handleReadMore}
+                            />
+                          </Col>
+                        ))}
+                      </Row>
+                      {totalPages > 1 && (
+                        <Pagination
+                          currentPage={currentPage}
+                          totalPages={totalPages}
+                          onPageChange={handlePageChange}
+                          itemsPerPage={itemsPerPage}
+                        />
+                      )}
                     </>
                   )}
                 </div>

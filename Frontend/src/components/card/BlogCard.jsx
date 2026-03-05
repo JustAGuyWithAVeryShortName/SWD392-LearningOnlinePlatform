@@ -1,57 +1,80 @@
-import { Card, Button } from "react-bootstrap"
+import { Card } from "react-bootstrap"
 import { Calendar, Clock, User } from "lucide-react"
 import "./BlogCard.css"
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next"
 
 const BlogCard = ({ blog, status, onReadClick }) => {
-  const { t } = useTranslation("blogCard"); // Initialize useTranslation
+  const { t } = useTranslation("blogCard")
 
   return (
     <Card
-      className="blog-card mb-4"
+      className="blog-card-2 mb-4"
       style={{
         backgroundImage: `url(${blog.image})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="blog-card-overlay">
-        <div className="blog-card-content p-4">
-          <div className="d-flex align-items-center mb-3">
-            <span className="category-badge">{blog.blogType}</span>
-            <div className="ms-auto d-flex align-items-center">
-              <span className="meta-info">
-                <Clock size={16} className="meta-icon" />
+      <div className="blog-card-overlay-2">
+
+        <div className="blog-card-content-2 p-4">
+
+          {/* META */}
+          <div className="blog-meta-row-2">
+
+            <span className="category-badge-2">
+              {blog.blogType}
+            </span>
+
+            <div className="meta-group-2">
+
+              <span className="meta-info-2">
+                <Clock size={16} className="meta-icon-2"/>
                 {blog.readingTime} {t("readingTimeSuffix")}
               </span>
-              <span className="meta-info">
-                <Calendar size={16} className="meta-icon" />
-                {new Date(blog.createdAt).toLocaleDateString()} - {new Date(blog.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+
+              <span className="meta-info-2">
+                <Calendar size={16} className="meta-icon-2"/>
+                {new Date(blog.createdAt).toLocaleDateString()}
               </span>
-              <span className="meta-info ms-3">
-                <User size={16} className="meta-icon" />
+
+              <span className="meta-info-2">
+                <User size={16} className="meta-icon-2"/>
                 {blog.member.username}
               </span>
+
             </div>
+
           </div>
 
-          <h2 className="blog-title mb-3">{blog.blogName}</h2>
+          {/* TITLE */}
+          <h2 className="blog-title-2">
+            {blog.blogName}
+          </h2>
 
-          <p className="blog-excerpt mb-4">{blog.description}</p>
+          {/* DESCRIPTION */}
+          <p className="blog-excerpt-2">
+            {blog.description}
+          </p>
 
-          {status !== 'draft' && (
-            <div className="d-flex justify-content-end mt-2">
-              <Button variant="primary" className="read-button"
-                onClick={() => onReadClick(blog.blogID)}>
-                {t("readButton")}
-              </Button>
+          {/* READ MORE */}
+          {status !== "draft" && (
+            <div className="blog-readmore-wrapper-2">
+
+              <span
+                className="read-more-2"
+                onClick={() => onReadClick(blog.blogID)}
+              >
+                {t("readButton")} →
+              </span>
+
             </div>
           )}
+
         </div>
       </div>
     </Card>
   )
 }
 
-export default BlogCard;
+export default BlogCard

@@ -1,11 +1,11 @@
-import { Container } from "react-bootstrap";
-import { Globe, ArrowUp } from "lucide-react";
+import { Container, Row, Col } from "react-bootstrap";
+import { Globe, ArrowUp, Mail, Github, Facebook } from "lucide-react";
 import { Link } from "react-router-dom";
 import "./Footer.css";
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
-  const { t } = useTranslation("footer"); // Initialize useTranslation
+  const { t } = useTranslation("footer");
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -16,57 +16,79 @@ const Footer = () => {
 
   return (
     <footer className="site-footer">
-      <div className="footer-wave-container">
-        <svg
-          className="footer-wave"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1440 120"
-          preserveAspectRatio="none"
-        >
-          <path
-            d="M0,64L120,80C240,96,480,128,720,128C960,128,1200,96,1320,80L1440,64L1440,320L1320,320C1200,320,960,320,720,320C480,320,240,320,120,320L0,320Z"
-            fill="#171717"
-          ></path>
-        </svg>
-      </div>
-
       <div className="footer-content">
         <Container>
-          <div className="footer-brand mb-5">
+
+          {/* Brand */}
+          <div className="footer-brand">
             <Link to="/" className="footer-logo">
-              <svg width="40" height="40" viewBox="0 0 32 32" fill="none" className="me-2">
-                
-              </svg>
               <span className="brand-text">{t("projectName")}</span>
             </Link>
+            <p className="footer-description">
+              A modern e-learning platform helping people learn and share
+              knowledge anywhere.
+            </p>
           </div>
 
+          {/* Links */}
+          <Row className="footer-links-grid">
+
+            <Col md={3} sm={6}>
+              <h6 className="footer-title">Product</h6>
+              <Link to="/" className="footer-link">Features</Link>
+              <Link to="/" className="footer-link">Pricing</Link>
+              <Link to="/" className="footer-link">API</Link>
+            </Col>
+
+            <Col md={3} sm={6}>
+              <h6 className="footer-title">Company</h6>
+              <Link to="/" className="footer-link">About</Link>
+              <Link to="/" className="footer-link">Careers</Link>
+              <Link to="/" className="footer-link">Blog</Link>
+            </Col>
+
+            <Col md={3} sm={6}>
+              <h6 className="footer-title">Resources</h6>
+              <Link to="/terms" className="footer-link">{t("termsOfService")}</Link>
+              <Link to="/privacy" className="footer-link">{t("privacyPolicy")}</Link>
+              <Link to="/contact" className="footer-link">{t("contactUs")}</Link>
+            </Col>
+
+            <Col md={3} sm={6}>
+              <h6 className="footer-title">Contact</h6>
+
+              <div className="footer-contact">
+                <Mail size={16} />
+                support@email.com
+              </div>
+
+              <div className="footer-social">
+                <a href="#">
+                  <Github size={18} />
+                </a>
+
+                <a href="#">
+                  <Facebook size={18} />
+                </a>
+
+                <button onClick={scrollToTop}>
+                  <ArrowUp size={18} />
+                </button>
+              </div>
+
+            </Col>
+
+          </Row>
+
+          {/* Bottom */}
           <div className="footer-bottom">
-            <div className="footer-links">
-              <Link to="/terms" className="footer-link">
-                {t("termsOfService")}
-              </Link>
-              <Link to="/privacy" className="footer-link">
-                {t("privacyPolicy")}
-              </Link>
-              <Link to="/contact" className="footer-link">
-                {t("contactUs")}
-              </Link>
-            </div>
+            <p>{t("copyright")}</p>
 
-            <div className="footer-copyright">
-              <p>{t("copyright")}</p>
-            </div>
-
-            <div className="footer-actions">
-              <button className="footer-action-btn" aria-label="Language">
-                <Globe size={18} />
-              </button>
-              <button className="footer-action-btn" onClick={scrollToTop} aria-label="Scroll to top">
-                <ArrowUp size={18} />
-              </button>
-            </div>
+            <button className="footer-language">
+              <Globe size={16} /> EN
+            </button>
           </div>
+
         </Container>
       </div>
     </footer>
