@@ -29,7 +29,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final String[] PUBLIC_POST_ENDPOINTS = {"/auth/login", "/auth/introspect", "/auth/logout", "/auth/refresh", "/api/user", "/api/assessment/crafft/submit","/api/password/**", "/ws-chat/**", "/ws/**", "/ws/info", "/api/quizzes/**"};
+    private final String[] PUBLIC_POST_ENDPOINTS = {"/auth/login", "/auth/introspect", "/auth/logout", "/auth/refresh", "/api/user", "/api/assessment/crafft/submit","/api/password/**", "/ws-chat/**", "/ws/**", "/ws/info"};
 
     private final String[] PUBLIC_GET_ENDPOINTS = {"/api/blog/**", "/api/course/**", "/api/enrollment/course-list/**", "/api/assessment/**", "/api/assessment-result/risk-level", "/api/event", "/api/event/**", "/ws-chat/**", "/ws/**", "/ws/info", "/api/quizzes/**", "/api/videos/stream/**", "/api/videos/download/**"};
 

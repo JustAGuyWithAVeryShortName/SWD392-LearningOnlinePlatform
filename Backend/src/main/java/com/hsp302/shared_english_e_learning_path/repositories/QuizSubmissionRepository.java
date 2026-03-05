@@ -8,5 +8,5 @@ import java.util.UUID;
 public interface QuizSubmissionRepository
         extends JpaRepository<QuizSubmission, UUID> {
 
-    boolean existsByQuiz_QuizIdAndUsername(UUID quizId, String username);
+    boolean existsByUsernameAndQuiz_QuizId(String username, UUID quizId);
 }

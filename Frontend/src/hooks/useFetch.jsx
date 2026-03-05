@@ -15,14 +15,22 @@ const useFetch = (defaultUrl) => {
       const token = localStorage.getItem("token");
       // Build full URL - if url is relative, prepend API_BASE_URL
       const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
-      
-      const options = {
-        method,
-        headers: {
-          Authorization: token ? `Bearer ${token}` : undefined,
-          ...headers, // Merge custom headers
-        },
-      };
+    
+      // const options = {
+      //   method,
+      //   headers: {
+      //     Authorization: token ? `Bearer ${token}` : undefined,
+      //     ...headers, // Merge custom headers
+      //   },
+      // };
+       const options = {
+          method,
+          headers: {
+            ...(token && { Authorization: `Bearer ${token}` }),
+            ...headers,
+          },
+        };
+
 
       if (body instanceof FormData) {
         options.body = body;

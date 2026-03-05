@@ -1,6 +1,8 @@
 package com.hsp302.shared_english_e_learning_path.controllers;
 
 import com.hsp302.shared_english_e_learning_path.domain.dtos.requests.QuizRequest;
+import com.hsp302.shared_english_e_learning_path.domain.dtos.requests.SubmitQuizRequest;
+import com.hsp302.shared_english_e_learning_path.domain.dtos.responses.QuizResultResponse;
 import com.hsp302.shared_english_e_learning_path.domain.entities.Quiz;
 import com.hsp302.shared_english_e_learning_path.services.QuizService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,13 @@ public class QuizController {
     @GetMapping("/lessons/{lessonId}")
     public List<Quiz> getQuizzesByLesson(@PathVariable UUID lessonId) {
         return quizService.getQuizzesByLesson(lessonId);
+    }
+
+    @PostMapping("/submit-assignment")
+    public QuizResultResponse submitAssignment(
+            @RequestBody SubmitQuizRequest request
+    ) {
+        return quizService.submitAssignment(request);
     }
 
 

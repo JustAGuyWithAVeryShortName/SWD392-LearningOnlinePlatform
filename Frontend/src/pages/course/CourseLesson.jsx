@@ -13,7 +13,9 @@ import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 
 const CourseLesson = () => {
-  
+
+  const [quizResultsByLesson, setQuizResultsByLesson] = useState({});
+  const { post: submitAssignment } = useFetch();
   const [result, setResult] = useState(null);
   // của quiz
   const [isDoingQuiz, setIsDoingQuiz] = useState(false);
@@ -223,29 +225,35 @@ const CourseLesson = () => {
 
   
   // chấm điểm quiz (lỗi sẽ bỏ)
- const handleSubmitQuiz = () => {
-  let correct = 0;
-  const quizzes = selectedLesson.quizzes;
+ const handleSubmitQuiz = async () => {
+  try {
+    const payload = {
+      lessonId: selectedLesson.lessonID,
+      answers: quizAnswers,
+    };
 
-  quizzes.forEach((quiz) => {
-    const selectedOptionId = quizAnswers[quiz.quizId];
-
-    const correctOption = quiz.options.find(
-      (opt) => opt.isCorrect === true
+    const res = await submitAssignment(
+      payload,
+      {},
+      "http://localhost:8080/api/quizzes/submit-assignment"
     );
 
-    if (correctOption && selectedOptionId === correctOption.optionId) {
-      correct++;
-    }
-  });
+    setQuizResultsByLesson(prev => ({
+  ...prev,
+  [selectedLesson.lessonID]: {
+    result: res,
+    submitted: true
+  }
+}));
 
-  const score = Math.round((correct / quizzes.length) * 100);
+setResult(res);
+setQuizSubmitted(true);
 
-  setResult({
-    total: quizzes.length,
-    correct,
-    score,
-  });
+    setIsDoingQuiz(false);
+    toast.success("Nộp bài thành công");
+  } catch (err) {
+    toast.error(err?.messageFromServer || "Nộp bài thất bại");
+  }
 };
   // Xử lý khi người dùng nhấn "Mark as Read"
   const handleMarkAsRead = async () => {
@@ -345,14 +353,27 @@ const CourseLesson = () => {
 
   const handleLessonClick = async (lessonID) => {
     setIsDoingQuiz(false);
-    setQuizSubmitted(false);
+   // setQuizSubmitted(false);
     setQuizAnswers({});
+   // setResult(null);
 
     setSelectedLessonID(lessonID);
     const foundLesson = (lessonByModuleID[selectedModuleID] || []).find(
       (l) => l.lessonID === lessonID,
     );
     setSelectedLesson(foundLesson);
+    const savedQuiz = quizResultsByLesson[lessonID];
+
+if (savedQuiz?.submitted) {
+  setQuizSubmitted(true);
+  setIsDoingQuiz(false);
+  setResult(savedQuiz.result);
+  setQuizAnswers({});
+} else {
+  setQuizSubmitted(false);
+  setIsDoingQuiz(false);
+  // KHÔNG reset quizAnswers nếu muốn giữ bài đang làm
+}
     setCurrentLessonProgress(null); // Clear previous lesson's progress
 
     if (!enrollmentID || !lessonID) {
@@ -566,15 +587,11 @@ const CourseLesson = () => {
                   )}
 
                   {/* button start */}
-                  {selectedLesson?.quizzes?.length > 0 &&
-                    !isDoingQuiz &&
-                    !quizSubmitted && (
-                      <div className="mt-4">
-                        <Button onClick={() => setIsDoingQuiz(true)}>
-                          Bắt đầu làm bài
-                        </Button>
-                      </div>
-                    )}
+                  {hasQuiz && !isDoingQuiz && !quizSubmitted && (
+  <Button onClick={() => setIsDoingQuiz(true)}>
+    Bắt đầu làm bài
+  </Button>
+)}
                   {/* Quiz Section */}
                   {selectedLesson?.quizzes?.length > 0 && isDoingQuiz && (
                     <div className="lesson-quiz-section mt-4">
@@ -610,14 +627,10 @@ const CourseLesson = () => {
                       ))}
 
                       {/* Nút Nộp */}
-                      <Button
+                   <Button
   className="mt-3"
   disabled={!isQuizCompleted}
-  onClick={() => {
-    handleSubmitQuiz();     // ⭐ QUAN TRỌNG
-    setQuizSubmitted(true);
-    setIsDoingQuiz(false);
-  }}
+  onClick={handleSubmitQuiz}
 >
   Nộp
 </Button>
@@ -628,7 +641,7 @@ const CourseLesson = () => {
                       ✔ Bạn đã hoàn thành bài quiz
                     </div>
                   )}
-                  {result && (
+                  {quizSubmitted && result && (
   <div className="quiz-result">
     <h4>Kết quả</h4>
     <p>Đúng: {result.correct}/{result.total}</p>

@@ -2,6 +2,7 @@ package com.hsp302.shared_english_e_learning_path.services;
 
 import com.hsp302.shared_english_e_learning_path.domain.dtos.requests.QuizRequest;
 import com.hsp302.shared_english_e_learning_path.domain.dtos.requests.SubmitQuizRequest;
+import com.hsp302.shared_english_e_learning_path.domain.dtos.responses.QuizResultResponse;
 import com.hsp302.shared_english_e_learning_path.domain.entities.Lesson;
 import com.hsp302.shared_english_e_learning_path.domain.entities.Quiz;
 import com.hsp302.shared_english_e_learning_path.domain.entities.QuizOption;
@@ -10,11 +11,11 @@ import com.hsp302.shared_english_e_learning_path.repositories.LessonRepository;
 import com.hsp302.shared_english_e_learning_path.repositories.QuizOptionRepository;
 import com.hsp302.shared_english_e_learning_path.repositories.QuizRepository;
 import com.hsp302.shared_english_e_learning_path.repositories.QuizSubmissionRepository;
-import com.hsp302.shared_english_e_learning_path.security.MyUserDetails;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -56,30 +57,69 @@ public class QuizService {
 
         return quiz;
     }
-    public QuizSubmission submitQuiz(UUID quizId, SubmitQuizRequest request) {
+    @Transactional
+    public QuizResultResponse submitAssignment(SubmitQuizRequest request) {
 
         String username = getCurrentUsername();
 
-        if (quizSubmissionRepository.existsByQuiz_QuizIdAndUsername(quizId, username)) {
-            throw new RuntimeException("You already submitted this quiz");
+        List<Quiz> quizzes =
+                quizRepo.findByLessonWithOptions(request.getLessonId());
+
+        if (quizzes.isEmpty()) {
+            throw new RuntimeException("Lesson has no quiz");
         }
 
-        QuizOption option = optionRepo.findById(request.getOptionId())
-                .orElseThrow(() -> new RuntimeException("Option not found"));
+        // ✅ chặn nộp lại assignment
+        boolean submitted = quizzes.stream()
+                .anyMatch(q ->
+                        quizSubmissionRepository
+                                .existsByUsernameAndQuiz_QuizId(username, q.getQuizId())
+                );
 
-        if (!option.getQuiz().getQuizId().equals(quizId)) {
-            throw new RuntimeException("Option does not belong to quiz");
+        if (submitted) {
+            throw new RuntimeException("Assignment already submitted");
         }
 
-        QuizSubmission submission = QuizSubmission.builder()
-                .submissionId(UUID.randomUUID())
-                .quiz(option.getQuiz())
-                .username(username)
-                .isCorrect(option.getIsCorrect())
+        int total = quizzes.size();
+        int correct = 0;
+
+        for (Quiz quiz : quizzes) {
+
+            UUID selectedOptionId =
+                    request.getAnswers().get(quiz.getQuizId());
+
+            if (selectedOptionId == null) continue;
+
+            QuizOption option = quiz.getOptions().stream()
+                    .filter(o -> o.getOptionId().equals(selectedOptionId))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Option not found"));
+
+            boolean isCorrect = Boolean.TRUE.equals(option.getIsCorrect());
+
+            quizSubmissionRepository.save(
+                    QuizSubmission.builder()
+                            .submissionId(UUID.randomUUID())
+                            .username(username)
+                            .quiz(quiz)
+                            .isCorrect(isCorrect)
+                            .build()
+            );
+
+            if (isCorrect) correct++;
+        }
+
+        int score = Math.round(correct * 100f / total);
+
+        return QuizResultResponse.builder()
+                .total(total)
+                .correct(correct)
+                .score(score)
+                .passed(score >= 70)
                 .build();
-
-        return quizSubmissionRepository.save(submission);
     }
+
+
     private String getCurrentUsername() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -89,12 +129,14 @@ public class QuizService {
 
         Object principal = auth.getPrincipal();
 
-        if (principal instanceof MyUserDetails) {
-            MyUserDetails myUserDetails = (MyUserDetails) principal;
-            return myUserDetails.getUser().getUsername();
+        // ✅ JWT principal
+        if (principal instanceof Jwt jwt) {
+            return jwt.getSubject(); // chính là username
         }
 
-        throw new RuntimeException("Invalid authentication principal");
+        throw new RuntimeException(
+                "Invalid authentication principal: " + principal.getClass().getName()
+        );
     }
     public List<Quiz> getQuizzesByLesson(UUID lessonId) {
         return quizRepo.findByLessonWithOptions(lessonId);
