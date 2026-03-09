@@ -267,7 +267,7 @@ if (Array.isArray(staffRequests)) {
               onApprove={(id) => handleApprove(id, 'course')}
               onReject={(id) => handleReject(id, 'course')}
             />
-            <Link to="/course-management">
+            <Link to="/staff/courses">
               <button className="btn btn-primary mt-3">
                 {t('viewAllCourses')}
               </button>

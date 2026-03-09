@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import useFetch from '../hooks/useFetch';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorMessage from './ErrorMessage';
-import { Play, Download, Calendar } from 'lucide-react';
+import { Play, Download } from 'lucide-react';
 import './VideoPlayerDisplay.css';
 
 export default function VideoPlayerDisplay({ lessonID }) {
@@ -36,23 +36,6 @@ export default function VideoPlayerDisplay({ lessonID }) {
   const handleVideoSelect = (video) => {
     setSelectedVideo(video);
     setCurrentTime(0);
-  };
-
-  // Format duration in seconds to MM:SS
-  const formatDuration = (seconds) => {
-    if (!seconds) return '0:00';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  // Format date
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
   };
 
   if (loading) {
@@ -92,15 +75,6 @@ export default function VideoPlayerDisplay({ lessonID }) {
             </video>
             <div className="player-info">
               <h3 className="video-title">{selectedVideo.title}</h3>
-              <div className="video-meta">
-                <span className="duration">
-                  {formatDuration(selectedVideo.duration)}
-                </span>
-                <span className="upload-date">
-                  <Calendar size={14} />
-                  {formatDate(selectedVideo.createdAt)}
-                </span>
-              </div>
             </div>
           </div>
         )}
@@ -123,9 +97,6 @@ export default function VideoPlayerDisplay({ lessonID }) {
                 </div>
                 <div className="item-info">
                   <h5 className="item-title">{video.title}</h5>
-                  <p className="item-duration">
-                    {formatDuration(video.duration)}
-                  </p>
                 </div>
               </div>
             ))}

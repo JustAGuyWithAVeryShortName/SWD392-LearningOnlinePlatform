@@ -16,6 +16,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Table(
+    name = "Progress",
+    uniqueConstraints = @UniqueConstraint(
+        name = "UQ_Progress_Enrollment_Lesson",
+        columnNames = {"enrollment_id", "lesson_id"}
+    )
+)
 public class Progress {
 
     @Id

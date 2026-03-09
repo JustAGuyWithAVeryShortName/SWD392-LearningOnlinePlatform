@@ -18,5 +18,14 @@
 },
 "latestBlogs":{
   "title": "Latest Blogs"
+},
+"myCourses": {
+  "title": "My Courses",
+  "subtitle": "Track your learning progress",
+  "viewAll": "View all enrollments",
+  "continueButton": "Continue",
+  "reviewButton": "Review",
+  "completedLabel": "completed",
+  "noEnrollments": "You haven't enrolled in any courses yet."
 }
 }

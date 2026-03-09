@@ -16,7 +16,6 @@ const CourseLesson = () => {
   const { get: getQuizResult } = useFetch();
   const [quizResultsByLesson, setQuizResultsByLesson] = useState({});
   const { post: submitAssignment } = useFetch();
-  const { get: getQuizResult } = useFetch();
   const [result, setResult] = useState(null);
   // của quiz
   const [isDoingQuiz, setIsDoingQuiz] = useState(false);
@@ -218,7 +217,78 @@ const CourseLesson = () => {
     }
   }, [selectedModuleID, lessonByModuleID]);
 
-  
+  // Tự động fetch kết quả quiz khi chuyển lesson (bao gồm lesson đầu tiên auto-select)
+  useEffect(() => {
+    const lessonID = selectedLesson?.lessonID;
+    if (!lessonID || !selectedLesson?.quizzes?.length) {
+      return;
+    }
+
+    // Đã có trong cache → dùng luôn
+    if (quizResultsByLesson[lessonID]?.submitted) {
+      setResult(quizResultsByLesson[lessonID].result);
+      return;
+    }
+
+    let cancelled = false;
+    const fetchQuizResult = async () => {
+      try {
+        const res = await getQuizResult(
+          `http://localhost:8080/api/quizzes/result/${lessonID}`
+        );
+        if (res && !cancelled) {
+          setQuizResultsByLesson(prev => ({
+            ...prev,
+            [lessonID]: { result: res, submitted: true },
+          }));
+          setResult(res);
+        }
+      } catch {
+        // Quiz chưa nộp lần nào, không cần làm gì
+      }
+    };
+
+    fetchQuizResult();
+    return () => { cancelled = true; };
+  }, [selectedLesson?.lessonID]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-fix: quiz đã nộp nhưng progress vẫn NOT_STARTED → tự hoàn thành progress
+  useEffect(() => {
+    const lessonID = selectedLesson?.lessonID;
+    if (!lessonID || !enrollmentID) return;
+
+    const quizWasSubmitted = quizResultsByLesson[lessonID]?.submitted;
+    if (!quizWasSubmitted) return;
+
+    // Đã completed rồi thì không cần làm gì
+    if (currentLessonProgress?.status === 'COMPLETED') return;
+
+    const progressID = currentLessonProgress?.progressID;
+    if (!progressID) return; // Chưa có progress record → handleLessonClick sẽ tạo
+
+    let cancelled = false;
+    const fixProgress = async () => {
+      try {
+        await putCompletedLesson(null, {}, `http://localhost:8080/api/progress/${progressID}`);
+        if (cancelled) return;
+        setCurrentLessonProgress(prev => prev ? { ...prev, status: 'COMPLETED' } : prev);
+        setLessonByModuleID(prev => {
+          const newMap = { ...prev };
+          if (selectedModuleID && newMap[selectedModuleID]) {
+            newMap[selectedModuleID] = newMap[selectedModuleID].map(l =>
+              l.lessonID === lessonID ? { ...l, status: 'COMPLETED' } : l
+            );
+          }
+          return newMap;
+        });
+      } catch (err) {
+        console.error("Auto-fix progress for quiz lesson failed:", err);
+      }
+    };
+    fixProgress();
+    return () => { cancelled = true; };
+  }, [selectedLesson?.lessonID, quizResultsByLesson, currentLessonProgress?.status, currentLessonProgress?.progressID]); // eslint-disable-line react-hooks/exhaustive-deps
+
   console.log("Course:", course);
   console.log("Modules:", modules);
   console.log("Lessons for selected module:", lessons);
@@ -227,12 +297,55 @@ const CourseLesson = () => {
 
 
   // chấm điểm quiz (lỗi sẽ bỏ)
- const handleSubmitQuiz = async () => {
-  try {
-    const payload = {
-      lessonId: selectedLesson.lessonID,
-      answers: quizAnswers,
-    };
+  // Helper: ensure progress is created and marked COMPLETED
+  const ensureLessonProgressCompleted = async () => {
+    try {
+      let progressID = currentLessonProgress?.progressID || selectedLesson?.progressID;
+
+      if (!progressID && enrollmentID && selectedLesson?.lessonID) {
+        const newProgress = await postProgress(
+          { enrollmentID, lessonID: selectedLesson.lessonID },
+          {},
+          "http://localhost:8080/api/progress"
+        );
+        if (newProgress?.progressID) {
+          progressID = newProgress.progressID;
+          setCurrentLessonProgress(newProgress);
+        }
+      }
+
+      if (progressID) {
+        await putCompletedLesson(
+          null,
+          {},
+          `http://localhost:8080/api/progress/${progressID}`
+        );
+        setCurrentLessonProgress(prev => prev ? { ...prev, status: 'COMPLETED' } : prev);
+        setLessonByModuleID(prev => {
+          const newMap = { ...prev };
+          if (selectedModuleID && newMap[selectedModuleID]) {
+            newMap[selectedModuleID] = newMap[selectedModuleID].map(l =>
+              l.lessonID === selectedLesson.lessonID
+                ? { ...l, status: "COMPLETED" }
+                : l
+            );
+          }
+          return newMap;
+        });
+      }
+    } catch (progressErr) {
+      console.error("Failed to complete lesson progress:", progressErr);
+    }
+  };
+
+   const handleSubmitQuiz = async () => {
+    let quizDone = false;
+
+      try {
+        const payload = {
+          lessonId: selectedLesson.lessonID,
+          answers: quizAnswers,
+        };
 
       const res = await submitAssignment(
         payload,
@@ -248,32 +361,39 @@ const CourseLesson = () => {
         }
       }));
 
-    setResult(res);
-    setIsDoingQuiz(false);
+      setResult(res);
+      setIsDoingQuiz(false);
+      toast.success("Nộp bài thành công");
+      quizDone = true;
+    } catch (err) {
+      if (err?.messageFromServer === "Assignment already submitted") {
+        try {
+          const res = await getQuizResult(
+            `http://localhost:8080/api/quizzes/result/${selectedLesson.lessonID}`
+          );
+          if (res) {
+            setQuizResultsByLesson(prev => ({
+              ...prev,
+              [selectedLesson.lessonID]: { result: res, submitted: true }
+            }));
+            setResult(res);
+          }
+        } catch {
+          // ignore
+        }
+        setIsDoingQuiz(false);
+        toast.info("Bài quiz đã được nộp trước đó");
+        quizDone = true;
+      } else {
+        toast.error(err?.messageFromServer || "Nộp bài thất bại");
+      }
+    }
 
-    toast.success("Nộp bài thành công");
-    setLessonByModuleID(prev => {
-  const newMap = { ...prev };
-  if (selectedModuleID && newMap[selectedModuleID]) {
-    newMap[selectedModuleID] = newMap[selectedModuleID].map(l =>
-      l.lessonID === selectedLesson.lessonID
-        ? { ...l, status: "COMPLETED" }
-        : l
-    );
-  }
-  return newMap;
-});
-    if (currentLessonProgress?.progressID) {
-  await putCompletedLesson(
-    null,
-    {},
-    `http://localhost:8080/api/progress/${currentLessonProgress.progressID}`
-  );
-}
-  } catch (err) {
-    toast.error(err?.messageFromServer || "Nộp bài thất bại");
-  }
-};
+    // Complete progress separately - errors here won't affect quiz result display
+    if (quizDone) {
+      await ensureLessonProgressCompleted();
+    }
+  };
   // Xử lý khi người dùng nhấn "Mark as Read"
   const handleMarkAsRead = async () => {
     // Fallback sang selectedLesson.progressID nếu currentLessonProgress không có
@@ -380,35 +500,12 @@ const CourseLesson = () => {
       (l) => l.lessonID === lessonID,
     );
     setSelectedLesson(foundLesson);
-   let savedQuiz = quizResultsByLesson[lessonID];
+   const savedQuiz = quizResultsByLesson[lessonID];
 
-if (foundLesson?.quizzes?.length > 0 && !savedQuiz) {
-  try {
-    const res = await getQuizResult(
-      `http://localhost:8080/api/quizzes/result/${lessonID}`
-    );
-
-    if (res) {
-      savedQuiz = {
-        result: res,
-        submitted: true
-      };
-
-      setQuizResultsByLesson(prev => ({
-        ...prev,
-        [lessonID]: savedQuiz
-      }));
-    }
-  } catch (err) {
-    console.log("Quiz chưa làm");
-  }
-}
-
+setIsDoingQuiz(false);
 if (savedQuiz?.submitted) {
-  setIsDoingQuiz(false);
   setResult(savedQuiz.result);
 } else {
-  setIsDoingQuiz(false);
   setResult(null);
 }
     setCurrentLessonProgress(null); // Clear previous lesson's progress
