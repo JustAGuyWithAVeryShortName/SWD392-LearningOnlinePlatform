@@ -25,4 +25,6 @@ public class CourseResponse {
     CourseStatus status;
     String createdAt;
     String updatedAt;
+    private String staffUsername;
+    private String staffFullName;
 }

@@ -46,7 +46,7 @@ export default function AppRoute() {
         <Route path="/oauth2/success" element={<OAuth2RedirectHandler />} />
 
         <Route path="/blogs" element={<BlogList />} />
-        <Route path="/blog-management" element={<BlogManagement />} />
+        <Route path="/staff/blogs" element={<BlogManagement />} />
         <Route path="/blogs/:id" element={<BlogDetails />} />
         {/* Tạo blog mới tại /blogs/create */}
         <Route path="/blogs/create" element={<BlogCreation />} />
@@ -54,7 +54,7 @@ export default function AppRoute() {
         <Route path="/blogs/create/:id" element={<BlogCreation />} />
 
         <Route path="/courses" element={<CourseList />} />
-        <Route path="/course-management" element={<CourseManagement />} />
+        <Route path="/staff/courses" element={<CourseManagement />} />
         <Route path="/courses/:id" element={<CourseDetails />} />
 
         <Route path="/staffrequest-management" element={<StaffRequestManagement />} />

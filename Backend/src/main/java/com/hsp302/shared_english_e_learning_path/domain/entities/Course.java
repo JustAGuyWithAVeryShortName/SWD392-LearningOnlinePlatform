@@ -37,6 +37,10 @@ public class Course {
     Instant createdAt;
     Instant updatedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "staff_id", nullable = true)
+    User staff;
+
     @OneToMany(mappedBy = "course")
     List<Enrollment> enrollments = new ArrayList<>();
 

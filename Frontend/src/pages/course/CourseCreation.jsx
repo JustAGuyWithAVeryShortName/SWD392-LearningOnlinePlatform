@@ -174,14 +174,17 @@ const CourseCreation = () => {
         image: uploadedImageUrl,
       };
 
+      // Pass Authorization header so backend can identify the actor
+      const token = localStorage.getItem("token");
+      const headers = { Authorization: `Bearer ${token}` };
+
       const res = await postCourse(
         body,
-        {},
+        headers,                              // ← was {} before
         "http://localhost:8080/api/course"
       );
 
       setCourseID(res.courseID);
-
       toast.success("Course created successfully");
     } catch (err) {
       toast.error("Create course failed");
