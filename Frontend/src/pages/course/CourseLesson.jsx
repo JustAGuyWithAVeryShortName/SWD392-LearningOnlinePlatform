@@ -13,13 +13,13 @@ import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 
 const CourseLesson = () => {
-
+  
   const [quizResultsByLesson, setQuizResultsByLesson] = useState({});
   const { post: submitAssignment } = useFetch();
   const [result, setResult] = useState(null);
   // của quiz
   const [isDoingQuiz, setIsDoingQuiz] = useState(false);
-  const [quizSubmitted, setQuizSubmitted] = useState(false);
+ // const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState({});
 
   const { t } = useTranslation("courseLesson"); // Khai báo useTranslation
@@ -27,6 +27,34 @@ const CourseLesson = () => {
   const [expandedModuleID, setExpandedModuleID] = useState(null);
 
   const { id: courseID } = useParams();
+  const { get: getEnrollment } = useFetch();
+
+  useEffect(() => {
+  const fetchEnrollment = async () => {
+    try {
+      const username = localStorage.getItem("username");
+
+      if (!username || !courseID) return;
+
+      const res = await getEnrollment(
+        `http://localhost:8080/api/enrollment?courseID=${courseID}&username=${username}`
+      );
+
+      if (res?.enrollmentID) {
+         setEnrollmentID(res.enrollmentID);
+  localStorage.setItem("enrollmentID", res.enrollmentID);
+      }
+    } catch (err) {
+      console.error("Cannot fetch enrollment:", err);
+    }
+  };
+
+  if (!enrollmentID) {
+    fetchEnrollment();
+  }
+}, [courseID]);
+
+
   const location = useLocation();
   const enrollmentID = location.state?.enrollmentID;
 
@@ -185,10 +213,11 @@ const CourseLesson = () => {
             mergedLessonsMap[firstModuleID] &&
             mergedLessonsMap[firstModuleID].length > 0
           ) {
-            const firstLesson = mergedLessonsMap[firstModuleID][0];
-            setSelectedLessonID(firstLesson.lessonID);
-            setSelectedLesson(firstLesson); // Set the selected lesson content
-            setCurrentLessonProgress({
+           const firstLesson = mergedLessonsMap[firstModuleID][0];
+setSelectedLessonID(firstLesson.lessonID);
+ setSelectedLesson(firstLesson);
+// Set the selected lesson content
+             setCurrentLessonProgress({
               progressID: firstLesson.progressID,
               status: firstLesson.status,
               enrollment: { enrollmentID: enrollmentID }, // Mock minimal enrollment for currentLessonProgress
@@ -217,12 +246,12 @@ const CourseLesson = () => {
     }
   }, [selectedModuleID, lessonByModuleID]);
 
+  
   console.log("Course:", course);
   console.log("Modules:", modules);
   console.log("Lessons for selected module:", lessons);
   console.log("All Lessons by Module ID (with progress):", lessonByModuleID);
   console.log("Current Lesson Progress:", currentLessonProgress);
-
   
   // chấm điểm quiz (lỗi sẽ bỏ)
  const handleSubmitQuiz = async () => {
@@ -239,18 +268,35 @@ const CourseLesson = () => {
     );
 
     setQuizResultsByLesson(prev => ({
-  ...prev,
-  [selectedLesson.lessonID]: {
-    result: res,
-    submitted: true
-  }
-}));
+      ...prev,
+      [selectedLesson.lessonID]: {
+        result: res,
+        submitted: true
+      }
+    }));
 
-setResult(res);
-setQuizSubmitted(true);
-
+    setResult(res);
     setIsDoingQuiz(false);
+
     toast.success("Nộp bài thành công");
+    setLessonByModuleID(prev => {
+  const newMap = { ...prev };
+  if (selectedModuleID && newMap[selectedModuleID]) {
+    newMap[selectedModuleID] = newMap[selectedModuleID].map(l =>
+      l.lessonID === selectedLesson.lessonID
+        ? { ...l, status: "COMPLETED" }
+        : l
+    );
+  }
+  return newMap;
+});
+    if (currentLessonProgress?.progressID) {
+  await putCompletedLesson(
+    null,
+    {},
+    `http://localhost:8080/api/progress/${currentLessonProgress.progressID}`
+  );
+}
   } catch (err) {
     toast.error(err?.messageFromServer || "Nộp bài thất bại");
   }
@@ -351,32 +397,57 @@ setQuizSubmitted(true);
     }
   };
 
-  const handleLessonClick = async (lessonID) => {
+  const handleLessonClick = async (lessonID, lessonData = null) => {
     setIsDoingQuiz(false);
    // setQuizSubmitted(false);
-    setQuizAnswers({});
+    if (!quizResultsByLesson[lessonID]) {
+  setQuizAnswers({});
+}
    // setResult(null);
 
     setSelectedLessonID(lessonID);
-    const foundLesson = (lessonByModuleID[selectedModuleID] || []).find(
-      (l) => l.lessonID === lessonID,
-    );
+    const foundLesson =
+  lessonData ||
+  Object.values(lessonByModuleID)
+    .flat()
+    .find((l) => l.lessonID === lessonID);
     setSelectedLesson(foundLesson);
-    const savedQuiz = quizResultsByLesson[lessonID];
+   let savedQuiz = quizResultsByLesson[lessonID];
+
+if (foundLesson?.quizzes?.length > 0 && !savedQuiz) {
+  try {
+    const res = await getQuizResult(
+      `http://localhost:8080/api/quizzes/result/${lessonID}`
+    );
+
+    if (res) {
+      savedQuiz = {
+        result: res,
+        submitted: true
+      };
+
+      setQuizResultsByLesson(prev => ({
+        ...prev,
+        [lessonID]: savedQuiz
+      }));
+    }
+  } catch (err) {
+    console.log("Quiz chưa làm");
+  }
+}
 
 if (savedQuiz?.submitted) {
-  setQuizSubmitted(true);
   setIsDoingQuiz(false);
   setResult(savedQuiz.result);
-  setQuizAnswers({});
 } else {
-  setQuizSubmitted(false);
   setIsDoingQuiz(false);
-  // KHÔNG reset quizAnswers nếu muốn giữ bài đang làm
+  setResult(null);
 }
     setCurrentLessonProgress(null); // Clear previous lesson's progress
 
     if (!enrollmentID || !lessonID) {
+     console.log("Enrollment ID:", enrollmentID);
+console.log("Lesson ID:", lessonID);
       console.warn(
         "Enrollment ID or Lesson ID is missing, cannot fetch progress.",
       );
@@ -386,18 +457,22 @@ if (savedQuiz?.submitted) {
     try {
       // Fetch the specific progress for this lesson and enrollment
       const progressResponse = await getProgress(
-        `http://localhost:8080/api/progress?enrollmentID=${enrollmentID}&lessonID=${lessonID}`,
-      );
+  `http://localhost:8080/api/progress?enrollmentID=${enrollmentID}&lessonID=${lessonID}`
+);
 
-      if (progressResponse.data) {
-        setCurrentLessonProgress(progressResponse);
-      } else {
-        const newProgress = await postProgress(
-          { enrollmentID, lessonID },
-          {},
-          "http://localhost:8080/api/progress",
-        );
-        setCurrentLessonProgress(newProgress);
+if (progressResponse && progressResponse.progressID) {
+  setCurrentLessonProgress(progressResponse);
+} else {
+  const newProgress = await postProgress(
+    { enrollmentID, lessonID },
+    {},
+    "http://localhost:8080/api/progress"
+  );
+
+  setCurrentLessonProgress(newProgress);
+
+
+        //console.log("New progress:", newProgress);
 
         // Update the lessonByModuleID with the new progress status for this lesson
         setLessonByModuleID((prevMap) => {
@@ -436,12 +511,16 @@ if (savedQuiz?.submitted) {
 
   // check quiz completion status
   const isQuizCompleted = Array.isArray(selectedLesson?.quizzes)
-    ? selectedLesson.quizzes.every((q) => quizAnswers[q.quizId])
-    : true;
+  ? selectedLesson.quizzes.every(
+      (q) => quizAnswers[q.quizId] !== undefined
+    )
+  : true;
   // Check if the current lesson has quizzes
   const hasQuiz =
     Array.isArray(selectedLesson?.quizzes) && selectedLesson.quizzes.length > 0;
 
+    const savedQuiz = quizResultsByLesson[selectedLesson?.lessonID];
+const quizSubmitted = savedQuiz?.submitted;
   // Show loading spinner if any initial data is loading
   if (isLoadingData) {
     return (
@@ -526,9 +605,9 @@ if (savedQuiz?.submitted) {
                             <button
                               key={lessonItem.lessonID}
                               className={`lesson-item ${lessonItem.lessonID === selectedLessonID ? "active" : ""}`}
-                              onClick={() =>
-                                handleLessonClick(lessonItem.lessonID)
-                              }
+                             onClick={() =>
+  handleLessonClick(lessonItem.lessonID, lessonItem)
+}
                             >
                               {/* Use lessonItem.status directly for sidebar icons */}
                               {lessonItem.status === "COMPLETED" ? (

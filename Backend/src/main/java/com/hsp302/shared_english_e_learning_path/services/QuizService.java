@@ -29,6 +29,8 @@ public class QuizService {
     private final LessonRepository lessonRepo;
     private final QuizSubmissionRepository quizSubmissionRepository;
 
+
+
     @Transactional
     public Quiz createQuiz(UUID lessonId, QuizRequest request) {
 
@@ -140,5 +142,50 @@ public class QuizService {
     }
     public List<Quiz> getQuizzesByLesson(UUID lessonId) {
         return quizRepo.findByLessonWithOptions(lessonId);
+    }
+
+
+    public QuizResultResponse getQuizResultByLesson(UUID lessonId) {
+
+        String username = getCurrentUsername();
+
+        List<Quiz> quizzes = quizRepo.findByLessonWithOptions(lessonId);
+
+        if (quizzes.isEmpty()) {
+            throw new RuntimeException("Lesson has no quiz");
+        }
+
+        int total = quizzes.size();
+        int correct = 0;
+        int answered = 0;
+
+        for (Quiz quiz : quizzes) {
+
+            QuizSubmission submission =
+                    quizSubmissionRepository
+                            .findByUsernameAndQuiz_QuizId(username, quiz.getQuizId())
+                            .orElse(null);
+
+            if (submission != null) {
+                answered++;
+                if (Boolean.TRUE.equals(submission.getIsCorrect())) {
+                    correct++;
+                }
+            }
+        }
+
+        // chưa làm quiz
+        if (answered == 0) {
+            return null;
+        }
+
+        int score = Math.round(correct * 100f / total);
+
+        return QuizResultResponse.builder()
+                .total(total)
+                .correct(correct)
+                .score(score)
+                .passed(score >= 70)
+                .build();
     }
 }
