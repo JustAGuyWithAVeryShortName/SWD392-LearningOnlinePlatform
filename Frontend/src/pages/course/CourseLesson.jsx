@@ -223,38 +223,38 @@ const CourseLesson = () => {
   console.log("All Lessons by Module ID (with progress):", lessonByModuleID);
   console.log("Current Lesson Progress:", currentLessonProgress);
 
-  
+
   // chấm điểm quiz (lỗi sẽ bỏ)
- const handleSubmitQuiz = async () => {
-  try {
-    const payload = {
-      lessonId: selectedLesson.lessonID,
-      answers: quizAnswers,
-    };
+  const handleSubmitQuiz = async () => {
+    try {
+      const payload = {
+        lessonId: selectedLesson.lessonID,
+        answers: quizAnswers,
+      };
 
-    const res = await submitAssignment(
-      payload,
-      {},
-      "http://localhost:8080/api/quizzes/submit-assignment"
-    );
+      const res = await submitAssignment(
+        payload,
+        {},
+        "http://localhost:8080/api/quizzes/submit-assignment"
+      );
 
-    setQuizResultsByLesson(prev => ({
-  ...prev,
-  [selectedLesson.lessonID]: {
-    result: res,
-    submitted: true
-  }
-}));
+      setQuizResultsByLesson(prev => ({
+        ...prev,
+        [selectedLesson.lessonID]: {
+          result: res,
+          submitted: true
+        }
+      }));
 
-setResult(res);
-setQuizSubmitted(true);
+      setResult(res);
+      setQuizSubmitted(true);
 
-    setIsDoingQuiz(false);
-    toast.success("Nộp bài thành công");
-  } catch (err) {
-    toast.error(err?.messageFromServer || "Nộp bài thất bại");
-  }
-};
+      setIsDoingQuiz(false);
+      toast.success("Nộp bài thành công");
+    } catch (err) {
+      toast.error(err?.messageFromServer || "Nộp bài thất bại");
+    }
+  };
   // Xử lý khi người dùng nhấn "Mark as Read"
   const handleMarkAsRead = async () => {
     if (
@@ -353,9 +353,9 @@ setQuizSubmitted(true);
 
   const handleLessonClick = async (lessonID) => {
     setIsDoingQuiz(false);
-   // setQuizSubmitted(false);
+    // setQuizSubmitted(false);
     setQuizAnswers({});
-   // setResult(null);
+    // setResult(null);
 
     setSelectedLessonID(lessonID);
     const foundLesson = (lessonByModuleID[selectedModuleID] || []).find(
@@ -364,16 +364,16 @@ setQuizSubmitted(true);
     setSelectedLesson(foundLesson);
     const savedQuiz = quizResultsByLesson[lessonID];
 
-if (savedQuiz?.submitted) {
-  setQuizSubmitted(true);
-  setIsDoingQuiz(false);
-  setResult(savedQuiz.result);
-  setQuizAnswers({});
-} else {
-  setQuizSubmitted(false);
-  setIsDoingQuiz(false);
-  // KHÔNG reset quizAnswers nếu muốn giữ bài đang làm
-}
+    if (savedQuiz?.submitted) {
+      setQuizSubmitted(true);
+      setIsDoingQuiz(false);
+      setResult(savedQuiz.result);
+      setQuizAnswers({});
+    } else {
+      setQuizSubmitted(false);
+      setIsDoingQuiz(false);
+      // KHÔNG reset quizAnswers nếu muốn giữ bài đang làm
+    }
     setCurrentLessonProgress(null); // Clear previous lesson's progress
 
     if (!enrollmentID || !lessonID) {
@@ -406,10 +406,10 @@ if (savedQuiz?.submitted) {
             newMap[selectedModuleID] = newMap[selectedModuleID].map((lesson) =>
               lesson.lessonID === lessonID
                 ? {
-                    ...lesson,
-                    status: newProgress.status,
-                    progressID: newProgress.progressID,
-                  }
+                  ...lesson,
+                  status: newProgress.status,
+                  progressID: newProgress.progressID,
+                }
                 : lesson,
             );
           }
@@ -588,10 +588,10 @@ if (savedQuiz?.submitted) {
 
                   {/* button start */}
                   {hasQuiz && !isDoingQuiz && !quizSubmitted && (
-  <Button onClick={() => setIsDoingQuiz(true)}>
-    Bắt đầu làm bài
-  </Button>
-)}
+                    <Button onClick={() => setIsDoingQuiz(true)}>
+                      Bắt đầu làm bài
+                    </Button>
+                  )}
                   {/* Quiz Section */}
                   {selectedLesson?.quizzes?.length > 0 && isDoingQuiz && (
                     <div className="lesson-quiz-section mt-4">
@@ -627,13 +627,13 @@ if (savedQuiz?.submitted) {
                       ))}
 
                       {/* Nút Nộp */}
-                   <Button
-  className="mt-3"
-  disabled={!isQuizCompleted}
-  onClick={handleSubmitQuiz}
->
-  Nộp
-</Button>
+                      <Button
+                        className="mt-3"
+                        disabled={!isQuizCompleted}
+                        onClick={handleSubmitQuiz}
+                      >
+                        Nộp
+                      </Button>
                     </div>
                   )}
                   {quizSubmitted && (
@@ -642,12 +642,12 @@ if (savedQuiz?.submitted) {
                     </div>
                   )}
                   {quizSubmitted && result && (
-  <div className="quiz-result">
-    <h4>Kết quả</h4>
-    <p>Đúng: {result.correct}/{result.total}</p>
-    <p>Điểm: <b>{result.score}</b></p>
-  </div>
-)}
+                    <div className="quiz-result">
+                      <h4>Kết quả</h4>
+                      <p>Đúng: {result.correct}/{result.total}</p>
+                      <p>Điểm: <b>{result.score}</b></p>
+                    </div>
+                  )}
                   {/* Mark as Read Button */}
 
                   {!hasQuiz && (
@@ -663,8 +663,8 @@ if (savedQuiz?.submitted) {
                         }
                       >
                         {loadingCompletedLesson ||
-                        loadingNewProgress ||
-                        loadingProgress
+                          loadingNewProgress ||
+                          loadingProgress
                           ? t("mainContent.markAsReadButton.loading")
                           : isCurrentLessonCompleted
                             ? t("mainContent.markAsReadButton.completed")
@@ -674,14 +674,14 @@ if (savedQuiz?.submitted) {
                       {(errorNewProgress ||
                         errorCompletedLesson ||
                         errorProgress) && (
-                        <ErrorMessage
-                          error={
-                            errorNewProgress ||
-                            errorCompletedLesson ||
-                            errorProgress
-                          }
-                        />
-                      )}
+                          <ErrorMessage
+                            error={
+                              errorNewProgress ||
+                              errorCompletedLesson ||
+                              errorProgress
+                            }
+                          />
+                        )}
                     </div>
                   )}
                 </div>
