@@ -23,6 +23,8 @@ public class Course {
     @Id
     @Column(name = "course_id")
     UUID courseID;
+
+    @Column(columnDefinition = "NVARCHAR(255)")
     String courseName;
     Integer quantity;
     Integer duration;

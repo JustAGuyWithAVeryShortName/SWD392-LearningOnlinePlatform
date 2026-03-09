@@ -13,7 +13,7 @@ import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 
 const CourseLesson = () => {
-  
+  const { get: getQuizResult } = useFetch();
   const [quizResultsByLesson, setQuizResultsByLesson] = useState({});
   const { post: submitAssignment } = useFetch();
   const [result, setResult] = useState(null);
