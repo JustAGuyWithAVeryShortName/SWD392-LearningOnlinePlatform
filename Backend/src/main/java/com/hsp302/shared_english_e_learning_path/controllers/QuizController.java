@@ -18,12 +18,6 @@ public class QuizController {
 
     private final QuizService quizService;
 
-
-    @GetMapping("/result/{lessonId}")
-    public QuizResultResponse getQuizResult(@PathVariable UUID lessonId) {
-        return quizService.getQuizResultByLesson(lessonId);
-    }
-
     @PostMapping("/lesson/{lessonId}")
     public Quiz createQuiz(
             @PathVariable UUID lessonId,

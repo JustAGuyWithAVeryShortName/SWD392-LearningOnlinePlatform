@@ -19,7 +19,7 @@ const CourseLesson = () => {
   const [result, setResult] = useState(null);
   // của quiz
   const [isDoingQuiz, setIsDoingQuiz] = useState(false);
- // const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState({});
 
   const { t } = useTranslation("courseLesson"); // Khai báo useTranslation
@@ -27,34 +27,6 @@ const CourseLesson = () => {
   const [expandedModuleID, setExpandedModuleID] = useState(null);
 
   const { id: courseID } = useParams();
-  const { get: getEnrollment } = useFetch();
-
-  useEffect(() => {
-  const fetchEnrollment = async () => {
-    try {
-      const username = localStorage.getItem("username");
-
-      if (!username || !courseID) return;
-
-      const res = await getEnrollment(
-        `http://localhost:8080/api/enrollment?courseID=${courseID}&username=${username}`
-      );
-
-      if (res?.enrollmentID) {
-         setEnrollmentID(res.enrollmentID);
-  localStorage.setItem("enrollmentID", res.enrollmentID);
-      }
-    } catch (err) {
-      console.error("Cannot fetch enrollment:", err);
-    }
-  };
-
-  if (!enrollmentID) {
-    fetchEnrollment();
-  }
-}, [courseID]);
-
-
   const location = useLocation();
   const enrollmentID = location.state?.enrollmentID;
 
@@ -213,11 +185,10 @@ const CourseLesson = () => {
             mergedLessonsMap[firstModuleID] &&
             mergedLessonsMap[firstModuleID].length > 0
           ) {
-           const firstLesson = mergedLessonsMap[firstModuleID][0];
-setSelectedLessonID(firstLesson.lessonID);
- setSelectedLesson(firstLesson);
-// Set the selected lesson content
-             setCurrentLessonProgress({
+            const firstLesson = mergedLessonsMap[firstModuleID][0];
+            setSelectedLessonID(firstLesson.lessonID);
+            setSelectedLesson(firstLesson); // Set the selected lesson content
+            setCurrentLessonProgress({
               progressID: firstLesson.progressID,
               status: firstLesson.status,
               enrollment: { enrollmentID: enrollmentID }, // Mock minimal enrollment for currentLessonProgress
@@ -246,61 +217,44 @@ setSelectedLessonID(firstLesson.lessonID);
     }
   }, [selectedModuleID, lessonByModuleID]);
 
-  
   console.log("Course:", course);
   console.log("Modules:", modules);
   console.log("Lessons for selected module:", lessons);
   console.log("All Lessons by Module ID (with progress):", lessonByModuleID);
   console.log("Current Lesson Progress:", currentLessonProgress);
-  
+
+
   // chấm điểm quiz (lỗi sẽ bỏ)
- const handleSubmitQuiz = async () => {
-  try {
-    const payload = {
-      lessonId: selectedLesson.lessonID,
-      answers: quizAnswers,
-    };
+  const handleSubmitQuiz = async () => {
+    try {
+      const payload = {
+        lessonId: selectedLesson.lessonID,
+        answers: quizAnswers,
+      };
 
-    const res = await submitAssignment(
-      payload,
-      {},
-      "http://localhost:8080/api/quizzes/submit-assignment"
-    );
+      const res = await submitAssignment(
+        payload,
+        {},
+        "http://localhost:8080/api/quizzes/submit-assignment"
+      );
 
-    setQuizResultsByLesson(prev => ({
-      ...prev,
-      [selectedLesson.lessonID]: {
-        result: res,
-        submitted: true
-      }
-    }));
+      setQuizResultsByLesson(prev => ({
+        ...prev,
+        [selectedLesson.lessonID]: {
+          result: res,
+          submitted: true
+        }
+      }));
 
-    setResult(res);
-    setIsDoingQuiz(false);
+      setResult(res);
+      setQuizSubmitted(true);
 
-    toast.success("Nộp bài thành công");
-    setLessonByModuleID(prev => {
-  const newMap = { ...prev };
-  if (selectedModuleID && newMap[selectedModuleID]) {
-    newMap[selectedModuleID] = newMap[selectedModuleID].map(l =>
-      l.lessonID === selectedLesson.lessonID
-        ? { ...l, status: "COMPLETED" }
-        : l
-    );
-  }
-  return newMap;
-});
-    if (currentLessonProgress?.progressID) {
-  await putCompletedLesson(
-    null,
-    {},
-    `http://localhost:8080/api/progress/${currentLessonProgress.progressID}`
-  );
-}
-  } catch (err) {
-    toast.error(err?.messageFromServer || "Nộp bài thất bại");
-  }
-};
+      setIsDoingQuiz(false);
+      toast.success("Nộp bài thành công");
+    } catch (err) {
+      toast.error(err?.messageFromServer || "Nộp bài thất bại");
+    }
+  };
   // Xử lý khi người dùng nhấn "Mark as Read"
   const handleMarkAsRead = async () => {
     if (
@@ -397,57 +351,32 @@ setSelectedLessonID(firstLesson.lessonID);
     }
   };
 
-  const handleLessonClick = async (lessonID, lessonData = null) => {
+  const handleLessonClick = async (lessonID) => {
     setIsDoingQuiz(false);
-   // setQuizSubmitted(false);
-    if (!quizResultsByLesson[lessonID]) {
-  setQuizAnswers({});
-}
-   // setResult(null);
+    // setQuizSubmitted(false);
+    setQuizAnswers({});
+    // setResult(null);
 
     setSelectedLessonID(lessonID);
-    const foundLesson =
-  lessonData ||
-  Object.values(lessonByModuleID)
-    .flat()
-    .find((l) => l.lessonID === lessonID);
-    setSelectedLesson(foundLesson);
-   let savedQuiz = quizResultsByLesson[lessonID];
-
-if (foundLesson?.quizzes?.length > 0 && !savedQuiz) {
-  try {
-    const res = await getQuizResult(
-      `http://localhost:8080/api/quizzes/result/${lessonID}`
+    const foundLesson = (lessonByModuleID[selectedModuleID] || []).find(
+      (l) => l.lessonID === lessonID,
     );
+    setSelectedLesson(foundLesson);
+    const savedQuiz = quizResultsByLesson[lessonID];
 
-    if (res) {
-      savedQuiz = {
-        result: res,
-        submitted: true
-      };
-
-      setQuizResultsByLesson(prev => ({
-        ...prev,
-        [lessonID]: savedQuiz
-      }));
+    if (savedQuiz?.submitted) {
+      setQuizSubmitted(true);
+      setIsDoingQuiz(false);
+      setResult(savedQuiz.result);
+      setQuizAnswers({});
+    } else {
+      setQuizSubmitted(false);
+      setIsDoingQuiz(false);
+      // KHÔNG reset quizAnswers nếu muốn giữ bài đang làm
     }
-  } catch (err) {
-    console.log("Quiz chưa làm");
-  }
-}
-
-if (savedQuiz?.submitted) {
-  setIsDoingQuiz(false);
-  setResult(savedQuiz.result);
-} else {
-  setIsDoingQuiz(false);
-  setResult(null);
-}
     setCurrentLessonProgress(null); // Clear previous lesson's progress
 
     if (!enrollmentID || !lessonID) {
-     console.log("Enrollment ID:", enrollmentID);
-console.log("Lesson ID:", lessonID);
       console.warn(
         "Enrollment ID or Lesson ID is missing, cannot fetch progress.",
       );
@@ -457,22 +386,18 @@ console.log("Lesson ID:", lessonID);
     try {
       // Fetch the specific progress for this lesson and enrollment
       const progressResponse = await getProgress(
-  `http://localhost:8080/api/progress?enrollmentID=${enrollmentID}&lessonID=${lessonID}`
-);
+        `http://localhost:8080/api/progress?enrollmentID=${enrollmentID}&lessonID=${lessonID}`,
+      );
 
-if (progressResponse && progressResponse.progressID) {
-  setCurrentLessonProgress(progressResponse);
-} else {
-  const newProgress = await postProgress(
-    { enrollmentID, lessonID },
-    {},
-    "http://localhost:8080/api/progress"
-  );
-
-  setCurrentLessonProgress(newProgress);
-
-
-        //console.log("New progress:", newProgress);
+      if (progressResponse.data) {
+        setCurrentLessonProgress(progressResponse);
+      } else {
+        const newProgress = await postProgress(
+          { enrollmentID, lessonID },
+          {},
+          "http://localhost:8080/api/progress",
+        );
+        setCurrentLessonProgress(newProgress);
 
         // Update the lessonByModuleID with the new progress status for this lesson
         setLessonByModuleID((prevMap) => {
@@ -481,10 +406,10 @@ if (progressResponse && progressResponse.progressID) {
             newMap[selectedModuleID] = newMap[selectedModuleID].map((lesson) =>
               lesson.lessonID === lessonID
                 ? {
-                    ...lesson,
-                    status: newProgress.status,
-                    progressID: newProgress.progressID,
-                  }
+                  ...lesson,
+                  status: newProgress.status,
+                  progressID: newProgress.progressID,
+                }
                 : lesson,
             );
           }
@@ -511,16 +436,12 @@ if (progressResponse && progressResponse.progressID) {
 
   // check quiz completion status
   const isQuizCompleted = Array.isArray(selectedLesson?.quizzes)
-  ? selectedLesson.quizzes.every(
-      (q) => quizAnswers[q.quizId] !== undefined
-    )
-  : true;
+    ? selectedLesson.quizzes.every((q) => quizAnswers[q.quizId])
+    : true;
   // Check if the current lesson has quizzes
   const hasQuiz =
     Array.isArray(selectedLesson?.quizzes) && selectedLesson.quizzes.length > 0;
 
-    const savedQuiz = quizResultsByLesson[selectedLesson?.lessonID];
-const quizSubmitted = savedQuiz?.submitted;
   // Show loading spinner if any initial data is loading
   if (isLoadingData) {
     return (
@@ -605,9 +526,9 @@ const quizSubmitted = savedQuiz?.submitted;
                             <button
                               key={lessonItem.lessonID}
                               className={`lesson-item ${lessonItem.lessonID === selectedLessonID ? "active" : ""}`}
-                             onClick={() =>
-  handleLessonClick(lessonItem.lessonID, lessonItem)
-}
+                              onClick={() =>
+                                handleLessonClick(lessonItem.lessonID)
+                              }
                             >
                               {/* Use lessonItem.status directly for sidebar icons */}
                               {lessonItem.status === "COMPLETED" ? (
@@ -667,10 +588,10 @@ const quizSubmitted = savedQuiz?.submitted;
 
                   {/* button start */}
                   {hasQuiz && !isDoingQuiz && !quizSubmitted && (
-  <Button onClick={() => setIsDoingQuiz(true)}>
-    Bắt đầu làm bài
-  </Button>
-)}
+                    <Button onClick={() => setIsDoingQuiz(true)}>
+                      Bắt đầu làm bài
+                    </Button>
+                  )}
                   {/* Quiz Section */}
                   {selectedLesson?.quizzes?.length > 0 && isDoingQuiz && (
                     <div className="lesson-quiz-section mt-4">
@@ -706,13 +627,13 @@ const quizSubmitted = savedQuiz?.submitted;
                       ))}
 
                       {/* Nút Nộp */}
-                   <Button
-  className="mt-3"
-  disabled={!isQuizCompleted}
-  onClick={handleSubmitQuiz}
->
-  Nộp
-</Button>
+                      <Button
+                        className="mt-3"
+                        disabled={!isQuizCompleted}
+                        onClick={handleSubmitQuiz}
+                      >
+                        Nộp
+                      </Button>
                     </div>
                   )}
                   {quizSubmitted && (
@@ -721,12 +642,12 @@ const quizSubmitted = savedQuiz?.submitted;
                     </div>
                   )}
                   {quizSubmitted && result && (
-  <div className="quiz-result">
-    <h4>Kết quả</h4>
-    <p>Đúng: {result.correct}/{result.total}</p>
-    <p>Điểm: <b>{result.score}</b></p>
-  </div>
-)}
+                    <div className="quiz-result">
+                      <h4>Kết quả</h4>
+                      <p>Đúng: {result.correct}/{result.total}</p>
+                      <p>Điểm: <b>{result.score}</b></p>
+                    </div>
+                  )}
                   {/* Mark as Read Button */}
 
                   {!hasQuiz && (
@@ -742,8 +663,8 @@ const quizSubmitted = savedQuiz?.submitted;
                         }
                       >
                         {loadingCompletedLesson ||
-                        loadingNewProgress ||
-                        loadingProgress
+                          loadingNewProgress ||
+                          loadingProgress
                           ? t("mainContent.markAsReadButton.loading")
                           : isCurrentLessonCompleted
                             ? t("mainContent.markAsReadButton.completed")
@@ -753,14 +674,14 @@ const quizSubmitted = savedQuiz?.submitted;
                       {(errorNewProgress ||
                         errorCompletedLesson ||
                         errorProgress) && (
-                        <ErrorMessage
-                          error={
-                            errorNewProgress ||
-                            errorCompletedLesson ||
-                            errorProgress
-                          }
-                        />
-                      )}
+                          <ErrorMessage
+                            error={
+                              errorNewProgress ||
+                              errorCompletedLesson ||
+                              errorProgress
+                            }
+                          />
+                        )}
                     </div>
                   )}
                 </div>
