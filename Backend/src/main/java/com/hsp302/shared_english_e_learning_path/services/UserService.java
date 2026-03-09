@@ -192,7 +192,7 @@ public class UserService {
     }
 
     //ADMIN SECTION
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public List<UserResponse> getAllUsersExceptAdmin() {
         List<User> users = userRepository.findByRoleNot(Role.ADMIN);
         return users.stream()

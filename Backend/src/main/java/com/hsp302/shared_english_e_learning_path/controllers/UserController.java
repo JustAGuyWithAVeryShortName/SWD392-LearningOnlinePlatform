@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -176,6 +177,7 @@ public class UserController {
 
     //ADMIN SECTION
     @GetMapping("/no-admin")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<?> getAllUsersExceptAdmin() {
         List<UserResponse> responses = userService.getAllUsersExceptAdmin();
         ApiResponse<List<UserResponse>> apiResponses = ApiResponse.<List<UserResponse>>builder()

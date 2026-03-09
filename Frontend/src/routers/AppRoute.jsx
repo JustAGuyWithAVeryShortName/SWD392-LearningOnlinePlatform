@@ -34,6 +34,7 @@ import CourseManagement from "../pages/course/CourseManagement";
 import ChatPage from "../pages/chat/ChatPage";
 
 import StaffRequestManagement from "../pages/home/Staffrequestmanagement";
+import UserManagement from "../pages/home/UserManagement";
 
 export default function AppRoute() {
   return (
@@ -58,6 +59,7 @@ export default function AppRoute() {
         <Route path="/courses/:id" element={<CourseDetails />} />
 
         <Route path="/staffrequest-management" element={<StaffRequestManagement />} />
+        <Route path="/user-management" element={<UserManagement />} />
         
         {/* Tạo khóa học mới tại /courses/create */}
         <Route path="/courses/create" element={<CourseCreation />} />

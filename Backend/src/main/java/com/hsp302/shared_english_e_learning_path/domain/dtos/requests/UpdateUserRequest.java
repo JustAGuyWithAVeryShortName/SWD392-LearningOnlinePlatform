@@ -30,8 +30,11 @@ public class UpdateUserRequest {
     Gender gender;
 
     @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^(\\+0?1\\s)?\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4}$", message = "Invalid phone number format")
-    String phoneNumber;
+    @Pattern(
+            regexp = "^(0|84|\\+84)\\d{9}$",
+            message = "Invalid phone number format"
+    )
+    private String phoneNumber;
 
     @NotBlank(message = "Job is required")
     @Size(max = 255, message = "Job must be less than 256 characters")
