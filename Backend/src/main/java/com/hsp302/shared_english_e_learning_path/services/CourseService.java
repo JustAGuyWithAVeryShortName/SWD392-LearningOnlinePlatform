@@ -6,15 +6,18 @@ import com.hsp302.shared_english_e_learning_path.domain.dtos.responses.CourseRes
 import com.hsp302.shared_english_e_learning_path.domain.entities.Course;
 import com.hsp302.shared_english_e_learning_path.domain.entities.Module;
 import com.hsp302.shared_english_e_learning_path.domain.entities.Lesson;
+import com.hsp302.shared_english_e_learning_path.domain.entities.User;
 import com.hsp302.shared_english_e_learning_path.domain.enums.AgeGroup;
 import com.hsp302.shared_english_e_learning_path.domain.enums.CourseStatus;
 import com.hsp302.shared_english_e_learning_path.domain.enums.EnrollmentStatus;
 import com.hsp302.shared_english_e_learning_path.mappers.CourseMapper;
 import com.hsp302.shared_english_e_learning_path.repositories.CourseRepository;
 import com.hsp302.shared_english_e_learning_path.repositories.EnrollmentRepository;
+import com.hsp302.shared_english_e_learning_path.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -28,6 +31,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CourseService {
 
+    private final UserRepository userRepository;
     private final CourseRepository courseRepository;
     private final CourseMapper courseMapper;
     private final EnrollmentRepository enrollmentRepository;
@@ -36,10 +40,22 @@ public class CourseService {
 
     @PreAuthorize("hasRole('STAFF')")
     public CourseResponse createCourse(CreateCourseRequest request) {
+        // 1. Get the authenticated username
+        String username = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        // 2. Load the User entity
+        User staff = userRepository.findById(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + username));
+
+        // 3. Build the course and assign the author
         Course course = courseMapper.toEntity(request);
         course.setCourseID(UUID.randomUUID());
         course.setStatus(CourseStatus.PENDING);
         course.setDuration(0);
+        course.setStaff(staff);
+
         courseRepository.save(course);
         return courseMapper.toDto(course);
     }
@@ -110,7 +126,7 @@ public class CourseService {
                 .toList();
     }
 
-    public List<CourseResponse> getAllCoursesByDateDuration( Instant startedAt,  Instant endedAt) {
+    public List<CourseResponse> getAllCoursesByDateDuration(Instant startedAt, Instant endedAt) {
         List<Course> courses = courseRepository.findByCreatedAtBetween(startedAt, endedAt);
         return courses.stream()
                 .map(course -> courseMapper.toDto(course))

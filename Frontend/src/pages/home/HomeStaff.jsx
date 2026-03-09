@@ -152,7 +152,7 @@ function HomeStaff() {
               onAdd={() => handleAdd('courses')}
             />
 
-            <Link to="/course-management" className="staff-link">
+            <Link to="/staff/courses" className="staff-link">
               <button className="staff-button">
                 {t('viewAllCourses')}
               </button>
@@ -191,7 +191,7 @@ function HomeStaff() {
               onAdd={() => handleAdd('blogs')}
             />
 
-            <Link to="/blog-management" className="staff-link">
+            <Link to="/staff/blogs" className="staff-link">
               <button className="staff-button">
                 {t('viewAllBlogs')}
               </button>

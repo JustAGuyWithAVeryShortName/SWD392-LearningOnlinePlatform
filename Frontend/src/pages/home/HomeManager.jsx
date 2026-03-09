@@ -56,19 +56,31 @@ const { get: getPendingStaffRequests } = useFetch();
           setStaffPendingBlogs(staffPendingBlogsData || []);
         }
 
-        const pendingEventsData = await getPendingEvents("http://localhost:8080/api/event/status/PENDING_APPROVAL");
-        setPendingEvents(pendingEventsData || []);
-        
+        try {
+  const pendingEventsData = await getPendingEvents(
+    "http://localhost:8080/api/event/status/PENDING_APPROVAL"
+  );
+  setPendingEvents(pendingEventsData || []);
+} catch (e) {
+  console.log("Event API lỗi nhưng bỏ qua");
+}
         //staff pending requests
-        const staffRequests =await getPendingStaffRequests("http://localhost:8080/api/staff-request/status/PENDING");
-         setPendingStaffRequests(staffRequests || []);
+        const staffRequests = await getPendingStaffRequests(
+  "/api/staff-requests/pending"
+);
+
+if (Array.isArray(staffRequests)) {
+  setPendingStaffRequests(staffRequests);
+} else {
+  setPendingStaffRequests([]);
+}
       } catch (error) {
         console.error("Fetch error in HomeManager:", error);
       }
     }
 
     fetchData()
-  }, [getStat, getPendingCourses, getStaffPendingBlogs, user]);
+  }, [getStat, getPendingCourses, getStaffPendingBlogs,getPendingEvents, getPendingStaffRequests, user]);
   console.log(stat);
   console.log(staffPendingBlogs);
   console.log(pendingCourses);
@@ -208,7 +220,7 @@ const { get: getPendingStaffRequests } = useFetch();
   <div
     role="button"
     tabIndex={0}
-    onClick={() => navigate("/staffrequest-management")}
+    onClick={() => navigate("/staffrequest-management")} b 
     onKeyDown={(e) => {
       if (e.key === "Enter") navigate("/staffrequest-management");
     }}
@@ -216,11 +228,12 @@ const { get: getPendingStaffRequests } = useFetch();
   >
     <StatusCard
       title={t("staffPending")}
-      value={pendingStaffRequests.length}
-      change={0}
+      value={pendingStaffRequests?.length || 0}
+      change={10}
       icon={UserCheck}
       gradientClass="icon-gradient-warning"
     />
+    
   </div>
 </Col>
             </Row>

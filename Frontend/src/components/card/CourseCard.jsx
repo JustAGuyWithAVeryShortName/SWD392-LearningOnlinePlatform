@@ -1,6 +1,6 @@
-import { Clock, Calendar } from "lucide-react";
 import "./CourseCard.css";
 import { useTranslation } from "react-i18next";
+import { Clock, Calendar, User } from "lucide-react";
 
 const CourseCard = ({
   course,
@@ -44,6 +44,13 @@ const CourseCard = ({
                 {course.duration} {t("durationSuffix")}
               </span>
             </div>
+
+            {course.staffFullName && (
+              <div className="course-meta-info-2">
+                <User size={16} className="meta-icon-2" />
+                <span className="meta-text-2">{course.staffFullName}</span>
+              </div>
+            )}
           </div>
 
           <h3 className="course-title-2">{course.courseName}</h3>

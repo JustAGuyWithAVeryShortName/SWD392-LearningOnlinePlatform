@@ -23,6 +23,8 @@ public class Course {
     @Id
     @Column(name = "course_id")
     UUID courseID;
+
+    @Column(columnDefinition = "NVARCHAR(255)")
     String courseName;
     Integer quantity;
     Integer duration;
@@ -36,6 +38,10 @@ public class Course {
     CourseStatus status;
     Instant createdAt;
     Instant updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "staff_id", nullable = true)
+    User staff;
 
     @OneToMany(mappedBy = "course")
     List<Enrollment> enrollments = new ArrayList<>();

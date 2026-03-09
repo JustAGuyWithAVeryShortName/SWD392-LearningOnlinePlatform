@@ -25,10 +25,20 @@ export default function Navbar() {
   else if (role === "MANAGER") homePath = "/manager";
   else if (role === "CONSULTANT") homePath = "/consultant";
 
+  let coursePath = "/courses";
+  if (role === "STAFF") coursePath = "/staff/courses";
+  else if (role === "MANAGER") coursePath = "/manager/courses";
+  else if (role === "CONSULTANT") coursePath = "/consultant/courses";
+
+  let blogPath = "/blogs";
+  if (role === "STAFF") blogPath = "/staff/blogs";
+  else if (role === "MANAGER") blogPath = "/manager/blogs";
+  else if (role === "CONSULTANT") blogPath = "/consultant/blogs";
+
   let navItems = [
     { name: t("home"), path: homePath },
-    { name: t("blogs"), path: "/blogs" },
-    { name: t("courses"), path: "/courses" },
+    { name: t("blogs"), path: blogPath },
+    { name: t("courses"), path: coursePath },
   ];
 
   // Add chat to navigation for consultants and members
