@@ -315,7 +315,7 @@ function HomeManager() {
               onApprove={(id) => handleApprove(id, "blog")}
               onReject={(id) => handleReject(id, "blog")}
             />
-            <Link to="/blog-management">
+            <Link to="/staff/blogs">
               <button className="btn btn-primary mt-3">
                 {t("viewAllBlogs")}
               </button>

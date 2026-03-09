@@ -149,11 +149,6 @@ const CourseCreation = () => {
       return false;
     }
 
-    if (!uploadedImageUrl) {
-      toast.error("Course image required");
-      return false;
-    }
-
     return true;
   };
 

@@ -28,7 +28,7 @@ public class EnrollmentService {
     private final UserService userService;
     private final CourseService courseService;
 
-    @PreAuthorize("hasRole('MEMBER')")
+    @PreAuthorize("hasAnyRole('MEMBER','MANAGER')")
     public EnrollmentResponse createEnrollment(CreateEnrollmentRequest request) {
         Enrollment enrollment = enrollmentMapper.toEntity(request);
         String loginUsername = userService.getLoginUsername();
