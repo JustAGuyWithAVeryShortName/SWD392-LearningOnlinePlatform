@@ -34,4 +34,7 @@ public class UpdateCourseRequest {
 
     @NotNull(message = "Age group is required")
     AgeGroup ageGroup;
+
+    @PositiveOrZero(message = "Price cannot be negative")
+    Long price;
 }

@@ -29,4 +29,7 @@ public class CreateCourseRequest {
 
     @NotNull(message = "Age group is required")
     AgeGroup ageGroup;
+
+    @PositiveOrZero(message = "Price cannot be negative")
+    Long price;
 }

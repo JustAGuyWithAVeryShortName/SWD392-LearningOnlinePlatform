@@ -86,6 +86,7 @@ public class CourseService {
         course.setImage(request.getImage());
         course.setDescription(request.getDescription());
         course.setAgeGroup(request.getAgeGroup());
+        course.setPrice(request.getPrice());
         courseRepository.save(course);
         return courseMapper.toDto(course);
     }
@@ -99,7 +100,8 @@ public class CourseService {
     }
 
     public List<CourseResponse> getCoursesByAgeGroup(AgeGroup ageGroup) {
-        List<Course> courses = courseRepository.findByAgeGroupAndStatusOrderByCreatedAtDesc(ageGroup, CourseStatus.AVAILABLE);
+        List<Course> courses = courseRepository.findByAgeGroupAndStatusOrderByCreatedAtDesc(ageGroup,
+                CourseStatus.AVAILABLE);
         return courses.stream()
                 .map(course -> courseMapper.toDto(course))
                 .toList();
@@ -119,7 +121,8 @@ public class CourseService {
                 .toList();
     }
 
-    public List<CourseResponse> getCoursesByStatusAndDateDuration(CourseStatus status, Instant startedAt, Instant endedAt) {
+    public List<CourseResponse> getCoursesByStatusAndDateDuration(CourseStatus status, Instant startedAt,
+            Instant endedAt) {
         List<Course> courses = courseRepository.findByStatusAndCreatedAtBetween(status, startedAt, endedAt);
         return courses.stream()
                 .map(course -> courseMapper.toDto(course))
@@ -134,7 +137,8 @@ public class CourseService {
     }
 
     public Integer calculateCourseDuration(UUID courseID) {
-        List<com.hsp302.shared_english_e_learning_path.domain.entities.Module> modules = moduleService.getAllModulesByCourseID(courseID, CourseStatus.AVAILABLE);
+        List<com.hsp302.shared_english_e_learning_path.domain.entities.Module> modules = moduleService
+                .getAllModulesByCourseID(courseID, CourseStatus.AVAILABLE);
 
         int totalDuration = 0;
 
@@ -147,7 +151,7 @@ public class CourseService {
         return totalDuration;
     }
 
-    //ADMIN HOMEPAGE
+    // ADMIN HOMEPAGE
     @PreAuthorize("hasRole('ADMIN')")
     public Map<String, Object> getCourseStats() {
         Map<String, Object> stats = new HashMap<>();

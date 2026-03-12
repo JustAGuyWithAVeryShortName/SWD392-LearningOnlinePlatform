@@ -29,6 +29,7 @@ public class Course {
     Integer quantity;
     Integer duration;
     String image;
+    Long price;
 
     @Column(columnDefinition = "NVARCHAR(2000)")
     String description;

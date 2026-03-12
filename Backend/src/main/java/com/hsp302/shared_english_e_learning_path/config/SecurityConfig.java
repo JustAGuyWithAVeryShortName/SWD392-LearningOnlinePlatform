@@ -29,11 +29,17 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final String[] PUBLIC_POST_ENDPOINTS = {"/auth/login", "/auth/introspect", "/auth/logout", "/auth/refresh", "/api/user", "/api/assessment/crafft/submit","/api/password/**", "/ws-chat/**", "/ws/**", "/ws/info"};
+    private final String[] PUBLIC_POST_ENDPOINTS = { "/auth/login", "/auth/introspect", "/auth/logout", "/auth/refresh",
+            "/api/user", "/api/assessment/crafft/submit", "/api/password/**", "/ws-chat/**", "/ws/**", "/ws/info",
+            "/api/payment/momo/ipn" };
 
-    private final String[] PUBLIC_GET_ENDPOINTS = {"/api/blog/**", "/api/course/**", "/api/enrollment/course-list/**", "/api/assessment/**", "/api/assessment-result/risk-level", "/api/event", "/api/event/**", "/ws-chat/**", "/ws/**", "/ws/info", "/api/quizzes/**", "/api/videos/stream/**", "/api/videos/download/**"};
+    private final String[] PUBLIC_GET_ENDPOINTS = { "/api/blog/**", "/api/course/**", "/api/enrollment/course-list/**",
+            "/api/assessment/**", "/api/assessment-result/risk-level", "/api/event", "/api/event/**", "/ws-chat/**",
+            "/ws/**", "/ws/info", "/api/quizzes/**", "/api/videos/stream/**", "/api/videos/download/**",
+            "/api/payment/momo/callback" };
 
-    private final String[] SWAGGER_ENDPOINTS = {"/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**"};
+    private final String[] SWAGGER_ENDPOINTS = { "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
+            "/swagger-resources/**" };
 
     private final CustomJwtDecoder customJwtDecoder;
     private final AuthenticationService authenticationService;
@@ -48,27 +54,24 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
-                                           JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+            JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/ws/info").permitAll() // Explicitly allow ws/info
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow all OPTIONS requests for CORS preflight
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow all OPTIONS requests for CORS
+                                                                                // preflight
                         .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS).permitAll()
                         .requestMatchers(SWAGGER_ENDPOINTS).permitAll()
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwtConfigurer -> jwtConfigurer
                                 .decoder(customJwtDecoder)
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                        )
-                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-                )
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint()))
                 .csrf(csrf -> csrf.disable())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-        ;
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
@@ -78,23 +81,19 @@ public class SecurityConfig {
         http
                 .securityMatcher("/login/**", "/oauth2/**")
                 .authorizeHttpRequests(authz -> authz
-                        .anyRequest().permitAll()
-                )
+                        .anyRequest().permitAll())
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
-                                .userService(oauth2UserService())
-                        )
+                                .userService(oauth2UserService()))
                         .successHandler((request, response, authentication) -> {
                             OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
                             String email = oAuth2User.getAttribute("email");
                             String name = oAuth2User.getAttribute("name");
-//                            String avatar = oAuth2User.getAttribute("picture");
+                            // String avatar = oAuth2User.getAttribute("picture");
                             UserResponse user = authenticationService.findOrCreateUserFromGoogle(email, name);
                             String jwt = authenticationService.generateToken(user);
                             response.sendRedirect("http://localhost:5173/oauth2/success?token=" + jwt);
-                        })
-                )
-        ;
+                        }));
         return http.build();
     }
 

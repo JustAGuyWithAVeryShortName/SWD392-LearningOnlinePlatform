@@ -5,7 +5,6 @@ import com.hsp302.shared_english_e_learning_path.domain.enums.CourseStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-
 import java.util.UUID;
 
 @Data
@@ -23,6 +22,7 @@ public class CourseResponse {
     String description;
     AgeGroup ageGroup;
     CourseStatus status;
+    Long price;
     String createdAt;
     String updatedAt;
     private String staffUsername;

@@ -7,6 +7,8 @@ import com.hsp302.shared_english_e_learning_path.domain.entities.Enrollment;
 import com.hsp302.shared_english_e_learning_path.domain.entities.User;
 import com.hsp302.shared_english_e_learning_path.domain.enums.AgeGroup;
 import com.hsp302.shared_english_e_learning_path.domain.enums.EnrollmentStatus;
+import com.hsp302.shared_english_e_learning_path.repositories.PaymentRepository;
+import com.hsp302.shared_english_e_learning_path.domain.enums.PaymentStatus;
 import com.hsp302.shared_english_e_learning_path.mappers.EnrollmentMapper;
 import com.hsp302.shared_english_e_learning_path.repositories.EnrollmentRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -27,6 +29,7 @@ public class EnrollmentService {
     private final EnrollmentMapper enrollmentMapper;
     private final UserService userService;
     private final CourseService courseService;
+    private final PaymentRepository paymentRepository;
 
     @PreAuthorize("hasAnyRole('MEMBER','MANAGER')")
     public EnrollmentResponse createEnrollment(CreateEnrollmentRequest request) {
@@ -34,6 +37,17 @@ public class EnrollmentService {
         String loginUsername = userService.getLoginUsername();
         User loginUser = userService.getUserEntity(loginUsername);
         Course course = courseService.getCourseEntity(request.getCourseID());
+
+        // Paid courses must go through the MoMo payment flow
+        if (course.getPrice() != null && course.getPrice() > 0) {
+            boolean hasPaid = paymentRepository.existsByMemberUsernameAndCourseCourseIDAndStatus(
+                    loginUsername, course.getCourseID(), PaymentStatus.SUCCESS);
+            if (!hasPaid) {
+                throw new IllegalStateException(
+                        "This course requires payment. Please complete payment via /api/payment/momo/initiate.");
+            }
+        }
+
         enrollment.setMember(loginUser);
         enrollment.setCourse(course);
         enrollment.setStartedAt(Instant.now());
@@ -79,9 +93,10 @@ public class EnrollmentService {
     @PreAuthorize("hasAnyRole('STAFF', 'MEMBER')")
     public EnrollmentResponse getEnrollmentByUsernameAndCourseID(UUID courseID, String username) {
         Enrollment enrollment = enrollmentRepository.findByMemberUsernameAndCourseCourseID(username, courseID);
-//        if (enrollment == null) {
-//            throw new EntityNotFoundException("Enrollment does not exist with username " + username + " courseID " +courseID);
-//        }
+        // if (enrollment == null) {
+        // throw new EntityNotFoundException("Enrollment does not exist with username "
+        // + username + " courseID " +courseID);
+        // }
         return enrollmentMapper.toDto(enrollment);
     }
 
@@ -93,7 +108,7 @@ public class EnrollmentService {
         return enrollmentMapper.toDto(enrollment);
     }
 
-    ////ADMIN HOMEPAGE
+    //// ADMIN HOMEPAGE
     @PreAuthorize("hasRole('ADMIN')")
     public Map<String, Object> getCompletedEnrollmentByAgeGroup() {
         List<Object[]> results = enrollmentRepository.getCompletedEnrollmentCountByAgeGroup();
