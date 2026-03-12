@@ -1,0 +1,17 @@
+{
+    "title": "Payment History",
+    "loading": "Loading...",
+    "empty": "No payment history found.",
+    "table": {
+        "courseName": "Course Name",
+        "amount": "Amount",
+        "status": "Status",
+        "date": "Payment Date",
+        "orderId": "Order ID",
+        "statuses": {
+            "SUCCESS": "Success",
+            "FAILED": "Failed",
+            "PENDING": "Pending"
+        }
+    }
+}

@@ -1,0 +1,18 @@
+{
+    "success": {
+        "title": "Thanh toán thành công!",
+        "message": "Đăng ký khóa học của bạn đã được xác nhận. Bạn có thể bắt đầu học ngay bây giờ.",
+        "orderId": "Mã đơn hàng: {{orderId}}",
+        "button": "Khóa học của tôi"
+    },
+    "failure": {
+        "title": "Thanh toán thất bại",
+        "defaultMessage": "Đã xảy ra lỗi trong quá trình thanh toán.",
+        "button": "Quay lại",
+        "codes": {
+            "1003": "Giao dịch đã bị hủy bởi người dùng.",
+            "1006": "Giao dịch bị từ chối. Vui lòng thử lại.",
+            "1007": "Tài khoản không đủ số dư để thực hiện giao dịch."
+        }
+    }
+}

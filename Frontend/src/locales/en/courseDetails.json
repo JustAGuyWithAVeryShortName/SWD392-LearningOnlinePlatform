@@ -26,6 +26,12 @@
         "courseContent": "Course content",
         "moduleTitle": "Module {{index}}: {{moduleName}}"
     },
+    "payButton": {
+        "pay": "Buy Course - {{price}}",
+        "alreadyPaid": "Already Enrolled",
+        "loading": "Processing...",
+        "myCourses": "View My Courses"
+    },
     "toastMessages": {
         "fetchDataError": "Failed to fetch data at CourseDetails",
         "loginRequired": "Please log in to enroll in the course.",
@@ -34,6 +40,8 @@
         "enrollmentSuccess": "Course enrolled successfully!",
         "enrollmentInform": ". You need to update your personal information",
         "enrollmentFailed": "Failed to enroll. Please try again.",
-        "apiError": "An error occurred: {{message}}"
+        "apiError": "An error occurred: {{message}}",
+        "paymentInitiateFailed": "Failed to initiate payment. Please try again.",
+        "paymentError": "Payment error: {{message}}"
     }
 }

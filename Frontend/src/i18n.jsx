@@ -80,6 +80,10 @@ import forgotResetPasswordVi from './locales/vi/forgotResetPassword.json'; // Im
 import userManagementVi from './locales/vi/userManagement.json';
 import blogManagementVi from './locales/vi/blogManagement.json';
 import courseManagementVi from './locales/vi/courseManagement.json';
+import paymentResultEn from './locales/en/paymentResult.json';
+import paymentResultVi from './locales/vi/paymentResult.json';
+import paymentHistoryEn from './locales/en/paymentHistory.json';
+import paymentHistoryVi from './locales/vi/paymentHistory.json';
 
 i18n
   .use(LanguageDetector)
@@ -127,6 +131,8 @@ i18n
         userManagement: userManagementEn,
         blogManagement: blogManagementEn,
         courseManagement: courseManagementEn,
+        paymentResult: paymentResultEn,
+        paymentHistory: paymentHistoryEn,
       },
       vi: {
         home: homeVi,
@@ -167,6 +173,8 @@ i18n
         userManagement: userManagementVi,
         blogManagement: blogManagementVi,
         courseManagement: courseManagementVi,
+        paymentResult: paymentResultVi,
+        paymentHistory: paymentHistoryVi,
       }
     },
 

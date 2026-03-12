@@ -1,0 +1,18 @@
+{
+    "success": {
+        "title": "Payment Successful!",
+        "message": "Your course enrollment has been confirmed. You can start learning now.",
+        "orderId": "Order ID: {{orderId}}",
+        "button": "My Courses"
+    },
+    "failure": {
+        "title": "Payment Failed",
+        "defaultMessage": "An error occurred during payment.",
+        "button": "Go Back",
+        "codes": {
+            "1003": "Transaction was cancelled by user.",
+            "1006": "Transaction was declined. Please try again.",
+            "1007": "Insufficient account balance."
+        }
+    }
+}

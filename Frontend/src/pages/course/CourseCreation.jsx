@@ -42,6 +42,7 @@ const CourseCreation = () => {
     description: "",
     ageGroup: "",
     image: "",
+    price: 0,
   });
 
   const [imagePreview, setImagePreview] = useState(null);
@@ -70,6 +71,7 @@ const CourseCreation = () => {
             description: courseData.description || "",
             ageGroup: courseData.ageGroup || "",
             image: courseData.image || "",
+            price: courseData.price ?? 0,
           });
 
           if (courseData.image) {
@@ -167,6 +169,7 @@ const CourseCreation = () => {
         description: formData.description,
         ageGroup: formData.ageGroup,
         image: uploadedImageUrl,
+        price: Number(formData.price) || 0,
       };
 
       // Pass Authorization header so backend can identify the actor
@@ -201,6 +204,7 @@ const CourseCreation = () => {
         description: formData.description,
         ageGroup: formData.ageGroup,
         image: uploadedImageUrl,
+        price: Number(formData.price) || 0,
       };
 
       await putCourse(
@@ -305,6 +309,22 @@ const CourseCreation = () => {
                   </option>
                 ))}
               </Form.Select>
+
+              <Form.Group className="mb-3 mt-3">
+                <Form.Label className="fw-semibold">Giá khóa học (VNĐ)</Form.Label>
+                <Form.Control
+                  type="number"
+                  min="0"
+                  step="1000"
+                  placeholder="0 = Miễn phí"
+                  value={formData.price}
+                  onChange={(e) => handleInputChange("price", e.target.value)}
+                  className="course-name-input"
+                />
+                <Form.Text className="text-muted">
+                  Để trống hoặc nhập 0 nếu khóa học miễn phí.
+                </Form.Text>
+              </Form.Group>
 
             </Col>
 

@@ -13,6 +13,9 @@ import { toast } from "react-toastify"
 import { useAuth } from "../../hooks/useAuth"
 import { useTranslation } from "react-i18next"; // Import useTranslation
 
+const formatVND = (amount) =>
+  new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount);
+
 const CourseDetails = () => {
   const { t } = useTranslation("courseDetails"); // Khai báo useTranslation
 
@@ -31,6 +34,9 @@ const CourseDetails = () => {
   const { loading: loadingEnrollment, error: errorEnrollment, get: getEnrollment } = useFetch()
   const { loading: loadingCompletionProgress, error: errorCompletionProgress, get: getCompletionProgress } = useFetch()
   const { loading: loadingNewEnrollment, error: errorNewEnrollment, post: postEnrollment } = useFetch()
+  const { loading: loadingPaymentHistory, get: getPaymentHistory } = useFetch()
+  const { loading: loadingPayment, post: postPayment } = useFetch()
+  const [paymentHistory, setPaymentHistory] = useState([])
   const [moduleCount, setModuleCount] = useState(0)
   const [moduleDuration, setModuleDuration] = useState(0)
   const navigate = useNavigate()
@@ -117,6 +123,22 @@ const CourseDetails = () => {
       fetchEnrollmentStatus();
     }
   }, [course, fetchEnrollmentStatus]);
+
+  // Fetch payment history to check if this course is already paid
+  useEffect(() => {
+    const fetchPaymentHistory = async () => {
+      if (username && !authLoading) {
+        try {
+          const history = await getPaymentHistory("http://localhost:8080/api/payment/my-history");
+          setPaymentHistory(Array.isArray(history) ? history : []);
+        } catch (error) {
+          console.error("Error fetching payment history:", error);
+          setPaymentHistory([]);
+        }
+      }
+    };
+    fetchPaymentHistory();
+  }, [username, authLoading, getPaymentHistory]);
   console.log("Course:", course);
   console.log("Modules:", modules);
   console.log("Lessons:", lessons);
@@ -177,12 +199,39 @@ const CourseDetails = () => {
     }
   }
 
+  const onPayClick = async (courseId) => {
+    if (!username) {
+      toast.error(t("toastMessages.loginRequired"));
+      navigate('/login');
+      return;
+    }
+    try {
+      const token = localStorage.getItem("token");
+      const response = await postPayment(
+        { courseId },
+        { Authorization: `Bearer ${token}` },
+        "http://localhost:8080/api/payment/momo/initiate"
+      );
+      if (response?.resultCode === 0 && response?.payUrl) {
+        window.location.href = response.payUrl;
+      } else {
+        toast.error(t("toastMessages.paymentError", { message: response?.message || "" }));
+      }
+    } catch (error) {
+      console.error("Payment initiation failed:", error);
+      toast.error(t("toastMessages.paymentInitiateFailed"));
+    }
+  };
+
   const isCourseEnrolled = enrollment?.status;
-  console.log(isCourseEnrolled);
+  const isPaidCourse = course?.price && course.price > 0;
+  const alreadyPaid = isPaidCourse && paymentHistory.some(
+    (p) => p.course?.courseID === course?.courseID && p.status === "SUCCESS"
+  );
 
   return (
     <Container className="py-5">
-      <LoadingSpinner loading={authLoading || loadingCourseDetails || loadingModules || loadingLessons || loadingEnrollment || loadingNewEnrollment} />
+      <LoadingSpinner loading={authLoading || loadingCourseDetails || loadingModules || loadingLessons || loadingEnrollment || loadingNewEnrollment || loadingPayment} />
       {/* <ErrorMessage error={errorCourseDetails || errorModules || errorLessons || errorEnrollment || errorNewEnrollment} /> */}
 
       {!course || !modules || !lessons ? (
@@ -224,27 +273,54 @@ const CourseDetails = () => {
                       </div>
                     </div>
                   )}
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    className="enroll-button"
-                    onClick={() => onEnrollClick(course.courseID)}
-                    disabled={loadingNewEnrollment || loadingEnrollment}
-                  >
-                    {loadingNewEnrollment || loadingEnrollment ? (
-                      t("enrollButton.loading")
+
+                  {isPaidCourse ? (
+                    alreadyPaid ? (
+                      <div className="d-flex flex-column gap-2">
+                        <Button variant="secondary" size="lg" className="enroll-button" disabled>
+                          {t("payButton.alreadyPaid")}
+                        </Button>
+                        <Button variant="outline-primary" size="sm" onClick={() => navigate("/courses/lesson/" + course.courseID)}>
+                          {t("payButton.myCourses")}
+                        </Button>
+                      </div>
                     ) : (
-                      isCourseEnrolled === "NOT_STARTED" || isCourseEnrolled === "LEARNING" ? (
-                        t("enrollButton.continue")
-                      ) : isCourseEnrolled === "EXPIRED" ? (
-                        t("enrollButton.refreshDue")
-                      ) : isCourseEnrolled === "COMPLETED" ? (
-                        t("enrollButton.completed")
+                      <Button
+                        variant="warning"
+                        size="lg"
+                        className="enroll-button fw-bold"
+                        onClick={() => onPayClick(course.courseID)}
+                        disabled={loadingPayment}
+                      >
+                        {loadingPayment
+                          ? t("payButton.loading")
+                          : t("payButton.pay", { price: formatVND(course.price) })}
+                      </Button>
+                    )
+                  ) : (
+                    <Button
+                      variant="primary"
+                      size="lg"
+                      className="enroll-button"
+                      onClick={() => onEnrollClick(course.courseID)}
+                      disabled={loadingNewEnrollment || loadingEnrollment}
+                    >
+                      {loadingNewEnrollment || loadingEnrollment ? (
+                        t("enrollButton.loading")
                       ) : (
-                        t("enrollButton.enroll")
-                      )
-                    )}
-                  </Button>
+                        isCourseEnrolled === "NOT_STARTED" || isCourseEnrolled === "LEARNING" ? (
+                          t("enrollButton.continue")
+                        ) : isCourseEnrolled === "EXPIRED" ? (
+                          t("enrollButton.refreshDue")
+                        ) : isCourseEnrolled === "COMPLETED" ? (
+                          t("enrollButton.completed")
+                        ) : (
+                          t("enrollButton.enroll")
+                        )
+                      )}
+                    </Button>
+                  )}
+
                   <p className="enrolled-count">{t("enrolledCount", { quantity: course.quantity })}</p>
                 </div>
               </div>

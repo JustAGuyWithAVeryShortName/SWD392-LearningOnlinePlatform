@@ -35,6 +35,8 @@ import ChatPage from "../pages/chat/ChatPage";
 
 import StaffRequestManagement from "../pages/home/Staffrequestmanagement";
 import UserManagement from "../pages/home/UserManagement";
+import PaymentResult from "../pages/payment/PaymentResult";
+import PaymentHistory from "../pages/payment/PaymentHistory";
 
 export default function AppRoute() {
   return (
@@ -60,7 +62,7 @@ export default function AppRoute() {
 
         <Route path="/staffrequest-management" element={<StaffRequestManagement />} />
         <Route path="/user-management" element={<UserManagement />} />
-        
+
         {/* Tạo khóa học mới tại /courses/create */}
         <Route path="/courses/create" element={<CourseCreation />} />
         <Route
@@ -86,6 +88,8 @@ export default function AppRoute() {
         <Route path="/appointment" element={<AppointmentBooking />} />
         <Route path="/availability" element={<AvailabilityBooking />} />
 
+        <Route path="/payment/history" element={<PaymentHistory />} />
+
         <Route path="*" element={<NotFound />} />
       </Route>
       <Route path="/chat" element={<ChatPage />} />
@@ -93,6 +97,8 @@ export default function AppRoute() {
       <Route path="/profile" element={<MyProfile />} />
       <Route path="/courses/lesson/:id" element={<CourseLesson />} />
       <Route path="/forgot-password" element={<ForgotResetPassword />} />
+      {/* Public route — no auth guard, MoMo redirects here */}
+      <Route path="/payment/result" element={<PaymentResult />} />
     </Routes>
   );
 }

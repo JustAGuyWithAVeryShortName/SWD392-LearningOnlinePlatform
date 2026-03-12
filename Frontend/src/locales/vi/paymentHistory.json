@@ -1,0 +1,17 @@
+{
+    "title": "Lịch sử thanh toán",
+    "loading": "Đang tải...",
+    "empty": "Chưa có lịch sử thanh toán nào.",
+    "table": {
+        "courseName": "Tên khóa học",
+        "amount": "Số tiền",
+        "status": "Trạng thái",
+        "date": "Ngày thanh toán",
+        "orderId": "Mã đơn hàng",
+        "statuses": {
+            "SUCCESS": "Thành công",
+            "FAILED": "Thất bại",
+            "PENDING": "Đang chờ"
+        }
+    }
+}

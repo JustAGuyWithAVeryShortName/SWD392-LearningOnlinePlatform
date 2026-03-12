@@ -26,6 +26,12 @@
     "courseContent": "Nội dung khóa học",
     "moduleTitle": "Mô-đun {{index}}: {{moduleName}}"
   },
+  "payButton": {
+    "pay": "Mua khóa học - {{price}}",
+    "alreadyPaid": "Đã đăng ký",
+    "loading": "Đang xử lý...",
+    "myCourses": "Xem khóa học của tôi"
+  },
   "toastMessages": {
     "fetchDataError": "Không thể tải dữ liệu trong Chi Tiết Khóa Học",
     "loginRequired": "Vui lòng đăng nhập để đăng ký khóa học.",
@@ -34,6 +40,8 @@
     "enrollmentSuccess": "Đăng ký khóa học thành công!",
     "enrollmentInform": ". Bạn cần phải cập nhật thông tin cá nhân của mình",
     "enrollmentFailed": "Đăng ký thất bại. Vui lòng thử lại.",
-    "apiError": "Đã xảy ra lỗi: {{message}}"
+    "apiError": "Đã xảy ra lỗi: {{message}}",
+    "paymentInitiateFailed": "Không thể khởi tạo thanh toán. Vui lòng thử lại.",
+    "paymentError": "Lỗi thanh toán: {{message}}"
   }
 }
