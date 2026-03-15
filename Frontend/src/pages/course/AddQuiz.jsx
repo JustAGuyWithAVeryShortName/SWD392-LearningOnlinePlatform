@@ -7,11 +7,25 @@ const AddQuiz = ({ lessonID }) => {
   const { post } = useFetch()
   const [question, setQuestion] = useState("")
 
+  const normalizeText = (value) => {
+    if (typeof value !== "string") return value
+    return value.normalize("NFC")
+  }
+
+  const getUtf8Headers = () => {
+    const token = localStorage.getItem("token")
+    return {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json; charset=UTF-8",
+      "Accept-Charset": "UTF-8",
+    }
+  }
+
   const handleAddQuiz = async () => {
     if (!question.trim()) return toast.error("Question required")
 
     const payload = {
-      question,
+      question: normalizeText(question),
       type: "SINGLE_CHOICE",
       options: [
         { content: "Option A", isCorrect: true },
@@ -21,7 +35,7 @@ const AddQuiz = ({ lessonID }) => {
 
     await post(
       payload,
-      {},
+      getUtf8Headers(),
       `http://localhost:8080/api/quizzes/lesson/${lessonID}`
     )
 

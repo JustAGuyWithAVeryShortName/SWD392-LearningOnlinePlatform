@@ -1,8 +1,11 @@
 {
     "durationSuffix": "phút",
     "enrollButton": "Đăng Ký",
+    "buyButton": "Mua Ngay",
     "detailsButton": "Chi Tiết",
     "continueButton": "Tiếp Tục",
+    "pricePaid": "{{price}}",
+    "priceFree": "Miễn phí",
     "ageGroup": {
         "ADOLESCENT": "Thanh Thiếu Niên",
         "ADULT": "Người Trưởng Thành",

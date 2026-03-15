@@ -13,9 +13,11 @@
   "toastMessages": {
     "fetchError": "Không thể tải dữ liệu khi tạo bài học",
     "createSuccess": "Tạo bài học thành công!",
+    "createDraftInfo": "Đã tạo bản nháp bài học. Vui lòng tải lên ít nhất một video trước khi lưu hoàn tất.",
     "createError": "Không thể tạo bài học. Vui lòng thử lại.",
     "saveSuccess": "Lưu bài học thành công!",
-    "saveError": "Không thể lưu bài học. Vui lòng thử lại."
+    "saveError": "Không thể lưu bài học. Vui lòng thử lại.",
+    "videoRequired": "Vui lòng tải lên ít nhất một video trước khi lưu bài học."
   },
   "video": {
     "title": "📹 Video Bài Học",

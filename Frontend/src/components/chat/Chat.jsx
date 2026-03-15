@@ -4,6 +4,21 @@ import API from "../../api";
 import UserList from "./UserList";
 import ChatBox from "./ChatBox";
 
+const resolveChatIdentity = (value) => {
+  if (!value) return "";
+  if (typeof value === "string" || typeof value === "number") {
+    return String(value).trim();
+  }
+
+  return String(
+    value.username
+    || value.userName
+    || value.email
+    || value.id
+    || ""
+  ).trim();
+};
+
 export default function Chat({ userId, role, onClose }) {
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -28,7 +43,7 @@ export default function Chat({ userId, role, onClose }) {
     const fetchUsers = async () => {
       const targetRole = role === "consultant" ? "MEMBER" : "CONSULTANT";
       const endpoint = `/api/user/role/${targetRole}`;
-      
+
       try {
         console.log("Original Chat - Fetching users from endpoint:", endpoint);
         console.log("Original Chat - Current user role:", role);
@@ -36,10 +51,10 @@ export default function Chat({ userId, role, onClose }) {
         console.log("Original Chat - API response status:", res.status);
         console.log("Original Chat - Full API response:", res);
         console.log("Original Chat - Response data:", res.data);
-        
+
         // Try multiple possible response structures
         let userData = null;
-        
+
         if (Array.isArray(res.data)) {
           userData = res.data;
         } else if (res.data?.data && Array.isArray(res.data.data)) {
@@ -53,17 +68,24 @@ export default function Chat({ userId, role, onClose }) {
         } else {
           userData = res.data;
         }
-        
+
         console.log("Original Chat - Final processed user data:", userData);
-        
+
         if (Array.isArray(userData)) {
-          setUserList(userData);
+          const normalizedUsers = userData
+            .map((item) => ({
+              ...item,
+              username: resolveChatIdentity(item),
+            }))
+            .filter((item) => item.username);
+
+          setUserList(normalizedUsers);
           console.log("Original Chat - Successfully set user list with", userData.length, "users");
         } else {
           console.log("Original Chat - Data is not an array, setting empty list");
           setUserList([]);
         }
-        
+
       } catch (e) {
         console.error("Original Chat - Failed to fetch users:", e);
         setUserList([]);
@@ -75,9 +97,10 @@ export default function Chat({ userId, role, onClose }) {
   // When a user is selected, set chatId and fetch history
   useEffect(() => {
     if (selectedUser) {
-      const selectedUserId = selectedUser.id || selectedUser.username;
-      const currentUserId = userId;
-      
+      const selectedUserId = resolveChatIdentity(selectedUser);
+      const currentUserId = resolveChatIdentity(userId);
+      if (!selectedUserId || !currentUserId) return;
+
       const newChatId =
         currentUserId < selectedUserId
           ? `${currentUserId}-${selectedUserId}`
@@ -95,11 +118,14 @@ export default function Chat({ userId, role, onClose }) {
 
   const handleSend = () => {
     if (!input.trim() || !selectedUser) return;
-    
-    const selectedUserId = selectedUser.id || selectedUser.username;
+
+    const selectedUserId = resolveChatIdentity(selectedUser);
+    const currentUserId = resolveChatIdentity(userId);
+    if (!selectedUserId || !currentUserId) return;
+
     sendMessage({
       chatId,
-      senderId: userId,
+      senderId: currentUserId,
       recipientId: selectedUserId,
       content: input,
       role

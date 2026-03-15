@@ -32,6 +32,8 @@
     "loading": "Đang xử lý...",
     "myCourses": "Xem khóa học của tôi"
   },
+  "viewDirect": "Xem trực tiếp khóa học",
+  "roleRestriction": "Chỉ tài khoản thành viên mới có thể đăng ký hoặc mua khóa học",
   "toastMessages": {
     "fetchDataError": "Không thể tải dữ liệu trong Chi Tiết Khóa Học",
     "loginRequired": "Vui lòng đăng nhập để đăng ký khóa học.",

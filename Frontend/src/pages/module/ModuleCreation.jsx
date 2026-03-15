@@ -31,6 +31,20 @@ const ModuleCreation = () => {
   const { get: getCourse } = useFetch();
   const { loading: loadingPutLessonsStatus, put: putLessonsStatus } = useFetch();
 
+  const normalizeText = (value) => {
+    if (typeof value !== "string") return value;
+    return value.normalize("NFC");
+  };
+
+  const getUtf8Headers = () => {
+    const token = localStorage.getItem("token");
+    return {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json; charset=UTF-8",
+      "Accept-Charset": "UTF-8",
+    };
+  };
+
   /* ---------------- FETCH DATA ---------------- */
 
   useEffect(() => {
@@ -139,13 +153,13 @@ const ModuleCreation = () => {
   const handleCreateModule = async () => {
     try {
       const moduleData = {
-        moduleName: formData.moduleName,
+        moduleName: normalizeText(formData.moduleName),
         courseID,
       };
 
       const response = await postNewModule(
         moduleData,
-        {},
+        getUtf8Headers(),
         "http://localhost:8080/api/module"
       );
 
@@ -167,13 +181,13 @@ const ModuleCreation = () => {
   const handleSaveModule = async () => {
     try {
       const moduleData = {
-        moduleName: formData.moduleName,
+        moduleName: normalizeText(formData.moduleName),
         courseID,
       };
 
       await putModule(
         moduleData,
-        {},
+        getUtf8Headers(),
         `http://localhost:8080/api/module/${moduleID}`
       );
 
@@ -292,11 +306,10 @@ const ModuleCreation = () => {
                 lessons.map((lesson) => (
                   <Card
                     key={lesson.lessonID}
-                    className={`lesson-card d-flex flex-row align-items-center ${
-                      lesson.status === "UNAVAILABLE"
+                    className={`lesson-card d-flex flex-row align-items-center ${lesson.status === "UNAVAILABLE"
                         ? "lesson-unavailable"
                         : ""
-                    }`}
+                      }`}
                   >
                     <Card.Body className="d-flex align-items-center w-100">
 

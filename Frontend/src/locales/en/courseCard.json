@@ -1,8 +1,11 @@
 {
     "durationSuffix": "mins",
     "enrollButton": "Enroll",
+    "buyButton": "Buy Now",
     "detailsButton": "Details",
     "continueButton": "Continue",
+    "pricePaid": "{{price}}",
+    "priceFree": "Free",
     "ageGroup": {
         "ADOLESCENT": "Adolescent",
         "ADULT": "Adult",

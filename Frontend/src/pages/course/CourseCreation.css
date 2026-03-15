@@ -11,8 +11,8 @@
 
   --border-color: #e5e7eb;
 
-  --shadow-sm: 0 2px 10px rgba(0,0,0,0.08);
-  --shadow-md: 0 6px 20px rgba(0,0,0,0.12);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.12);
 
   --radius-md: 12px;
   --radius-lg: 16px;
@@ -41,6 +41,9 @@
   padding: 1rem;
 
   font-size: 1rem;
+  font-family: "Segoe UI", "Noto Sans", "Roboto", "Arial", sans-serif;
+  text-transform: none;
+  letter-spacing: normal;
   color: var(--text-primary);
 
   box-shadow: var(--shadow-sm);
@@ -50,12 +53,13 @@
 .course-name-input::placeholder,
 .course-description-input::placeholder {
   color: var(--text-secondary);
+  font-family: "Segoe UI", "Noto Sans", "Roboto", "Arial", sans-serif;
 }
 
 .course-name-input:focus,
 .course-description-input:focus {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(106,27,154,0.15);
+  box-shadow: 0 0 0 2px rgba(106, 27, 154, 0.15);
   outline: none;
 }
 
@@ -75,18 +79,16 @@
 
 .filter-select-new:focus {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(106,27,154,0.2);
+  box-shadow: 0 0 0 2px rgba(106, 27, 154, 0.2);
 }
 
 
 /* ================= BUTTON ================= */
 
 .create-button {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--primary-hover)
-  );
+  background: linear-gradient(135deg,
+      var(--primary-color),
+      var(--primary-hover));
 
   border: none;
   border-radius: 999px;
@@ -103,13 +105,11 @@
 .create-button:hover {
   transform: translateY(-2px);
 
-  background: linear-gradient(
-    135deg,
-    var(--primary-hover),
-    var(--primary-color)
-  );
+  background: linear-gradient(135deg,
+      var(--primary-hover),
+      var(--primary-color));
 
-  box-shadow: 0 6px 20px rgba(106,27,154,0.35);
+  box-shadow: 0 6px 20px rgba(106, 27, 154, 0.35);
 }
 
 
@@ -185,7 +185,7 @@
   color: white;
   font-weight: 500;
 
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
 
   opacity: 0;
   transition: opacity 0.2s ease;

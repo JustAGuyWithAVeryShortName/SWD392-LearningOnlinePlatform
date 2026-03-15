@@ -16,7 +16,9 @@
     "title": "Các khóa học",
     "showingCourses": "Hiển thị {{start}}-{{end}} trong tổng số {{total}} khóa học",
     "noMatchingCourses": "Không tìm thấy khóa học phù hợp với tiêu chí.",
-    "clearFilters": "Xóa bộ lọc"
+    "clearFilters": "Xóa bộ lọc",
+    "showPurchasedOnly": "Chỉ hiện khóa đã mua",
+    "showAllCourses": "Hiện tất cả khóa học"
   },
   "durationOptions": {
     "lessThan10Mins": "Dưới 10 phút",

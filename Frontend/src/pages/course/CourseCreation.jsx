@@ -8,9 +8,12 @@ import useUpload from "../../hooks/useUpload";
 import { toast } from "react-toastify";
 import BackButton from "../../components/BackButton";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../hooks/useAuth";
+import NotFound from "../not-found/NotFound";
 
 const CourseCreation = () => {
   const { t } = useTranslation("courseCreation");
+  const { user, authLoading } = useAuth();
 
   const navigate = useNavigate();
   const { courseID: paramCourseID } = useParams();
@@ -46,6 +49,13 @@ const CourseCreation = () => {
   });
 
   const [imagePreview, setImagePreview] = useState(null);
+  const userRole = (user?.role || "").toUpperCase();
+  const canManageCourse = userRole === "STAFF";
+
+  const normalizeText = (value) => {
+    if (typeof value !== "string") return value;
+    return value.normalize("NFC");
+  };
 
   /*
   =========================
@@ -165,16 +175,20 @@ const CourseCreation = () => {
 
     try {
       const body = {
-        courseName: formData.courseName,
-        description: formData.description,
+        courseName: normalizeText(formData.courseName),
+        description: normalizeText(formData.description),
         ageGroup: formData.ageGroup,
         image: uploadedImageUrl,
         price: Number(formData.price) || 0,
       };
 
-      // Pass Authorization header so backend can identify the actor
+      // Force UTF-8 JSON for backends that fail to infer charset correctly.
       const token = localStorage.getItem("token");
-      const headers = { Authorization: `Bearer ${token}` };
+      const headers = {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json; charset=UTF-8",
+        "Accept-Charset": "UTF-8",
+      };
 
       const res = await postCourse(
         body,
@@ -200,16 +214,23 @@ const CourseCreation = () => {
 
     try {
       const body = {
-        courseName: formData.courseName,
-        description: formData.description,
+        courseName: normalizeText(formData.courseName),
+        description: normalizeText(formData.description),
         ageGroup: formData.ageGroup,
         image: uploadedImageUrl,
         price: Number(formData.price) || 0,
       };
 
+      const token = localStorage.getItem("token");
+      const headers = {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json; charset=UTF-8",
+        "Accept-Charset": "UTF-8",
+      };
+
       await putCourse(
         body,
-        {},
+        headers,
         `http://localhost:8080/api/course/${courseID}`
       );
 
@@ -255,228 +276,238 @@ const CourseCreation = () => {
   */
 
   return (
-    <Container className="course-creation-container py-5">
-      <Row className="justify-content-center">
+    authLoading ? null : !canManageCourse ? (
+      <NotFound
+        code="403"
+        title="Forbidden"
+        message="You do not have permission to create or edit courses."
+        backLink="/courses"
+        backText="Back to courses"
+      />
+    ) : (
+      <Container className="course-creation-container py-5">
+        <Row className="justify-content-center">
 
-        <Col lg={10}>
-          <BackButton label="Back" />
+          <Col lg={10}>
+            <BackButton label="Back" />
 
-          {/* FORM */}
+            {/* FORM */}
 
-          <Row className="align-items-center">
+            <Row className="align-items-center">
 
-            {/* LEFT */}
+              {/* LEFT */}
 
-            <Col md={6}>
+              <Col md={6}>
 
-              <Form.Group className="mb-3">
-                <Form.Control
-                  type="text"
-                  placeholder="Course name"
-                  value={formData.courseName}
+                <Form.Group className="mb-3">
+                  <Form.Control
+                    type="text"
+                    placeholder="Course name"
+                    value={formData.courseName}
+                    onChange={(e) =>
+                      handleInputChange("courseName", e.target.value)
+                    }
+                    className="course-name-input"
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-4">
+                  <Form.Control
+                    as="textarea"
+                    rows={4}
+                    placeholder="Description"
+                    value={formData.description}
+                    onChange={(e) =>
+                      handleInputChange("description", e.target.value)
+                    }
+                    className="course-description-input"
+                  />
+                </Form.Group>
+
+                <Form.Select
+                  value={formData.ageGroup}
                   onChange={(e) =>
-                    handleInputChange("courseName", e.target.value)
+                    handleInputChange("ageGroup", e.target.value)
                   }
-                  className="course-name-input"
-                />
-              </Form.Group>
+                  className="filter-select-new"
+                >
+                  <option value="">Select age group</option>
 
-              <Form.Group className="mb-4">
-                <Form.Control
-                  as="textarea"
-                  rows={4}
-                  placeholder="Description"
-                  value={formData.description}
-                  onChange={(e) =>
-                    handleInputChange("description", e.target.value)
-                  }
-                  className="course-description-input"
-                />
-              </Form.Group>
+                  {ageGroups.map((age) => (
+                    <option key={age} value={age}>
+                      {age}
+                    </option>
+                  ))}
+                </Form.Select>
 
-              <Form.Select
-                value={formData.ageGroup}
-                onChange={(e) =>
-                  handleInputChange("ageGroup", e.target.value)
-                }
-                className="filter-select-new"
-              >
-                <option value="">Select age group</option>
+                <Form.Group className="mb-3 mt-3">
+                  <Form.Label className="fw-semibold">Giá khóa học (VNĐ)</Form.Label>
+                  <Form.Control
+                    type="number"
+                    min="0"
+                    step="1000"
+                    placeholder="0 = Miễn phí"
+                    value={formData.price}
+                    onChange={(e) => handleInputChange("price", e.target.value)}
+                    className="course-name-input"
+                  />
+                  <Form.Text className="text-muted">
+                    Để trống hoặc nhập 0 nếu khóa học miễn phí.
+                  </Form.Text>
+                </Form.Group>
 
-                {ageGroups.map((age) => (
-                  <option key={age} value={age}>
-                    {age}
-                  </option>
-                ))}
-              </Form.Select>
+              </Col>
 
-              <Form.Group className="mb-3 mt-3">
-                <Form.Label className="fw-semibold">Giá khóa học (VNĐ)</Form.Label>
-                <Form.Control
-                  type="number"
-                  min="0"
-                  step="1000"
-                  placeholder="0 = Miễn phí"
-                  value={formData.price}
-                  onChange={(e) => handleInputChange("price", e.target.value)}
-                  className="course-name-input"
-                />
-                <Form.Text className="text-muted">
-                  Để trống hoặc nhập 0 nếu khóa học miễn phí.
-                </Form.Text>
-              </Form.Group>
+              {/* RIGHT */}
 
-            </Col>
+              <Col md={6}>
 
-            {/* RIGHT */}
+                <div
+                  className="image-upload-area-new"
+                  onClick={() => fileInputRef.current.click()}
+                >
 
-            <Col md={6}>
+                  {imagePreview || uploadedImageUrl ? (
+                    <div className="image-preview-new">
 
-              <div
-                className="image-upload-area-new"
-                onClick={() => fileInputRef.current.click()}
-              >
+                      <img
+                        src={imagePreview || uploadedImageUrl}
+                        alt="preview"
+                        className="preview-image-new"
+                      />
 
-                {imagePreview || uploadedImageUrl ? (
-                  <div className="image-preview-new">
+                      <div className="image-overlay-new">
+                        <Upload size={22} />
+                        <span>Change image</span>
+                      </div>
 
-                    <img
-                      src={imagePreview || uploadedImageUrl}
-                      alt="preview"
-                      className="preview-image-new"
-                    />
-
-                    <div className="image-overlay-new">
-                      <Upload size={22} />
-                      <span>Change image</span>
                     </div>
+                  ) : (
+                    <div className="upload-placeholder-new">
 
-                  </div>
-                ) : (
-                  <div className="upload-placeholder-new">
+                      <ImageIcon
+                        size={48}
+                        className="upload-icon-new"
+                      />
 
-                    <ImageIcon
-                      size={48}
-                      className="upload-icon-new"
-                    />
+                      <span className="upload-text-new">
+                        Click to upload
+                      </span>
 
-                    <span className="upload-text-new">
-                      Click to upload
-                    </span>
+                    </div>
+                  )}
 
-                  </div>
+                </div>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="d-none"
+                  onChange={handleImageSelect}
+                />
+
+                {isUploadingImage && (
+                  <Alert className="mt-2">Uploading image...</Alert>
                 )}
+
+                {imageUploadError && (
+                  <Alert variant="danger">{imageUploadError}</Alert>
+                )}
+
+                {/* BUTTON */}
+
+                <div className="mt-4">
+
+                  {courseID ? (
+                    <Button
+                      className="create-button"
+                      onClick={handleSaveCourse}
+                    >
+                      <Save size={16} className="me-2" />
+                      Save course
+                    </Button>
+                  ) : (
+                    <Button
+                      className="create-button"
+                      onClick={handleCreateCourse}
+                    >
+                      <Plus size={16} className="me-2" />
+                      Create course
+                    </Button>
+                  )}
+
+                </div>
+
+              </Col>
+
+            </Row>
+
+            {/* MODULES */}
+
+            <div className="module-section mt-5">
+
+              <div className="d-flex justify-content-between mb-4">
+
+                <Button
+                  className="add-module-btn"
+                  onClick={handleAddModule}
+                >
+                  <Plus size={16} className="me-1" />
+                  Add Module
+                </Button>
 
               </div>
 
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="d-none"
-                onChange={handleImageSelect}
-              />
+              {modules.length === 0 ? (
+                <p className="text-center text-muted">
+                  No modules yet
+                </p>
+              ) : (
+                modules.map((module) => (
 
-              {isUploadingImage && (
-                <Alert className="mt-2">Uploading image...</Alert>
-              )}
-
-              {imageUploadError && (
-                <Alert variant="danger">{imageUploadError}</Alert>
-              )}
-
-              {/* BUTTON */}
-
-              <div className="mt-4">
-
-                {courseID ? (
-                  <Button
-                    className="create-button"
-                    onClick={handleSaveCourse}
+                  <Card
+                    key={module.moduleID}
+                    className="module-card mb-3"
                   >
-                    <Save size={16} className="me-2" />
-                    Save course
-                  </Button>
-                ) : (
-                  <Button
-                    className="create-button"
-                    onClick={handleCreateCourse}
-                  >
-                    <Plus size={16} className="me-2" />
-                    Create course
-                  </Button>
-                )}
 
-              </div>
+                    <Card.Body className="d-flex align-items-center">
 
-            </Col>
+                      <Form.Check
+                        type="checkbox"
+                        className="me-3"
+                        checked={selectedModuleIds.includes(module.moduleID)}
+                        onChange={() =>
+                          toggleModuleSelect(module.moduleID)
+                        }
+                      />
 
-          </Row>
+                      <h5 className="module-title flex-grow-1 mb-0">
+                        {module.moduleName}
+                      </h5>
 
-          {/* MODULES */}
+                      <Button
+                        variant="link"
+                        onClick={() =>
+                          handleEditModule(module.moduleID)
+                        }
+                      >
+                        <Edit3 size={16} />
+                      </Button>
 
-          <div className="module-section mt-5">
+                    </Card.Body>
 
-            <div className="d-flex justify-content-between mb-4">
+                  </Card>
 
-              <Button
-                className="add-module-btn"
-                onClick={handleAddModule}
-              >
-                <Plus size={16} className="me-1" />
-                Add Module
-              </Button>
+                ))
+              )}
 
             </div>
 
-            {modules.length === 0 ? (
-              <p className="text-center text-muted">
-                No modules yet
-              </p>
-            ) : (
-              modules.map((module) => (
-
-                <Card
-                  key={module.moduleID}
-                  className="module-card mb-3"
-                >
-
-                  <Card.Body className="d-flex align-items-center">
-
-                    <Form.Check
-                      type="checkbox"
-                      className="me-3"
-                      checked={selectedModuleIds.includes(module.moduleID)}
-                      onChange={() =>
-                        toggleModuleSelect(module.moduleID)
-                      }
-                    />
-
-                    <h5 className="module-title flex-grow-1 mb-0">
-                      {module.moduleName}
-                    </h5>
-
-                    <Button
-                      variant="link"
-                      onClick={() =>
-                        handleEditModule(module.moduleID)
-                      }
-                    >
-                      <Edit3 size={16} />
-                    </Button>
-
-                  </Card.Body>
-
-                </Card>
-
-              ))
-            )}
-
-          </div>
-
-        </Col>
-      </Row>
-    </Container>
+          </Col>
+        </Row>
+      </Container>
+    )
   );
 };
 

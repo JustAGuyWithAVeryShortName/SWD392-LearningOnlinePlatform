@@ -23,6 +23,9 @@ const CourseDetails = () => {
   const { user, authLoading } = useAuth()
   console.log('user', user);
   const username = user?.username
+  const userRole = (user?.role || "").toUpperCase();
+  const isMemberRole = !user || userRole === "MEMBER";
+  const isStaffOrManager = ["STAFF", "MANAGER"].includes(userRole);
   const [course, setCourse] = useState(null)
   const [enrollment, setEnrollment] = useState(null)
   const [completionProgress, setCompletionProgress] = useState(0)
@@ -274,7 +277,20 @@ const CourseDetails = () => {
                     </div>
                   )}
 
-                  {isPaidCourse ? (
+                  {isStaffOrManager ? (
+                    <Button
+                      variant="outline-primary"
+                      size="lg"
+                      className="enroll-button"
+                      onClick={() => navigate(`/courses/lesson/${course.courseID}`)}
+                    >
+                      {t("viewDirect")}
+                    </Button>
+                  ) : !isMemberRole ? (
+                    <Button variant="outline-secondary" size="lg" className="enroll-button" disabled>
+                      {t("roleRestriction")}
+                    </Button>
+                  ) : isPaidCourse ? (
                     alreadyPaid ? (
                       <div className="d-flex flex-column gap-2">
                         <Button variant="secondary" size="lg" className="enroll-button" disabled>

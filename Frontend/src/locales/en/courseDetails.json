@@ -32,6 +32,8 @@
         "loading": "Processing...",
         "myCourses": "View My Courses"
     },
+    "viewDirect": "View Course Directly",
+    "roleRestriction": "Only members can enroll or buy courses",
     "toastMessages": {
         "fetchDataError": "Failed to fetch data at CourseDetails",
         "loginRequired": "Please log in to enroll in the course.",

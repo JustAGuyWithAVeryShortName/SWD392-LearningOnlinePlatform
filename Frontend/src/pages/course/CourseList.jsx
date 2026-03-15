@@ -10,6 +10,7 @@ import LoadingSpinner from "../../components/LoadingSpinner"
 import ErrorMessage from "../../components/ErrorMessage"
 import NotFound from "../not-found/NotFound"
 import { useTranslation } from "react-i18next"; // Import useTranslation
+import { useAuth } from "../../hooks/useAuth"
 
 const CourseList = () => {
   const { t } = useTranslation("courseList"); // Khai báo useTranslation
@@ -17,11 +18,16 @@ const CourseList = () => {
   const [courses, setCourses] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedDuration, setSelectedDuration] = useState("")
+  const [showPurchasedOnly, setShowPurchasedOnly] = useState(false)
+  const [purchasedCourseIds, setPurchasedCourseIds] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 6 // Show 6 courses per page (2 rows of 3)
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const isMember = (user?.role || "").toUpperCase() === "MEMBER"
 
   const { error: errorCourses, loading: loadingCourses, get: getcourses } = useFetch();
+  const { get: getPaymentHistory } = useFetch();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,6 +40,29 @@ const CourseList = () => {
     }
     fetchData()
   }, [getcourses]);
+
+  useEffect(() => {
+    const fetchPurchasedCourses = async () => {
+      if (!isMember) {
+        setPurchasedCourseIds([])
+        return
+      }
+
+      try {
+        const paymentData = await getPaymentHistory("http://localhost:8080/api/payment/my-history")
+        const purchasedIds = (Array.isArray(paymentData) ? paymentData : [])
+          .filter((item) => item.status === "SUCCESS" && item.course?.courseID)
+          .map((item) => item.course.courseID)
+
+        setPurchasedCourseIds(Array.from(new Set(purchasedIds)))
+      } catch (error) {
+        console.error("Fetch purchased courses error:", error)
+        setPurchasedCourseIds([])
+      }
+    }
+
+    fetchPurchasedCourses()
+  }, [isMember, getPaymentHistory])
   console.log(courses);
 
   const durationOptions = [
@@ -54,6 +83,7 @@ const CourseList = () => {
       const matchesName = course.courseName && course.courseName.toLowerCase().includes(searchTerm.toLowerCase());
       const duration = course.duration;
       let matchesDuration = true;
+      const matchesPurchased = !showPurchasedOnly || purchasedCourseIds.includes(course.courseID)
       if (selectedDuration !== "") {
         const selected = Number(selectedDuration);
         if (selected === 3) {
@@ -68,9 +98,9 @@ const CourseList = () => {
           matchesDuration = true;
         }
       }
-      return matchesName && matchesDuration;
+      return matchesName && matchesDuration && matchesPurchased;
     })
-  }, [courses, searchTerm, selectedDuration])
+  }, [courses, searchTerm, selectedDuration, showPurchasedOnly, purchasedCourseIds])
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredCourses.length / itemsPerPage)
@@ -99,11 +129,12 @@ const CourseList = () => {
   const clearAllFilters = () => {
     setSearchTerm("")
     setSelectedDuration("")
+    setShowPurchasedOnly(false)
     setCurrentPage(1)
   }
 
   const handleEnroll = (courseId) => {
-    navigate(`/courses/lesson/${courseId}`)
+    navigate(`/courses/${courseId}`)
   }
 
   const handleDetails = (courseId) => {
@@ -144,7 +175,21 @@ const CourseList = () => {
               filterFor="courses"
             />
 
-            {(searchTerm !== "" || selectedDuration !== "") && (
+            {isMember && (
+              <div className="d-flex justify-content-center mt-3">
+                <Button
+                  variant={showPurchasedOnly ? "success" : "outline-success"}
+                  onClick={() => {
+                    setCurrentPage(1)
+                    setShowPurchasedOnly((prev) => !prev)
+                  }}
+                >
+                  {showPurchasedOnly ? t("coursesSection.showAllCourses") : t("coursesSection.showPurchasedOnly")}
+                </Button>
+              </div>
+            )}
+
+            {(searchTerm !== "" || selectedDuration !== "" || showPurchasedOnly) && (
               <div className="d-flex justify-content-center mt-3"> {/* Căn giữa nút */}
                 <Button variant="outline-primary" onClick={clearAllFilters}>
                   {t("coursesSection.clearFilters")}
@@ -172,7 +217,9 @@ const CourseList = () => {
                     <Col md={6} lg={4} key={course.courseID} className="mb-4">
                       <CourseCard key={course.courseID}
                         course={course}
+                        isPurchased={purchasedCourseIds.includes(course.courseID)}
                         onEnrollClick={handleEnroll}
+                        onContinueClick={handleDetails}
                         onDetailsClick={handleDetails} />
                     </Col>
                   ))}

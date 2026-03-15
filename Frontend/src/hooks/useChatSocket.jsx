@@ -7,9 +7,32 @@ const SOCKET_URL = "/ws"; // Use proxied endpoint
 
 export default function useChatSocket({ userId, role, onMessage, onTyping, onRead }) {
   const stompClient = useRef(null);
+  const messageSubscriptions = useRef([]);
   const [connected, setConnected] = useState(false);
   const [messages, setMessages] = useState([]);
   const [typingUsers, setTypingUsers] = useState([]);
+
+  const upsertMessage = useCallback((message) => {
+    setMessages((prev) => {
+      const normalizedMessageId = message?.messageId ? String(message.messageId) : null;
+      if (normalizedMessageId && prev.some((m) => String(m.messageId) === normalizedMessageId)) {
+        return prev;
+      }
+
+      const isDuplicateByContent = prev.some((m) => (
+        m.content === message.content
+        && m.senderUsername === message.senderUsername
+        && m.recipientUsername === message.recipientUsername
+        && m.roomId === message.roomId
+        && Math.abs(new Date(m.sentAt).getTime() - new Date(message.sentAt).getTime()) < 1500
+      ));
+
+      if (isDuplicateByContent) return prev;
+
+      const newMessages = [...prev, message];
+      return newMessages.sort((a, b) => new Date(a.sentAt) - new Date(b.sentAt));
+    });
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -37,20 +60,24 @@ export default function useChatSocket({ userId, role, onMessage, onTyping, onRea
             setConnected(true);
             reconnectAttempts = 0;
 
-            // Subscribe to user-specific queues for private messages
-            stompClient.current.subscribe("/user/queue/private", msg => {
-              console.log("Received private message:", msg.body);
-              const message = JSON.parse(msg.body);
-              console.log("Parsed message:", message);
-              setMessages(prev => {
-                // Avoid duplicates and sort by sentAt timestamp
-                const messageExists = prev.some(m => m.messageId === message.messageId);
-                if (messageExists) return prev;
-                
-                const newMessages = [...prev, message];
-                return newMessages.sort((a, b) => new Date(a.sentAt) - new Date(b.sentAt));
+            // Clean up old subscriptions before re-subscribing after reconnect.
+            messageSubscriptions.current.forEach((sub) => sub?.unsubscribe?.());
+            messageSubscriptions.current = [];
+
+            const privateDestinations = [
+              "/user/queue/private",
+              "/user/queue/messages",
+              "/user/queue/chat",
+            ];
+
+            privateDestinations.forEach((destination) => {
+              const sub = stompClient.current.subscribe(destination, (msg) => {
+                console.log(`Received message from ${destination}:`, msg.body);
+                const message = JSON.parse(msg.body);
+                upsertMessage(message);
+                onMessage && onMessage(message);
               });
-              onMessage && onMessage(message);
+              messageSubscriptions.current.push(sub);
             });
 
             stompClient.current.subscribe("/user/queue/typing", msg => {
@@ -98,21 +125,23 @@ export default function useChatSocket({ userId, role, onMessage, onTyping, onRea
     connectWebSocket();
 
     return () => {
+      messageSubscriptions.current.forEach((sub) => sub?.unsubscribe?.());
+      messageSubscriptions.current = [];
       if (stompClient.current) {
         stompClient.current.deactivate();
       }
     };
-  }, [userId, role]); // Removed onMessage, onTyping, onRead from dependencies
+  }, [userId, role, onMessage, onRead, onTyping, upsertMessage]);
 
   const sendMessage = async message => {
     console.log("Sending message:", message);
     console.log("WebSocket connected:", stompClient.current?.connected);
-    
+
     if (!stompClient.current || !stompClient.current.connected) {
       console.error("Cannot send message: WebSocket not connected");
       return;
     }
-    
+
     try {
       const payload = {
         content: message.content,
@@ -120,13 +149,13 @@ export default function useChatSocket({ userId, role, onMessage, onTyping, onRea
         roomId: message.chatId
       };
       console.log("WebSocket payload:", payload);
-      
+
       stompClient.current.publish({
         destination: "/app/private",
         body: JSON.stringify(payload)
       });
       console.log("Message sent via WebSocket");
-      
+
       // Add message to local state immediately for better UX
       const localMessage = {
         messageId: `local-${Date.now()}`, // temporary ID with prefix
@@ -141,16 +170,9 @@ export default function useChatSocket({ userId, role, onMessage, onTyping, onRea
         isDelivered: false,
         isRead: false
       };
-      
-      setMessages(prev => {
-        // Avoid duplicates and sort by sentAt timestamp
-        const messageExists = prev.some(m => m.messageId === localMessage.messageId);
-        if (messageExists) return prev;
-        
-        const newMessages = [...prev, localMessage];
-        return newMessages.sort((a, b) => new Date(a.sentAt) - new Date(b.sentAt));
-      });
-      
+
+      upsertMessage(localMessage);
+
     } catch (error) {
       console.error("Error sending message via WebSocket:", error);
       throw error;
@@ -162,7 +184,7 @@ export default function useChatSocket({ userId, role, onMessage, onTyping, onRea
       console.error("Cannot send typing: WebSocket not connected");
       return;
     }
-    
+
     try {
       stompClient.current.publish({
         destination: "/app/typing",
@@ -178,7 +200,7 @@ export default function useChatSocket({ userId, role, onMessage, onTyping, onRea
       console.error("Cannot send read receipt: WebSocket not connected");
       return;
     }
-    
+
     try {
       stompClient.current.publish({
         destination: "/app/read",

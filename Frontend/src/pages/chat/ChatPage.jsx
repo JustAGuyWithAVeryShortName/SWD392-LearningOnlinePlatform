@@ -8,6 +8,21 @@ import Navbar from "../../components/home/Navbar";
 import API from "../../api";
 import "./ChatPage.css";
 
+const resolveChatIdentity = (value) => {
+  if (!value) return "";
+  if (typeof value === "string" || typeof value === "number") {
+    return String(value).trim();
+  }
+
+  return String(
+    value.username
+    || value.userName
+    || value.email
+    || value.id
+    || ""
+  ).trim();
+};
+
 export default function ChatPage() {
   const { user } = useAuth();
   const [input, setInput] = useState("");
@@ -17,7 +32,7 @@ export default function ChatPage() {
   const [chatId, setChatId] = useState(null);
   const lastFetchedChatId = useRef(null);
 
-  const userId = user?.id || user?.username; // Fallback to username if id is not available
+  const userId = resolveChatIdentity(user);
   const role = user?.role?.toLowerCase();
 
   const {
@@ -39,16 +54,16 @@ export default function ChatPage() {
       if (!role || !['consultant', 'member'].includes(role)) {
         return;
       }
-      
+
       const targetRole = role === "consultant" ? "MEMBER" : "CONSULTANT";
       const endpoint = `/api/user/role/${targetRole}`;
-      
+
       try {
         const res = await API.get(endpoint);
-        
+
         // Try multiple possible response structures
         let userData = null;
-        
+
         if (Array.isArray(res.data)) {
           userData = res.data;
         } else if (res.data?.data && Array.isArray(res.data.data)) {
@@ -62,13 +77,20 @@ export default function ChatPage() {
         } else {
           userData = res.data;
         }
-        
+
         if (Array.isArray(userData)) {
-          setUserList(userData);
+          const normalizedUsers = userData
+            .map((item) => ({
+              ...item,
+              username: resolveChatIdentity(item),
+            }))
+            .filter((item) => item.username);
+
+          setUserList(normalizedUsers);
         } else {
           setUserList([]);
         }
-        
+
       } catch (e) {
         console.error("Failed to fetch users:", e);
         setUserList([]);
@@ -80,9 +102,14 @@ export default function ChatPage() {
   // When a user is selected, set chatId and fetch history
   useEffect(() => {
     if (selectedUser && userId) {
-      const selectedUserId = selectedUser.id || selectedUser.username;
+      const selectedUserId = resolveChatIdentity(selectedUser);
       const currentUserId = userId;
-      
+
+      if (!selectedUserId) {
+        console.error("Selected user does not have a valid chat identity", selectedUser);
+        return;
+      }
+
       // Use role-based room ID format: memberUsername-consultantUsername
       let newChatId;
       if (role === 'member') {
@@ -95,9 +122,9 @@ export default function ChatPage() {
           ? `${currentUserId}-${selectedUserId}`
           : `${selectedUserId}-${currentUserId}`;
       }
-      
+
       setChatId(newChatId);
-      
+
       // Only fetch history if chatId has changed
       if (newChatId !== lastFetchedChatId.current) {
         console.log("Fetching history for new chatId:", newChatId);
@@ -111,6 +138,17 @@ export default function ChatPage() {
   }, [selectedUser, userId, role]); // Removed fetchHistory from dependencies
 
   useEffect(() => {
+    if (!chatId) return;
+
+    // Fallback sync: keep current room fresh if backend websocket routing is inconsistent.
+    const intervalId = setInterval(() => {
+      fetchHistory(chatId);
+    }, 2000);
+
+    return () => clearInterval(intervalId);
+  }, [chatId, fetchHistory]);
+
+  useEffect(() => {
     if (isTyping && chatId) {
       sendTyping({ chatId, userId });
     }
@@ -121,13 +159,18 @@ export default function ChatPage() {
     console.log("Input:", input);
     console.log("Selected user:", selectedUser);
     console.log("Chat ID:", chatId);
-    
+
     if (!input.trim() || !selectedUser) {
       console.log("Send blocked: empty input or no selected user");
       return;
     }
-    
-    const selectedUserId = selectedUser.id || selectedUser.username;
+
+    const selectedUserId = resolveChatIdentity(selectedUser);
+    if (!selectedUserId) {
+      console.error("Cannot send message: selected user identity is missing", selectedUser);
+      return;
+    }
+
     const messageData = {
       chatId,
       senderId: userId,
@@ -135,7 +178,7 @@ export default function ChatPage() {
       content: input,
       role
     };
-    
+
     console.log("Sending message with data:", messageData);
     sendMessage(messageData);
     setInput("");
@@ -172,17 +215,17 @@ export default function ChatPage() {
   }
 
   return (
-    <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+    <div className="chat-page-shell">
       <Navbar />
-      <div className="chat-page" style={{ flex: 1, overflow: "hidden", padding: "10px" }}>
+      <div className="chat-page">
         <Row className="chat-page-header">
           <Col>
             <h2 className="chat-page-title">Chat</h2>
             <p className="chat-page-subtitle">
               {connected ? "Connected" : "Connecting..."}
             </p>
-          {/* Temporary debug info */}
-          {/* <div style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
+            {/* Temporary debug info */}
+            {/* <div style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
             DEBUG: UserList length: {userList?.length || 0} | Role: {role} | User ID: {userId}
             {userList?.length > 0 && <span> | First user: {JSON.stringify(userList[0])}</span>}
             <br />
@@ -191,43 +234,43 @@ export default function ChatPage() {
             Connected: {connected ? 'Yes' : 'No'} | 
             Input: "{input}"
           </div> */}
-        </Col>
-      </Row>
-      
-      <Row className="chat-page-content h-100 flex-fill mx-0">
-        <Col xs={12} className="chat-container h-100 px-0">
-          <Card className="chat-card h-100">
-            <Card.Body className="p-0 h-100 d-flex flex-column">
-              <div className="chat-layout h-100">
-                <div className="chat-sidebar">
-                  <UserList
-                    users={userList}
-                    selectedUser={selectedUser}
-                    onSelect={(user) => {
-                      setSelectedUser(user);
-                    }}
-                    role={role}
-                  />
+          </Col>
+        </Row>
+
+        <Row className="chat-page-content h-100 flex-fill mx-0">
+          <Col xs={12} className="chat-container h-100 px-0">
+            <Card className="chat-card h-100">
+              <Card.Body className="p-0 h-100 d-flex flex-column">
+                <div className="chat-layout h-100">
+                  <div className="chat-sidebar">
+                    <UserList
+                      users={userList}
+                      selectedUser={selectedUser}
+                      onSelect={(user) => {
+                        setSelectedUser(user);
+                      }}
+                      role={role}
+                    />
+                  </div>
+
+                  <div className="chat-main">
+                    <ChatBox
+                      userId={userId}
+                      selectedUser={selectedUser}
+                      messages={messages}
+                      typingUsers={typingUsers}
+                      input={input}
+                      onInputChange={handleInputChange}
+                      onSend={handleSend}
+                      onRead={handleRead}
+                      connected={connected}
+                    />
+                  </div>
                 </div>
-                
-                <div className="chat-main">
-                  <ChatBox
-                    userId={userId}
-                    selectedUser={selectedUser}
-                    messages={messages}
-                    typingUsers={typingUsers}
-                    input={input}
-                    onInputChange={handleInputChange}
-                    onSend={handleSend}
-                    onRead={handleRead}
-                    connected={connected}
-                  />
-                </div>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
       </div>
     </div>
   );

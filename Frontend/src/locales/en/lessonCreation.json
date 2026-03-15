@@ -13,9 +13,11 @@
     "toastMessages": {
         "fetchError": "Failed to fetch data in Lesson Creation",
         "createSuccess": "Lesson created successfully!",
+        "createDraftInfo": "Lesson draft created. Please upload at least one video before saving.",
         "createError": "Failed to create lesson. Please try again.",
         "saveSuccess": "Lesson saved successfully!",
-        "saveError": "Failed to save lesson. Please try again."
+        "saveError": "Failed to save lesson. Please try again.",
+        "videoRequired": "Please upload at least one video before saving this lesson."
     },
     "video": {
         "title": "📹 Lesson Videos",

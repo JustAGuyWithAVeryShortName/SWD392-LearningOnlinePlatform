@@ -8,10 +8,11 @@ import { PlusCircle } from "lucide-react";
 import { toast } from "react-toastify";
 import { useAuth } from "../../hooks/useAuth";
 import { useTranslation } from "react-i18next";
+import NotFound from "../not-found/NotFound";
 
 function CourseManagement() {
     const navigate = useNavigate(); // Initialize useNavigate hook
-    const { user } = useAuth()
+    const { user, authLoading } = useAuth()
     const { t } = useTranslation('courseManagement');
 
     const [courses, setCourses] = useState([]);
@@ -24,6 +25,8 @@ function CourseManagement() {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
     const { get, put } = useFetch(); // Destructure 'del' for delete operations
+    const userRole = (user?.role || "").toUpperCase();
+    const canManageCourse = ["STAFF", "MANAGER"].includes(userRole);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -178,162 +181,172 @@ function CourseManagement() {
     };
 
     return (
-        <div className="course-management-content">
-            <Container className="mb-5 courses-section">
-                <h1>{t("courseManagementTitle")}</h1>
+        authLoading ? null : !canManageCourse ? (
+            <NotFound
+                code="403"
+                title="Forbidden"
+                message="You do not have permission to manage courses."
+                backLink="/courses"
+                backText="Back to courses"
+            />
+        ) : (
+            <div className="course-management-content">
+                <Container className="mb-5 courses-section">
+                    <h1>{t("courseManagementTitle")}</h1>
 
-                {/* Search Filter Section */}
-                <SearchFilter
-                    searchTerm={searchTerm}
-                    selectedAgeGroup={selectedAgeGroup}
-                    selectedDuration={selectedDuration}
-                    selectedStatus={selectedStatus}
-                    onSearchChange={(value) => handleFilterChange("searchTerm", value)} // Updated to use handleFilterChange
-                    onAgeGroupChange={(value) => handleFilterChange("ageGroup", value)}
-                    onDurationChange={(value) => handleFilterChange("duration", value)}
-                    onStatusChange={(value) => handleFilterChange("status", value)}
-                    ageGroupOptions={ageGroupOptions}
-                    durationOptions={durationOptions}
-                    statusOptions={statusOptions}
-                    placeholder={t("searchFilter.placeholder")}
-                    filterFor="courses"
-                />
+                    {/* Search Filter Section */}
+                    <SearchFilter
+                        searchTerm={searchTerm}
+                        selectedAgeGroup={selectedAgeGroup}
+                        selectedDuration={selectedDuration}
+                        selectedStatus={selectedStatus}
+                        onSearchChange={(value) => handleFilterChange("searchTerm", value)} // Updated to use handleFilterChange
+                        onAgeGroupChange={(value) => handleFilterChange("ageGroup", value)}
+                        onDurationChange={(value) => handleFilterChange("duration", value)}
+                        onStatusChange={(value) => handleFilterChange("status", value)}
+                        ageGroupOptions={ageGroupOptions}
+                        durationOptions={durationOptions}
+                        statusOptions={statusOptions}
+                        placeholder={t("searchFilter.placeholder")}
+                        filterFor="courses"
+                    />
 
-                {(searchTerm !== "" || selectedAgeGroup !== "" || selectedDuration !== "" || selectedStatus !== "") && (
-                    <div className="d-flex justify-content-center mt-3">
-                        <Button variant="outline-primary" onClick={clearAllFilters}>
-                            {t("coursesSection.clearFilters")}
+                    {(searchTerm !== "" || selectedAgeGroup !== "" || selectedDuration !== "" || selectedStatus !== "") && (
+                        <div className="d-flex justify-content-center mt-3">
+                            <Button variant="outline-primary" onClick={clearAllFilters}>
+                                {t("coursesSection.clearFilters")}
+                            </Button>
+                        </div>
+                    )}
+
+                    {/* Courses Section */}
+                    <div className="d-flex align-items-center mb-4">
+                        <Button variant="outline-success" size="sm" onClick={handleAddCourse} className="ms-auto">
+                            <PlusCircle size={16} className="me-1" /> Add
                         </Button>
                     </div>
-                )}
 
-                {/* Courses Section */}
-                <div className="d-flex align-items-center mb-4">
-                    <Button variant="outline-success" size="sm" onClick={handleAddCourse} className="ms-auto">
-                        <PlusCircle size={16} className="me-1" /> Add
-                    </Button>
-                </div>
-
-                {filteredCourses.length > 0 ? (
-                    <>
-                        <Card>
-                            <Card.Header>
-                                {t("courseList")} <Badge bg="secondary">{filteredCourses.length}</Badge>
-                            </Card.Header>
-                            <Card.Body style={{ padding: 0 }}>
-                                <div
-                                    style={{
-                                        maxHeight: "150vh",
-                                        position: "relative",
-                                    }}
-                                >
-                                    <Table bordered hover className="table-sticky-header" style={{ marginBottom: 0 }}>
-                                        <thead>
-                                            <tr>
-                                                <th>{t("no.")}</th>
-                                                <th>{t("courseName")}</th>
-                                                <th>{t("quantity")}</th>
-                                                <th>{t("duration")}</th>
-                                                <th>{t("ageGroup")}</th>
-                                                <th>{t("status")}</th>
-                                                <th>{t("createdAt")}</th>
-                                                <th>{t("updatedAt")}</th>
-                                                <th>{t("actions")}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {currentCourses.map((course, index) => (
-                                                <tr key={course.courseID}>
-                                                    <td>{startIndex + index + 1}</td>
-                                                    <td>{course.courseName}</td>
-                                                    <td>{course.quantity}</td>
-                                                    <td>{course.duration}</td>
-                                                    <td>{course.ageGroup}</td>
-                                                    <td>
-                                                        <Badge
-                                                            bg={
-                                                                course.status === "AVAILABLE"
-                                                                    ? "success"
-                                                                    : course.status === "PENDING"
-                                                                        ? "warning"
-                                                                        : "danger"
-                                                            }
-                                                        >
-                                                            {course.status}
-                                                        </Badge>
-                                                    </td>
-                                                    <td>{new Date(course.createdAt).toLocaleString()}</td>
-                                                    <td>{new Date(course.updatedAt).toLocaleString()}</td>
-                                                    <td>
-                                                        <div className="d-flex align-items-center gap-2 flex-shrink-0">
-                                                            <Button
-                                                                variant="outline-primary"
-                                                                size="sm"
-                                                                className="fw-bold"
-                                                                onClick={() => handleViewCourse(course.courseID)}
+                    {filteredCourses.length > 0 ? (
+                        <>
+                            <Card>
+                                <Card.Header>
+                                    {t("courseList")} <Badge bg="secondary">{filteredCourses.length}</Badge>
+                                </Card.Header>
+                                <Card.Body style={{ padding: 0 }}>
+                                    <div
+                                        style={{
+                                            maxHeight: "150vh",
+                                            position: "relative",
+                                        }}
+                                    >
+                                        <Table bordered hover className="table-sticky-header" style={{ marginBottom: 0 }}>
+                                            <thead>
+                                                <tr>
+                                                    <th>{t("no.")}</th>
+                                                    <th>{t("courseName")}</th>
+                                                    <th>{t("quantity")}</th>
+                                                    <th>{t("duration")}</th>
+                                                    <th>{t("ageGroup")}</th>
+                                                    <th>{t("status")}</th>
+                                                    <th>{t("createdAt")}</th>
+                                                    <th>{t("updatedAt")}</th>
+                                                    <th>{t("actions")}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {currentCourses.map((course, index) => (
+                                                    <tr key={course.courseID}>
+                                                        <td>{startIndex + index + 1}</td>
+                                                        <td>{course.courseName}</td>
+                                                        <td>{course.quantity}</td>
+                                                        <td>{course.duration}</td>
+                                                        <td>{course.ageGroup}</td>
+                                                        <td>
+                                                            <Badge
+                                                                bg={
+                                                                    course.status === "AVAILABLE"
+                                                                        ? "success"
+                                                                        : course.status === "PENDING"
+                                                                            ? "warning"
+                                                                            : "danger"
+                                                                }
                                                             >
-                                                                View
-                                                            </Button>
-
-                                                            {user?.role === 'STAFF' && (
+                                                                {course.status}
+                                                            </Badge>
+                                                        </td>
+                                                        <td>{new Date(course.createdAt).toLocaleString()}</td>
+                                                        <td>{new Date(course.updatedAt).toLocaleString()}</td>
+                                                        <td>
+                                                            <div className="d-flex align-items-center gap-2 flex-shrink-0">
                                                                 <Button
-                                                                    variant="outline-success"
+                                                                    variant="outline-primary"
                                                                     size="sm"
                                                                     className="fw-bold"
-                                                                    onClick={() => handleEditCourse(course.courseID)}
+                                                                    onClick={() => handleViewCourse(course.courseID)}
                                                                 >
-                                                                    Edit
+                                                                    View
                                                                 </Button>
-                                                            )}
 
-                                                            {(['PENDING', 'UNAVAILABLE', 'REJECTED'].includes(course.status)) &&
-                                                                user?.role === 'MANAGER' && (
+                                                                {user?.role === 'STAFF' && (
                                                                     <Button
                                                                         variant="outline-success"
                                                                         size="sm"
                                                                         className="fw-bold"
-                                                                        onClick={() => handleApproveCourse(course.courseID)}
+                                                                        onClick={() => handleEditCourse(course.courseID)}
                                                                     >
-                                                                        Approve
+                                                                        Edit
                                                                     </Button>
                                                                 )}
 
-                                                            {(['PENDING', 'AVAILABLE'].includes(course.status)) &&
-                                                                user?.role === 'MANAGER' && (
-                                                                    <Button
-                                                                        variant="outline-danger"
-                                                                        size="sm"
-                                                                        className="fw-bold"
-                                                                        onClick={() => handleRejectCourse(course.courseID)}
-                                                                    >
-                                                                        Reject
-                                                                    </Button>
-                                                                )}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </Table>
-                                </div>
-                            </Card.Body>
-                        </Card>
+                                                                {(['PENDING', 'UNAVAILABLE', 'REJECTED'].includes(course.status)) &&
+                                                                    user?.role === 'MANAGER' && (
+                                                                        <Button
+                                                                            variant="outline-success"
+                                                                            size="sm"
+                                                                            className="fw-bold"
+                                                                            onClick={() => handleApproveCourse(course.courseID)}
+                                                                        >
+                                                                            Approve
+                                                                        </Button>
+                                                                    )}
 
-                        {/* Pagination */}
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                            itemsPerPage={itemsPerPage}
-                        />
-                    </>
-                ) : (
-                    <div className="text-center py-5">
-                        <p className="text-muted">{t("coursesSection.noMatchingCourses")}</p>
-                    </div>
-                )}
-            </Container>
-        </div>
+                                                                {(['PENDING', 'AVAILABLE'].includes(course.status)) &&
+                                                                    user?.role === 'MANAGER' && (
+                                                                        <Button
+                                                                            variant="outline-danger"
+                                                                            size="sm"
+                                                                            className="fw-bold"
+                                                                            onClick={() => handleRejectCourse(course.courseID)}
+                                                                        >
+                                                                            Reject
+                                                                        </Button>
+                                                                    )}
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </Table>
+                                    </div>
+                                </Card.Body>
+                            </Card>
+
+                            {/* Pagination */}
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
+                                itemsPerPage={itemsPerPage}
+                            />
+                        </>
+                    ) : (
+                        <div className="text-center py-5">
+                            <p className="text-muted">{t("coursesSection.noMatchingCourses")}</p>
+                        </div>
+                    )}
+                </Container>
+            </div>
+        )
     );
 }
 

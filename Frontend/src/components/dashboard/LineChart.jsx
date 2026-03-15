@@ -30,13 +30,14 @@ const LineChart = () => {
 
   const lineConfigs = useMemo(() => ({
     totalMembers: { color: 'var(--primary-hover)', name: t('totalMembers') },
-    staffMembers: { color: '#10b981', name: t('staffMembers') },
-    consultants: { color: '#8b5cf6', name: t('consultants') },
-    monthlyConsultations: { color: '#f59e0b', name: t('monthlyConsultations') },
+    staffMembers: { color: '#10b981', name: t('lecturers') },
+    consultants: { color: '#8b5cf6', name: t('customerSupport') },
     activeCourses: { color: '#ef4444', name: t('activeCourses') },
     blogs: { color: '#06b6d4', name: t('blogs') },
     events: { color: '#84cc16', name: t('events') },
-    courses: { color: '#f97316', name: t('courses') }
+    courses: { color: '#f97316', name: t('courses') },
+    revenue: { color: '#16a34a', name: t('revenue') },
+    paidCourses: { color: '#0ea5e9', name: t('paidCourses') }
   }), [t]);
 
   // State để lưu dữ liệu đã lọc sẽ được hiển thị trên biểu đồ
@@ -44,31 +45,37 @@ const LineChart = () => {
   const [activeFilter, setActiveFilter] = useState('THIS_YEAR');
   const [startedMonth, setStartedMonth] = useState('');
   const [endedMonth, setEndedMonth] = useState('');
+  const [activeSeries, setActiveSeries] = useState([]);
   const { post: postData } = useFetch();
 
   useEffect(() => {
-    const request = {
-      filterType: activeFilter,
-      startedMonth,
-      endedMonth
-    };
-    console.log(request);
+    setActiveSeries(Object.keys(lineConfigs));
+  }, [lineConfigs]);
+
+  useEffect(() => {
+    const request = activeFilter === 'CUSTOM'
+      ? { filterType: activeFilter, startedMonth, endedMonth }
+      : { filterType: activeFilter };
+
     const fetchData = async () => {
       try {
         const resData = await postData(request, {}, 'http://localhost:8080/api/report');
-        const processedData = resData.map(item => ({
+        const safeData = Array.isArray(resData) ? resData : [];
+        const processedData = safeData.map(item => ({
           ...item,
-          date: new Date(item.date) // Convert the date string to a Date object
+          date: item.date ? new Date(item.date) : null,
+          revenue: Number(item.revenue ?? 0),
+          paidCourses: Number(item.paidCourses ?? 0)
         }));
         setFilteredData(processedData);
       } catch (error) {
         console.error("Fetch error in LineChart:", error);
+        setFilteredData([]);
       }
     };
 
     fetchData();
   }, [postData, activeFilter, startedMonth, endedMonth]);
-  console.log(filteredData);
 
   const handleFilterChange = (filterType) => {
     setActiveFilter(filterType);
@@ -79,25 +86,25 @@ const LineChart = () => {
       alert(t('alertSelectDates'));
       return;
     }
-    const start = new Date(startedMonth);
-    const end = new Date(endedMonth);
 
-    if (start > end) {
-      alert(t('alertStartDateAfterEndDate'));
-      return;
-    }
-    // The filtering logic for 'CUSTOM' type should be handled by the backend
-    // when setting the activeFilter to 'CUSTOM' and passing the dates.
-    // For now, we'll just set the active filter and let the useEffect handle the fetch.
+    // Let the backend validate the custom range and return an empty list if invalid.
     setActiveFilter('CUSTOM');
+  };
+
+  const toggleSeries = (key) => {
+    setActiveSeries((prev) => (
+      prev.includes(key) ? prev.filter((item) => item !== key) : [...prev, key]
+    ));
   };
 
   // Sử dụng useMemo để chỉ tính toán lại dữ liệu biểu đồ khi `filteredData` thay đổi.
   // Đây là một kỹ thuật tối ưu hóa quan trọng.
   const chartData = useMemo(() => {
+    const visibleEntries = Object.entries(lineConfigs).filter(([key]) => activeSeries.includes(key));
+
     return {
       labels: filteredData.map(d => d.month),
-      datasets: Object.entries(lineConfigs).map(([key, config]) => ({
+      datasets: visibleEntries.map(([key, config]) => ({
         label: config.name,
         data: filteredData.map(d => d[key]),
         borderColor: config.color,
@@ -108,7 +115,7 @@ const LineChart = () => {
         pointHoverBorderColor: config.color,
       })),
     };
-  }, [filteredData, lineConfigs]);
+  }, [filteredData, lineConfigs, activeSeries]);
 
   const chartOptions = {
     responsive: true,
@@ -126,12 +133,7 @@ const LineChart = () => {
     elements: { line: { tension: 0.4 }, point: { radius: 5, hoverRadius: 7, borderWidth: 2 } }
   };
 
-  // Tạo danh sách các tháng duy nhất để điền vào dropdown
-  const uniqueMonths = useMemo(() => {
-    const months = [...new Map(filteredData.map(item => [item.month, item])).values()];
-    // Sort months to ensure chronological order in dropdown
-    return months.sort((a, b) => a.date - b.date);
-  }, [filteredData]);
+  const showNoDataState = activeFilter === 'CUSTOM' && filteredData.length === 0;
 
   return (
     <Card className="chart-container h-100">
@@ -143,16 +145,18 @@ const LineChart = () => {
           {/* Custom range filter */}
           <Row className="g-2 mb-3 align-items-end">
             <Col md={4}>
-              <Form.Select value={startedMonth} onChange={e => setStartedMonth(e.target.value)}>
-                <option value="">{t('selectStartMonth')}</option>
-                {uniqueMonths.map(d => <option key={d.month} value={d.date.toISOString()}>{d.month}</option>)}
-              </Form.Select>
+              <Form.Control
+                type="date"
+                value={startedMonth}
+                onChange={e => setStartedMonth(e.target.value)}
+              />
             </Col>
             <Col md={4}>
-              <Form.Select value={endedMonth} onChange={e => setEndedMonth(e.target.value)}>
-                <option value="">{t('selectEndMonth')}</option>
-                {uniqueMonths.map(d => <option key={d.month} value={d.date.toISOString()}>{d.month}</option>)}
-              </Form.Select>
+              <Form.Control
+                type="date"
+                value={endedMonth}
+                onChange={e => setEndedMonth(e.target.value)}
+              />
             </Col>
             <Col md={4} className="d-grid">
               <Button variant={activeFilter === 'CUSTOM' ? 'primary' : 'outline-primary'} onClick={handleCustomDateFilter}>{t('apply')}</Button>
@@ -179,13 +183,37 @@ const LineChart = () => {
               </ButtonGroup>
             </Col>
           </Row>
+
+          <Row>
+            <Col>
+              <span className="me-2 fw-medium">{t('series')}</span>
+              {Object.entries(lineConfigs).map(([key, config]) => (
+                <Button
+                  key={key}
+                  size="sm"
+                  className="me-2 mb-2"
+                  variant={activeSeries.includes(key) ? 'primary' : 'outline-secondary'}
+                  onClick={() => toggleSeries(key)}
+                  style={{ borderColor: config.color }}
+                >
+                  {config.name}
+                </Button>
+              ))}
+            </Col>
+          </Row>
         </div>
 
         <hr />
 
         {/* === CHART AREA === */}
         <div style={{ height: '320px' }}>
-          <Line options={chartOptions} data={chartData} />
+          {showNoDataState ? (
+            <div className="h-100 d-flex align-items-center justify-content-center text-muted fw-medium">
+              {t('noDataForSelectedRange')}
+            </div>
+          ) : (
+            <Line options={chartOptions} data={chartData} />
+          )}
         </div>
       </Card.Body>
     </Card>

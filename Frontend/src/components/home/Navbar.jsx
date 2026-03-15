@@ -9,7 +9,7 @@ import {
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import "./Navbar.css";
 import { useAuth } from "../../hooks/useAuth";
-import { LogOut, User, MessageCircle } from "lucide-react";
+import { LogOut, User, BookOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
 
@@ -138,6 +138,16 @@ export default function Navbar() {
                     <User size={16} className="me-2" />
                     {t("myProfile")}
                   </Dropdown.Item>
+                  {role === "MEMBER" && (
+                    <Dropdown.Item
+                      as={Link}
+                      to="/payment/history"
+                      className="dropdown-item-custom"
+                    >
+                      <BookOpen size={16} className="me-2" />
+                      {t("myCourses")}
+                    </Dropdown.Item>
+                  )}
                   <Dropdown.Item
                     onClick={handleLogout}
                     className="dropdown-item-custom"

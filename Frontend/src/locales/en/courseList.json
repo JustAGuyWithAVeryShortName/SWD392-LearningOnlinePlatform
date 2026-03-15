@@ -16,7 +16,9 @@
         "title": "Courses",
         "showingCourses": "Showing {{start}}-{{end}} of {{total}} courses",
         "noMatchingCourses": "No courses found matching your criteria.",
-        "clearFilters": "Clear Filters"
+        "clearFilters": "Clear Filters",
+        "showPurchasedOnly": "Show Purchased Courses",
+        "showAllCourses": "Show All Courses"
     },
     "durationOptions": {
         "lessThan10Mins": "Less than 10 mins",

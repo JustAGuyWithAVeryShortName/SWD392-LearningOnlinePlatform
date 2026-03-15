@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import useFetch from "../../hooks/useFetch";
 import BackButton from "../../components/BackButton";
 import "./PaymentHistory.css";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 const formatVND = (amount) =>
     new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount);
@@ -28,7 +30,11 @@ const STATUS_VARIANT = {
 const PaymentHistory = () => {
     const { t } = useTranslation("paymentHistory");
     const { loading, get: getHistory } = useFetch();
+    const { get: getEnrollments } = useFetch();
+    const { user } = useAuth();
+    const navigate = useNavigate();
     const [payments, setPayments] = useState([]);
+    const [enrollmentByCourseId, setEnrollmentByCourseId] = useState({});
 
     useEffect(() => {
         const fetch = async () => {
@@ -42,6 +48,39 @@ const PaymentHistory = () => {
         };
         fetch();
     }, [getHistory]);
+
+    useEffect(() => {
+        const fetchEnrollments = async () => {
+            if (!user?.username) {
+                setEnrollmentByCourseId({});
+                return;
+            }
+
+            try {
+                const enrollments = await getEnrollments(`http://localhost:8080/api/enrollment/my-list/${user.username}`);
+                const map = {};
+                (Array.isArray(enrollments) ? enrollments : []).forEach((item) => {
+                    if (item?.course?.courseID && item?.enrollmentID) {
+                        map[item.course.courseID] = item.enrollmentID;
+                    }
+                });
+                setEnrollmentByCourseId(map);
+            } catch (error) {
+                console.error("Failed to fetch enrollments:", error);
+                setEnrollmentByCourseId({});
+            }
+        };
+
+        fetchEnrollments();
+    }, [user?.username, getEnrollments]);
+
+    const handleOpenCourse = (courseId) => {
+        if (!courseId) return;
+        const enrollmentID = enrollmentByCourseId[courseId];
+        navigate(`/courses/lesson/${courseId}`, {
+            state: enrollmentID ? { enrollmentID } : undefined,
+        });
+    };
 
     return (
         <Container className="payment-history-container py-5">
@@ -73,7 +112,25 @@ const PaymentHistory = () => {
                                     <td className="text-muted" style={{ fontSize: "0.82rem", maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                         {p.orderId}
                                     </td>
-                                    <td className="fw-semibold">{p.course?.courseName || "—"}</td>
+                                    <td className="fw-semibold">
+                                        {p.course?.courseName ? (
+                                            <button
+                                                type="button"
+                                                onClick={() => handleOpenCourse(p.course.courseID)}
+                                                style={{
+                                                    border: "none",
+                                                    background: "none",
+                                                    padding: 0,
+                                                    fontWeight: 600,
+                                                    color: "#0d6efd",
+                                                    textDecoration: "underline",
+                                                    cursor: "pointer",
+                                                }}
+                                            >
+                                                {p.course.courseName}
+                                            </button>
+                                        ) : "—"}
+                                    </td>
                                     <td className="fw-bold text-primary">{formatVND(p.amount)}</td>
                                     <td>
                                         <Badge bg={STATUS_VARIANT[p.status] || "secondary"}>

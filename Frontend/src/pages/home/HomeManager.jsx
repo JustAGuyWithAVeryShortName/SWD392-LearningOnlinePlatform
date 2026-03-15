@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import {
   Users,
-  Calendar,
   BookOpen,
   FileText,
-  MessageSquare,
   UserCheck,
   Award,
   Target,
-  ChevronRight,
+  DollarSign,
+  CreditCard,
 } from "lucide-react";
 import "./HomeManager.css";
 import StatusCard from "../../components/dashboard/StatusCard";
@@ -21,13 +20,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next"; // Import useTranslation
-import StaffRequestManagement from "../home/Staffrequestmanagement"; // Import StaffRequestManagement component
 
 function HomeManager() {
   const [pendingStaffRequests, setPendingStaffRequests] = useState([]);
   const { get: getPendingStaffRequests } = useFetch();
   const { t } = useTranslation("homeManager"); // Initialize useTranslation with the 'homeManager' namespace
-  const [activeTab, setActiveTab] = useState("dashboard");
   const { user } = useAuth();
   const navigate = useNavigate();
   const [itemsPerPage] = useState(3);
@@ -227,29 +224,11 @@ function HomeManager() {
               </Col>
               <Col xs={3} lg={6}>
                 <StatusCard
-                  title={t("staffMembers")}
+                  title={t("lecturers")}
                   value={stat.staffMembers}
-                  change={8}
-                  icon={UserCheck}
-                  gradientClass="icon-gradient-success"
-                />
-              </Col>
-              <Col xs={3} lg={6}>
-                <StatusCard
-                  title={t("consultants")}
-                  value={stat.consultants}
                   change={5}
                   icon={Award}
                   gradientClass="icon-gradient-secondary"
-                />
-              </Col>
-              <Col xs={3} lg={6}>
-                <StatusCard
-                  title={t("monthlyConsultations")}
-                  value={stat.monthlyConsultations}
-                  change={15}
-                  icon={MessageSquare}
-                  gradientClass="icon-gradient-warning"
                 />
               </Col>
               <Col xs={3} lg={6}>
@@ -281,11 +260,28 @@ function HomeManager() {
                 />
               </Col>
               <Col xs={3} lg={6}>
+                <StatusCard
+                  title={t("revenue")}
+                  value={stat.revenue ?? 0}
+                  change={14}
+                  icon={DollarSign}
+                  gradientClass="icon-gradient-success"
+                />
+              </Col>
+              <Col xs={3} lg={6}>
+                <StatusCard
+                  title={t("paidCourses")}
+                  value={stat.paidCourses ?? 0}
+                  change={9}
+                  icon={CreditCard}
+                  gradientClass="icon-gradient-primary"
+                />
+              </Col>
+              <Col xs={3} lg={6}>
                 <div
                   role="button"
                   tabIndex={0}
                   onClick={() => navigate("/staffrequest-management")}
-                  b
                   onKeyDown={(e) => {
                     if (e.key === "Enter") navigate("/staffrequest-management");
                   }}

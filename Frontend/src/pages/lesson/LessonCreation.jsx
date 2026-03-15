@@ -24,6 +24,21 @@ const LessonCreation = () => {
   const { loading: loadingPutLesson, error: errorPutLesson, put: putLesson } = useFetch()
   const { loading: loadingLesson, error: errorLesson, get: getLesson } = useFetch()
   const { loading: loadingModule, error: errorModule, get: getModule } = useFetch()
+  const { get: getVideosByLesson } = useFetch()
+
+  const normalizeText = (value) => {
+    if (typeof value !== "string") return value;
+    return value.normalize("NFC");
+  }
+
+  const getUtf8Headers = () => {
+    const token = localStorage.getItem("token")
+    return {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json; charset=UTF-8",
+      "Accept-Charset": "UTF-8",
+    }
+  }
 
   const [formData, setFormData] = useState({
     lessonName: "",
@@ -32,20 +47,21 @@ const LessonCreation = () => {
     content: ""
   })
   const [quizzes, setQuizzes] = useState([]);
-const handleAddQuiz = () => {
-  setQuizzes(prev => [
-    ...prev,
-    {
-      question: "",
-      options: [
-        { content: "", isCorrect: true },
-        { content: "", isCorrect: false },
-        { content: "", isCorrect: false },
-        { content: "", isCorrect: false }
-      ]
-    }
-  ]);
-};
+  const [uploadedVideoCount, setUploadedVideoCount] = useState(0)
+  const handleAddQuiz = () => {
+    setQuizzes(prev => [
+      ...prev,
+      {
+        question: "",
+        options: [
+          { content: "", isCorrect: true },
+          { content: "", isCorrect: false },
+          { content: "", isCorrect: false },
+          { content: "", isCorrect: false }
+        ]
+      }
+    ]);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,14 +73,14 @@ const handleAddQuiz = () => {
 
         if (lessonID) {
           const lessonData = await getLesson(`http://localhost:8080/api/lesson/${lessonID}`)
-           setFormData({
-    lessonName: lessonData.lessonName,
-    objective: lessonData.objective,
-    resource: lessonData.resource,
-    content: lessonData.content
-  });
+          setFormData({
+            lessonName: lessonData.lessonName,
+            objective: lessonData.objective,
+            resource: lessonData.resource,
+            content: lessonData.content
+          });
 
-  setQuizzes(lessonData.quizzes || []);
+          setQuizzes(lessonData.quizzes || []);
         }
       } catch (error) {
         console.error("Fetch error in Lesson Creation:", error);
@@ -109,28 +125,33 @@ const handleAddQuiz = () => {
   const handleCreateLesson = async () => {
     try {
       const lessonData = {
-        lessonName: formData.lessonName,
-        objective: formData.objective,
-        resource: formData.resource,
-        content: formData.content,
+        lessonName: normalizeText(formData.lessonName),
+        objective: normalizeText(formData.objective),
+        resource: normalizeText(formData.resource),
+        content: normalizeText(formData.content),
         moduleID,
 
-          quizzes: quizzes.map(q => ({
-        question: q.question,
-        type: q.type, // nếu có
-        options: q.options.map(o => ({
-          content: o.content,
-          isCorrect: o.isCorrect === true // ⭐ CỰC QUAN TRỌNG
+        quizzes: quizzes.map(q => ({
+          question: normalizeText(q.question),
+          type: q.type, // nếu có
+          options: q.options.map(o => ({
+            content: normalizeText(o.content),
+            isCorrect: o.isCorrect === true // ⭐ CỰC QUAN TRỌNG
+          }))
         }))
-      }))
-    
+
       }
       console.log(lessonData);
 
-      const response = await postNewLesson(lessonData, {}, "http://localhost:8080/api/lesson")
+      const response = await postNewLesson(lessonData, getUtf8Headers(), "http://localhost:8080/api/lesson")
+      const createdLessonID = response?.lessonID
+      setLessonID(createdLessonID)
       toast.success(t("toastMessages.createSuccess"), "success")
+      toast.info(t("toastMessages.createDraftInfo"))
       console.log("Created lesson:", response)
-      navigate(`/courses/${courseID}/module/${moduleID}/update`)
+      if (createdLessonID) {
+        navigate(`/courses/${courseID}/module/${moduleID}/lesson/${createdLessonID}/update`, { replace: true })
+      }
     } catch (error) {
       if (error.response && error.response.data && error.response.data.message) {
         toast.error(error.response.data.message);
@@ -143,25 +164,37 @@ const handleAddQuiz = () => {
 
   const handleSaveLesson = async () => {
     try {
+      if (!lessonID) {
+        toast.error(t("video.lessonRequired"))
+        return
+      }
+
+      const existingVideos = await getVideosByLesson(`http://localhost:8080/api/videos/lesson/${lessonID}`)
+      const totalVideos = Array.isArray(existingVideos) ? existingVideos.length : uploadedVideoCount
+      if (totalVideos === 0) {
+        toast.error(t("toastMessages.videoRequired"))
+        return
+      }
+
       const lessonData = {
-        lessonName: formData.lessonName,
-        objective: formData.objective,
-        resource: formData.resource,
-        content: formData.content,
+        lessonName: normalizeText(formData.lessonName),
+        objective: normalizeText(formData.objective),
+        resource: normalizeText(formData.resource),
+        content: normalizeText(formData.content),
         moduleID,
 
-         quizzes: quizzes.map(q => ({
-        question: q.question,
-        type: q.type,
-        options: q.options.map(o => ({
-          content: o.content,
-          isCorrect: o.isCorrect === true
+        quizzes: quizzes.map(q => ({
+          question: normalizeText(q.question),
+          type: q.type,
+          options: q.options.map(o => ({
+            content: normalizeText(o.content),
+            isCorrect: o.isCorrect === true
+          }))
         }))
-      }))
       }
       console.log(lessonData);
 
-      const response = await putLesson(lessonData, {}, `http://localhost:8080/api/lesson/${lessonID}`)
+      const response = await putLesson(lessonData, getUtf8Headers(), `http://localhost:8080/api/lesson/${lessonID}`)
       toast.success(t("toastMessages.saveSuccess"), "success")
       console.log("Saved lesson:", response)
       navigate(`/courses/${courseID}/module/${moduleID}/update`)
@@ -254,74 +287,78 @@ const handleAddQuiz = () => {
                 </div>
               </div>
             </div>
-{/* ===== QUIZ SECTION ===== */}
-<div className="lesson-quiz-section mt-5">
-  <h4>Quiz</h4>
+            {/* ===== QUIZ SECTION ===== */}
+            <div className="lesson-quiz-section mt-5">
+              <h4>Quiz</h4>
 
-  {quizzes.map((quiz, qIndex) => (
-    <div key={qIndex} className="mb-3 p-3 border rounded">
+              {quizzes.map((quiz, qIndex) => (
+                <div key={qIndex} className="mb-3 p-3 border rounded">
 
-      {/* QUESTION */}
-      <Form.Control
-        className="mb-2"
-        placeholder={`Question ${qIndex + 1}`}
-        value={quiz.question}
-        onChange={(e) => {
-          const copy = [...quizzes];
-          copy[qIndex].question = e.target.value;
-          setQuizzes(copy);
-        }}
-      />
+                  {/* QUESTION */}
+                  <Form.Control
+                    className="mb-2"
+                    placeholder={`Question ${qIndex + 1}`}
+                    value={quiz.question}
+                    onChange={(e) => {
+                      const copy = [...quizzes];
+                      copy[qIndex].question = e.target.value;
+                      setQuizzes(copy);
+                    }}
+                  />
 
-      {/* OPTIONS */}
-      {quiz.options.map((opt, oIndex) => (
-        <Form.Control
-          key={oIndex}
-          className="mb-1"
-          placeholder={`Option ${oIndex + 1}`}
-          value={opt.content}
-          onChange={(e) => {
-            const copy = [...quizzes];
-            copy[qIndex].options[oIndex].content = e.target.value;
-            setQuizzes(copy);
-          }}
-        />
-      ))}
+                  {/* OPTIONS */}
+                  {quiz.options.map((opt, oIndex) => (
+                    <Form.Control
+                      key={oIndex}
+                      className="mb-1"
+                      placeholder={`Option ${oIndex + 1}`}
+                      value={opt.content}
+                      onChange={(e) => {
+                        const copy = [...quizzes];
+                        copy[qIndex].options[oIndex].content = e.target.value;
+                        setQuizzes(copy);
+                      }}
+                    />
+                  ))}
 
-      {/* CORRECT ANSWER */}
-      <Form.Select
-        className="mt-2"
-        value={quiz.options.findIndex(o => o.isCorrect)}
-        onChange={(e) => {
-          const selected = Number(e.target.value);
-          const copy = [...quizzes];
+                  {/* CORRECT ANSWER */}
+                  <Form.Select
+                    className="mt-2"
+                    value={quiz.options.findIndex(o => o.isCorrect)}
+                    onChange={(e) => {
+                      const selected = Number(e.target.value);
+                      const copy = [...quizzes];
 
-          copy[qIndex].options.forEach((o, i) => {
-            o.isCorrect = i === selected;
-          });
+                      copy[qIndex].options.forEach((o, i) => {
+                        o.isCorrect = i === selected;
+                      });
 
-          setQuizzes(copy);
-        }}
-      >
-        {quiz.options.map((_, i) => (
-          <option key={i} value={i}>
-            Correct option {i + 1}
-          </option>
-        ))}
-      </Form.Select>
-    </div>
-  ))}
+                      setQuizzes(copy);
+                    }}
+                  >
+                    {quiz.options.map((_, i) => (
+                      <option key={i} value={i}>
+                        Correct option {i + 1}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </div>
+              ))}
 
-  {/* ADD QUIZ BUTTON */}
-  <Button variant="outline-primary" onClick={handleAddQuiz}>
-    <Plus size={16} className="me-1" />
-    Add Quiz
-  </Button>
-</div>
+              {/* ADD QUIZ BUTTON */}
+              <Button variant="outline-primary" onClick={handleAddQuiz}>
+                <Plus size={16} className="me-1" />
+                Add Quiz
+              </Button>
+            </div>
 
-{/* ===== VIDEO UPLOAD SECTION ===== */}
-<VideoUploadForm lessonID={lessonID} onVideoAdded={() => {}} />
-          
+            {/* ===== VIDEO UPLOAD SECTION ===== */}
+            <VideoUploadForm
+              lessonID={lessonID}
+              onVideoAdded={() => { }}
+              onVideoCountChange={setUploadedVideoCount}
+            />
+
             {/* Save Button */}
             <div className="save-section">
               {lessonID?.trim() !== "" ? (
@@ -343,9 +380,9 @@ const handleAddQuiz = () => {
         </Col>
       </Row>
     </Container>
-    
+
   );
-  
+
 }
 
 export default LessonCreation

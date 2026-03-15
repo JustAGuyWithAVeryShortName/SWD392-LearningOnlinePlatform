@@ -6,7 +6,7 @@ import useFetch from "../../hooks/useFetch"
 import { toast } from "react-toastify"
 import "./VideoUploadForm.css"
 
-const VideoUploadForm = ({ lessonID, onVideoAdded }) => {
+const VideoUploadForm = ({ lessonID, onVideoAdded, onVideoCountChange }) => {
   const { t } = useTranslation("lessonCreation")
   const [videoFile, setVideoFile] = useState(null)
   const [videoTitle, setVideoTitle] = useState("")
@@ -20,15 +20,22 @@ const VideoUploadForm = ({ lessonID, onVideoAdded }) => {
 
   // Fetch videos when lesson is loaded
   const loadVideos = async () => {
-    if (!lessonID) return
+    if (!lessonID) {
+      setVideos([])
+      onVideoCountChange?.(0)
+      return
+    }
     setLoadingVideos(true)
     try {
       // useFetch already extracts .data from ApiResponse
       const response = await fetchVideos(`http://localhost:8080/api/videos/lesson/${lessonID}`)
-      setVideos(Array.isArray(response) ? response : [])
+      const normalizedVideos = Array.isArray(response) ? response : []
+      setVideos(normalizedVideos)
+      onVideoCountChange?.(normalizedVideos.length)
     } catch (error) {
       console.error("Failed to fetch videos:", error)
       setVideos([])
+      onVideoCountChange?.(0)
     } finally {
       setLoadingVideos(false)
     }
@@ -46,7 +53,7 @@ const VideoUploadForm = ({ lessonID, onVideoAdded }) => {
       // Validate file type
       const allowedTypes = ["video/mp4", "video/x-msvideo", "video/quicktime", "video/x-matroska", "video/x-flv", "video/webm"]
       const allowedExtensions = ["mp4", "avi", "mov", "mkv", "flv", "webm"]
-      
+
       const fileExtension = file.name.split(".").pop().toLowerCase()
       const isValidType = allowedTypes.includes(file.type) || allowedExtensions.includes(fileExtension)
 

@@ -1,15 +1,71 @@
+import { useEffect, useState } from "react";
 import "./CourseCard.css";
 import { useTranslation } from "react-i18next";
 import { Clock, Calendar, User } from "lucide-react";
+import useFetch from "../../hooks/useFetch";
+
+const formatVND = (amount) =>
+  new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount || 0);
 
 const CourseCard = ({
   course,
   onEnrollClick,
   onDetailsClick,
   onContinueClick,
+  isPurchased = false,
   status,
 }) => {
   const { t } = useTranslation("courseCard");
+  const isPaidCourse = Number(course?.price || 0) > 0;
+  const [calculatedDuration, setCalculatedDuration] = useState(Number(course?.duration) || 0);
+  const { get: getModules } = useFetch();
+  const { get: getLessons } = useFetch();
+
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchAccurateDuration = async () => {
+      if (!course?.courseID) {
+        if (mounted) setCalculatedDuration(0);
+        return;
+      }
+
+      try {
+        const modules = await getModules(`http://localhost:8080/api/course/${course.courseID}/modules`);
+        const safeModules = Array.isArray(modules) ? modules : [];
+
+        if (safeModules.length === 0) {
+          if (mounted) setCalculatedDuration(Number(course?.duration) || 0);
+          return;
+        }
+
+        const lessonsByModule = await Promise.all(
+          safeModules.map((module) =>
+            getLessons(`http://localhost:8080/api/module/${module.moduleID}/lessons`)
+          )
+        );
+
+        const allLessons = lessonsByModule.flatMap((item) => (Array.isArray(item) ? item : []));
+        const totalDuration = allLessons.reduce(
+          (sum, lesson) => sum + Number(lesson.duration ?? lesson.lessonDuration ?? 0),
+          0
+        );
+
+        if (mounted) {
+          setCalculatedDuration(totalDuration > 0 ? Math.round(totalDuration) : Number(course?.duration) || 0);
+        }
+      } catch (error) {
+        console.error("Failed to calculate course duration:", error);
+        if (mounted) setCalculatedDuration(Number(course?.duration) || 0);
+      }
+    };
+
+    fetchAccurateDuration();
+
+    return () => {
+      mounted = false;
+    };
+  }, [course?.courseID, course?.duration, getLessons, getModules]);
 
   const getAgeGroupColor = (ageGroup) => {
     const colors = {
@@ -41,7 +97,7 @@ const CourseCard = ({
             <div className="course-meta-info-2">
               <Clock size={16} className="meta-icon-2" />
               <span className="meta-text-2">
-                {course.duration} {t("durationSuffix")}
+                {calculatedDuration} {t("durationSuffix")}
               </span>
             </div>
 
@@ -66,6 +122,11 @@ const CourseCard = ({
                 {new Date(course.createdAt).toLocaleDateString()}
               </span>
             </div>
+            <div className="course-price-2">
+              {isPaidCourse
+                ? t("pricePaid", { price: formatVND(course.price) })
+                : t("priceFree")}
+            </div>
           </div>
 
           <div className="course-actions-2">
@@ -80,9 +141,20 @@ const CourseCard = ({
               <>
                 <button
                   className="enroll-button-2"
-                  onClick={() => onEnrollClick(course.courseID)}
+                  onClick={() => {
+                    if (isPurchased) {
+                      if (onContinueClick) onContinueClick(course.courseID)
+                      else onDetailsClick(course.courseID)
+                      return
+                    }
+                    onEnrollClick(course.courseID)
+                  }}
                 >
-                  {t("enrollButton")}
+                  {isPurchased
+                    ? t("continueButton")
+                    : isPaidCourse
+                      ? t("buyButton")
+                      : t("enrollButton")}
                 </button>
 
                 <button
