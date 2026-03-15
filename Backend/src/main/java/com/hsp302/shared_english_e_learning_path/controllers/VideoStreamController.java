@@ -28,8 +28,7 @@ public class VideoStreamController {
      * Stream video file inline (for browser playback)
      */
     @GetMapping("/stream/{filename}")
-    @Operation(summary = "Stream a video", 
-               description = "Stream a video file for playback in browser")
+    @Operation(summary = "Stream a video", description = "Stream a video file for playback in browser")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Video stream"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Video file not found")
@@ -70,8 +69,7 @@ public class VideoStreamController {
      * Download video file as attachment
      */
     @GetMapping("/download/{filename}")
-    @Operation(summary = "Download a video", 
-               description = "Download a video file as an attachment")
+    @Operation(summary = "Download a video", description = "Download a video file as an attachment")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Video file"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Video file not found")

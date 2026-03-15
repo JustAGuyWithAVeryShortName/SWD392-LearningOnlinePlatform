@@ -18,15 +18,17 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, UUID> {
     @Query("SELECT e.course FROM Enrollment e " +
             "WHERE e.status = :status AND e.member.username = :username")
     List<Course> findEnrolledCoursesByStatusAndMember(@Param("status") EnrollmentStatus status,
-                                                      @Param("username") String username);
+            @Param("username") String username);
 
     Enrollment findByMemberUsernameAndCourseCourseID(String username, UUID courseID);
 
+    boolean existsByMemberUsernameAndCourseCourseID(String username, UUID courseID);
+
     @Query("""
-        SELECT e.member.ageGroup, COUNT(DISTINCT e.member.username)
-        FROM Enrollment e
-        WHERE e.status = 'COMPLETED'
-        GROUP BY e.member.ageGroup
-    """)
+                SELECT e.member.ageGroup, COUNT(DISTINCT e.member.username)
+                FROM Enrollment e
+                WHERE e.status = 'COMPLETED'
+                GROUP BY e.member.ageGroup
+            """)
     List<Object[]> getCompletedEnrollmentCountByAgeGroup();
 }

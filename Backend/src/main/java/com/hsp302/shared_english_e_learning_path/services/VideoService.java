@@ -23,27 +23,29 @@ public class VideoService {
 
     private final VideoRepository videoRepository;
     private final VideoMapper videoMapper;
+    private final CourseService courseService;
     private final Path ROOT = Paths.get("uploads/videos");
-    
-    @Value("${app.video.max-file-size:104857600}")  // 100MB default
+
+    @Value("${app.video.max-file-size:104857600}") // 100MB default
     private long maxFileSize;
-    
+
     @Value("${app.video.allowed-extensions:mp4,avi,mov,mkv,flv}")
     private String allowedExtensions;
-    
+
     @Value("${app.video.base-url:http://localhost:8080}")
     private String baseUrl;
 
-    public VideoService(VideoRepository videoRepository, VideoMapper videoMapper) {
+    public VideoService(VideoRepository videoRepository, VideoMapper videoMapper, CourseService courseService) {
         this.videoRepository = videoRepository;
         this.videoMapper = videoMapper;
+        this.courseService = courseService;
     }
 
     public VideoResponse uploadVideo(String title, MultipartFile file, Lesson lesson) throws IOException {
-        
+
         // Validation
         validateVideoFile(file);
-        
+
         if (title == null || title.isBlank()) {
             throw new InvalidVideoException("Video title cannot be empty");
         }
@@ -67,7 +69,8 @@ public class VideoService {
                 .build();
 
         Video savedVideo = videoRepository.save(video);
-        
+        courseService.refreshCourseDuration(lesson.getModule().getCourse().getCourseID());
+
         return videoMapper.toDto(savedVideo);
     }
 
@@ -81,8 +84,8 @@ public class VideoService {
     public void deleteVideo(UUID videoId) throws IOException {
         Video video = videoRepository.findById(videoId)
                 .orElseThrow(() -> new com.hsp302.shared_english_e_learning_path.exception.ResourceNotFoundException(
-                        "Video not found with ID: " + videoId
-                ));
+                        "Video not found with ID: " + videoId));
+        UUID courseId = video.getLesson().getModule().getCourse().getCourseID();
 
         // Extract filename from URL
         String videoUrl = video.getVideoUrl();
@@ -96,6 +99,7 @@ public class VideoService {
 
         // Delete record from database
         videoRepository.deleteById(videoId);
+        courseService.refreshCourseDuration(courseId);
     }
 
     private void validateVideoFile(MultipartFile file) {
@@ -105,8 +109,7 @@ public class VideoService {
 
         if (file.getSize() > maxFileSize) {
             throw new InvalidVideoException(
-                    String.format("File size exceeds maximum limit: %d bytes", maxFileSize)
-            );
+                    String.format("File size exceeds maximum limit: %d bytes", maxFileSize));
         }
 
         String filename = file.getOriginalFilename();
@@ -116,7 +119,7 @@ public class VideoService {
 
         String fileExtension = getFileExtension(filename).toLowerCase();
         String[] extensions = allowedExtensions.split(",");
-        
+
         boolean isAllowed = false;
         for (String ext : extensions) {
             if (fileExtension.equals(ext.trim())) {
@@ -124,11 +127,10 @@ public class VideoService {
                 break;
             }
         }
-        
+
         if (!isAllowed) {
             throw new InvalidVideoException(
-                    String.format("File type not allowed. Allowed types: %s", allowedExtensions)
-            );
+                    String.format("File type not allowed. Allowed types: %s", allowedExtensions));
         }
     }
 

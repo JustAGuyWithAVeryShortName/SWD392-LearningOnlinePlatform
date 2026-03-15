@@ -3,8 +3,10 @@ package com.hsp302.shared_english_e_learning_path.services;
 import com.hsp302.shared_english_e_learning_path.domain.dtos.requests.MomoApiRequest;
 import com.hsp302.shared_english_e_learning_path.domain.dtos.requests.MomoInitiateRequest;
 import com.hsp302.shared_english_e_learning_path.domain.dtos.requests.MomoIpnRequest;
+import com.hsp302.shared_english_e_learning_path.domain.dtos.requests.MomoQueryRequest;
 import com.hsp302.shared_english_e_learning_path.domain.dtos.responses.MomoApiResponse;
 import com.hsp302.shared_english_e_learning_path.domain.dtos.responses.MomoInitiateResponse;
+import com.hsp302.shared_english_e_learning_path.domain.dtos.responses.MomoQueryResponse;
 import com.hsp302.shared_english_e_learning_path.domain.dtos.responses.PaymentResponse;
 import com.hsp302.shared_english_e_learning_path.domain.entities.Course;
 import com.hsp302.shared_english_e_learning_path.domain.entities.Enrollment;
@@ -227,6 +229,98 @@ public class MomoPaymentService {
         }
 
         paymentRepository.save(payment);
+    }
+
+    /**
+     * Queries MoMo for the real-time status of a payment and updates the DB.
+     * Called by the frontend after being redirected back from MoMo, as a
+     * safety net in case the IPN was not delivered (e.g. ngrok tunnel down).
+     */
+    @PreAuthorize("hasAnyRole('MEMBER', 'MANAGER')")
+    @Transactional
+    public PaymentResponse checkAndUpdatePaymentStatus(String orderId) {
+        String username = userService.getLoginUsername();
+
+        Payment payment = paymentRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("Payment not found for orderId: " + orderId));
+
+        // Security: ensure the payment belongs to the calling user
+        if (!payment.getMember().getUsername().equals(username)) {
+            throw new SecurityException("Access denied: payment does not belong to the current user");
+        }
+
+        // If already resolved, return immediately without calling MoMo
+        if (payment.getStatus() != PaymentStatus.PENDING) {
+            return toResponse(payment);
+        }
+
+        // Build query signature (alphabetical field order per MoMo spec)
+        String requestId = UUID.randomUUID().toString();
+        String rawSignature = "accessKey=" + accessKey
+                + "&orderId=" + orderId
+                + "&partnerCode=" + partnerCode
+                + "&requestId=" + requestId;
+        String signature = hmacSHA256(rawSignature, secretKey);
+
+        MomoQueryRequest queryRequest = MomoQueryRequest.builder()
+                .partnerCode(partnerCode)
+                .requestId(requestId)
+                .orderId(orderId)
+                .lang("vi")
+                .signature(signature)
+                .build();
+
+        String queryEndpoint = endpoint.replace("/create", "/query");
+        RestTemplate restTemplate = restTemplateBuilder.build();
+        MomoQueryResponse queryResponse;
+        try {
+            queryResponse = restTemplate.postForObject(queryEndpoint, queryRequest, MomoQueryResponse.class);
+        } catch (Exception e) {
+            log.error("Failed to query MoMo transaction status for orderId={}", orderId, e);
+            throw new RuntimeException("Failed to query MoMo payment status. Please try again.");
+        }
+
+        if (queryResponse == null) {
+            log.warn("Null response from MoMo query API for orderId={}", orderId);
+            return toResponse(payment);
+        }
+
+        log.info("MoMo query result: orderId={}, resultCode={}, message={}",
+                orderId, queryResponse.getResultCode(), queryResponse.getMessage());
+
+        // Update the payment record from the query response
+        payment.setResultCode(queryResponse.getResultCode());
+        payment.setMessage(queryResponse.getMessage());
+        payment.setMomoTransId(queryResponse.getTransId() != null ? String.valueOf(queryResponse.getTransId()) : null);
+
+        if (Integer.valueOf(0).equals(queryResponse.getResultCode())) {
+            payment.setStatus(PaymentStatus.SUCCESS);
+
+            boolean alreadyEnrolled = enrollmentRepository
+                    .existsByMemberUsernameAndCourseCourseID(
+                            username, payment.getCourse().getCourseID());
+            if (!alreadyEnrolled) {
+                Enrollment enrollment = Enrollment.builder()
+                        .member(payment.getMember())
+                        .course(payment.getCourse())
+                        .status(EnrollmentStatus.LEARNING)
+                        .startedAt(Instant.now())
+                        .endedAt(Instant.now().plus(14, ChronoUnit.DAYS))
+                        .build();
+                enrollmentRepository.save(enrollment);
+                log.info("Enrollment created via status-check: orderId={}, user={}, course={}",
+                        orderId, username, payment.getCourse().getCourseID());
+            }
+        } else if (queryResponse.getResultCode() != null && queryResponse.getResultCode() != 1000
+                && queryResponse.getResultCode() != 7000
+                && queryResponse.getResultCode() != 7002) {
+            // resultCode 1000 = pending/processing, 7000/7002 = being processed
+            // Any other non-zero code is a definitive failure
+            payment.setStatus(PaymentStatus.FAILED);
+        }
+
+        paymentRepository.save(payment);
+        return toResponse(payment);
     }
 
     /**

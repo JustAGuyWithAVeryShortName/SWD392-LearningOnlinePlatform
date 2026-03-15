@@ -85,4 +85,20 @@ public class PaymentController {
                 .build();
         return ResponseEntity.ok(apiResponse);
     }
+
+    /**
+     * Queries MoMo for the real-time status of a payment and updates the DB.
+     * The frontend should call this after being redirected back from MoMo
+     * (i.e. after /momo/callback) to handle cases where the IPN was not delivered.
+     */
+    @GetMapping("/momo/status/{orderId}")
+    public ResponseEntity<ApiResponse<PaymentResponse>> checkPaymentStatus(
+            @PathVariable String orderId) {
+        PaymentResponse response = momoPaymentService.checkAndUpdatePaymentStatus(orderId);
+        ApiResponse<PaymentResponse> apiResponse = ApiResponse.<PaymentResponse>builder()
+                .status(HttpStatus.OK.value())
+                .data(response)
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
 }

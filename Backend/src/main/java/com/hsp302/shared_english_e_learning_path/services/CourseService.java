@@ -6,6 +6,7 @@ import com.hsp302.shared_english_e_learning_path.domain.dtos.responses.CourseRes
 import com.hsp302.shared_english_e_learning_path.domain.entities.Course;
 import com.hsp302.shared_english_e_learning_path.domain.entities.Module;
 import com.hsp302.shared_english_e_learning_path.domain.entities.Lesson;
+import com.hsp302.shared_english_e_learning_path.domain.entities.Video;
 import com.hsp302.shared_english_e_learning_path.domain.entities.User;
 import com.hsp302.shared_english_e_learning_path.domain.enums.AgeGroup;
 import com.hsp302.shared_english_e_learning_path.domain.enums.CourseStatus;
@@ -14,17 +15,22 @@ import com.hsp302.shared_english_e_learning_path.mappers.CourseMapper;
 import com.hsp302.shared_english_e_learning_path.repositories.CourseRepository;
 import com.hsp302.shared_english_e_learning_path.repositories.EnrollmentRepository;
 import com.hsp302.shared_english_e_learning_path.repositories.UserRepository;
+import com.hsp302.shared_english_e_learning_path.repositories.VideoRepository;
+import com.hsp302.shared_english_e_learning_path.utils.VideoMetadataUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.time.Instant;
 import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -37,6 +43,10 @@ public class CourseService {
     private final EnrollmentRepository enrollmentRepository;
     private final ModuleService moduleService;
     private final LessonService lessonService;
+    private final VideoRepository videoRepository;
+
+    @Value("${app.video.storage-path:uploads/videos}")
+    private String videoStoragePath;
 
     @PreAuthorize("hasRole('STAFF')")
     public CourseResponse createCourse(CreateCourseRequest request) {
@@ -63,7 +73,7 @@ public class CourseService {
     public List<CourseResponse> getAllCourses() {
         List<Course> courses = courseRepository.findAll();
         return courses.stream()
-                .map(course -> courseMapper.toDto(course))
+                .map(this::toDtoWithSyncedDuration)
                 .toList();
     }
 
@@ -74,20 +84,20 @@ public class CourseService {
 
     public CourseResponse getCourse(UUID courseId) {
         Course course = getCourseEntity(courseId);
-        return courseMapper.toDto(course);
+        return toDtoWithSyncedDuration(course);
     }
 
     @PreAuthorize("hasRole('STAFF')")
     public CourseResponse updateCourse(UUID courseId, UpdateCourseRequest request) {
         Course course = getCourseEntity(courseId);
         course.setCourseName(request.getCourseName());
-        course.setDuration(calculateCourseDuration(request.getCourseID()));
         course.setQuantity(request.getQuantity());
         course.setImage(request.getImage());
         course.setDescription(request.getDescription());
         course.setAgeGroup(request.getAgeGroup());
         course.setPrice(request.getPrice());
         courseRepository.save(course);
+        refreshCourseDuration(course.getCourseID());
         return courseMapper.toDto(course);
     }
 
@@ -103,21 +113,21 @@ public class CourseService {
         List<Course> courses = courseRepository.findByAgeGroupAndStatusOrderByCreatedAtDesc(ageGroup,
                 CourseStatus.AVAILABLE);
         return courses.stream()
-                .map(course -> courseMapper.toDto(course))
+                .map(this::toDtoWithSyncedDuration)
                 .toList();
     }
 
     public List<CourseResponse> getCoursesForMemberByStatus(EnrollmentStatus status, String username) {
         List<Course> courses = enrollmentRepository.findEnrolledCoursesByStatusAndMember(status, username);
         return courses.stream()
-                .map(course -> courseMapper.toDto(course))
+                .map(this::toDtoWithSyncedDuration)
                 .toList();
     }
 
     public List<CourseResponse> getCoursesByStatus(CourseStatus status) {
         List<Course> courses = courseRepository.findByStatusOrderByCreatedAtDesc(status);
         return courses.stream()
-                .map(course -> courseMapper.toDto(course))
+                .map(this::toDtoWithSyncedDuration)
                 .toList();
     }
 
@@ -125,15 +135,24 @@ public class CourseService {
             Instant endedAt) {
         List<Course> courses = courseRepository.findByStatusAndCreatedAtBetween(status, startedAt, endedAt);
         return courses.stream()
-                .map(course -> courseMapper.toDto(course))
+                .map(this::toDtoWithSyncedDuration)
                 .toList();
     }
 
     public List<CourseResponse> getAllCoursesByDateDuration(Instant startedAt, Instant endedAt) {
         List<Course> courses = courseRepository.findByCreatedAtBetween(startedAt, endedAt);
         return courses.stream()
-                .map(course -> courseMapper.toDto(course))
+                .map(this::toDtoWithSyncedDuration)
                 .toList();
+    }
+
+    public void refreshCourseDuration(UUID courseId) {
+        Course course = getCourseEntity(courseId);
+        int recalculatedDuration = calculateCourseDuration(courseId);
+        if (!Objects.equals(course.getDuration(), recalculatedDuration)) {
+            course.setDuration(recalculatedDuration);
+            courseRepository.save(course);
+        }
     }
 
     public Integer calculateCourseDuration(UUID courseID) {
@@ -146,9 +165,59 @@ public class CourseService {
             List<Lesson> lessons = lessonService.getLessonsByModuleID(module.getModuleID(), CourseStatus.AVAILABLE);
             for (Lesson lesson : lessons) {
                 totalDuration += lesson.getDuration();
+                totalDuration += calculateVideoDurationForLesson(lesson);
             }
         }
         return totalDuration;
+    }
+
+    private int calculateVideoDurationForLesson(Lesson lesson) {
+        int totalVideoDuration = 0;
+        List<Video> videos = videoRepository.findByLesson_LessonID(lesson.getLessonID());
+
+        for (Video video : videos) {
+            int duration = video.getDuration();
+            if (duration <= 0) {
+                duration = backfillVideoDuration(video);
+            }
+            totalVideoDuration += Math.max(duration, 0);
+        }
+
+        return totalVideoDuration;
+    }
+
+    private int backfillVideoDuration(Video video) {
+        File localVideoFile = resolveLocalVideoFile(video.getVideoUrl());
+        if (localVideoFile == null) {
+            return 0;
+        }
+
+        int extractedDuration = VideoMetadataUtil.extractDuration(localVideoFile);
+        if (extractedDuration > 0) {
+            video.setDuration(extractedDuration);
+            videoRepository.save(video);
+        }
+
+        return extractedDuration;
+    }
+
+    private File resolveLocalVideoFile(String videoUrl) {
+        if (videoUrl == null || !videoUrl.contains("/api/videos/stream/")) {
+            return null;
+        }
+
+        String filename = videoUrl.substring(videoUrl.lastIndexOf('/') + 1);
+        File videoFile = new File(videoStoragePath, filename);
+        return videoFile.exists() ? videoFile : null;
+    }
+
+    private CourseResponse toDtoWithSyncedDuration(Course course) {
+        int recalculatedDuration = calculateCourseDuration(course.getCourseID());
+        if (!Objects.equals(course.getDuration(), recalculatedDuration)) {
+            course.setDuration(recalculatedDuration);
+            courseRepository.save(course);
+        }
+        return courseMapper.toDto(course);
     }
 
     // ADMIN HOMEPAGE

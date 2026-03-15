@@ -1,259 +1,277 @@
 -- ============================================================
--- DEMO SEED DATA — E-Learning Platform
--- SQL Server (run AFTER Spring Boot creates the schema via ddl-auto=update)
--- All passwords are BCrypt hash of: Test@1234
--- BCrypt hash: $2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW
--- !! Replace the hash below if your BCrypt rounds differ !!
+-- DEMO SEED DATA (LARGE) - E-Learning Platform
+-- SQL Server (run AFTER Spring Boot creates the schema)
+-- This script will:
+--   1) Wipe all existing data in all tables
+--   2) Seed fresh demo data for reporting
+-- Default password for ALL users: 123456
+-- NOTE: Current AuthenticationService compares plain text password directly.
+-- So this seed stores plain text '123456' (NOT bcrypt) for compatibility.
 -- ============================================================
 
-DECLARE @pwd NVARCHAR(100) = '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW';
+SET NOCOUNT ON;
+
+DECLARE @pwd NVARCHAR(100) = '123456';
 DECLARE @now DATETIME2 = GETUTCDATE();
 
 -- ============================================================
--- 1. USERS
+-- 0) FULL CLEANUP (all tables)
 -- ============================================================
+DECLARE @sql NVARCHAR(MAX) = N'';
 
--- Admin
-IF NOT EXISTS (SELECT 1 FROM users WHERE username = 'admin')
-INSERT INTO users (username, password, email, full_name, dob, gender, phone_number, job, [address], created_at, updated_at, role, status, age_group)
-VALUES ('admin', @pwd, 'admin@elearning.com', N'System Admin', '1990-01-01', 'MALE', '0900000001', N'Administrator', N'Ho Chi Minh City', @now, @now, 'ADMIN', 'ACTIVE', 'ADULT');
+SELECT @sql = @sql + N'ALTER TABLE [' + s.name + N'].[' + t.name + N'] NOCHECK CONSTRAINT ALL;' + CHAR(10)
+FROM sys.tables t
+JOIN sys.schemas s ON s.schema_id = t.schema_id;
+EXEC sp_executesql @sql;
 
--- Manager
-IF NOT EXISTS (SELECT 1 FROM users WHERE username = 'manager01')
-INSERT INTO users (username, password, email, full_name, dob, gender, phone_number, job, [address], created_at, updated_at, role, status, age_group)
-VALUES ('manager01', @pwd, 'manager@elearning.com', N'Nguyen Van Manager', '1988-05-15', 'MALE', '0900000002', N'Course Manager', N'Ha Noi', @now, @now, 'MANAGER', 'ACTIVE', 'ADULT');
+SET @sql = N'';
+SELECT @sql = @sql + N'DELETE FROM [' + s.name + N'].[' + t.name + N'];' + CHAR(10)
+FROM sys.tables t
+JOIN sys.schemas s ON s.schema_id = t.schema_id;
+EXEC sp_executesql @sql;
 
--- Staff members
-IF NOT EXISTS (SELECT 1 FROM users WHERE username = 'staff01')
-INSERT INTO users (username, password, email, full_name, dob, gender, phone_number, job, [address], created_at, updated_at, role, status, age_group)
-VALUES ('staff01', @pwd, 'staff01@elearning.com', N'Tran Thi Staff', '1995-03-20', 'FEMALE', '0900000003', N'Content Creator', N'Da Nang', @now, @now, 'STAFF', 'ACTIVE', 'ADULT');
-
-IF NOT EXISTS (SELECT 1 FROM users WHERE username = 'staff02')
-INSERT INTO users (username, password, email, full_name, dob, gender, phone_number, job, [address], created_at, updated_at, role, status, age_group)
-VALUES ('staff02', @pwd, 'staff02@elearning.com', N'Le Van Staff', '1993-07-10', 'MALE', '0900000004', N'Content Creator', N'Can Tho', @now, @now, 'STAFF', 'ACTIVE', 'ADULT');
-
--- Consultant
-IF NOT EXISTS (SELECT 1 FROM users WHERE username = 'consultant01')
-INSERT INTO users (username, password, email, full_name, dob, gender, phone_number, job, [address], created_at, updated_at, role, status, age_group)
-VALUES ('consultant01', @pwd, 'consult01@elearning.com', N'Pham Thi Lan', '1985-11-25', 'FEMALE', '0900000005', N'English Consultant', N'Ho Chi Minh City', @now, @now, 'CONSULTANT', 'ACTIVE', 'ADULT');
-
--- Members
-IF NOT EXISTS (SELECT 1 FROM users WHERE username = 'member01')
-INSERT INTO users (username, password, email, full_name, dob, gender, phone_number, job, [address], created_at, updated_at, role, status, age_group)
-VALUES ('member01', @pwd, 'member01@gmail.com', N'Hoang Van An', '2000-06-15', 'MALE', '0911000001', N'Student', N'Ho Chi Minh City', @now, @now, 'MEMBER', 'ACTIVE', 'ADULT');
-
-IF NOT EXISTS (SELECT 1 FROM users WHERE username = 'member02')
-INSERT INTO users (username, password, email, full_name, dob, gender, phone_number, job, [address], created_at, updated_at, role, status, age_group)
-VALUES ('member02', @pwd, 'member02@gmail.com', N'Nguyen Thi Bich', '2002-09-30', 'FEMALE', '0911000002', N'Student', N'Ha Noi', @now, @now, 'MEMBER', 'ACTIVE', 'ADULT');
-
-IF NOT EXISTS (SELECT 1 FROM users WHERE username = 'member03')
-INSERT INTO users (username, password, email, full_name, dob, gender, phone_number, job, [address], created_at, updated_at, role, status, age_group)
-VALUES ('member03', @pwd, 'member03@gmail.com', N'Tran Minh Duc', '1998-01-05', 'MALE', '0911000003', N'Office Worker', N'Da Nang', @now, @now, 'MEMBER', 'ACTIVE', 'ADULT');
-
-IF NOT EXISTS (SELECT 1 FROM users WHERE username = 'member04')
-INSERT INTO users (username, password, email, full_name, dob, gender, phone_number, job, [address], created_at, updated_at, role, status, age_group)
-VALUES ('member04', @pwd, 'member04@gmail.com', N'Le Thi My', '2006-04-18', 'FEMALE', '0911000004', N'High School Student', N'Hue', @now, @now, 'MEMBER', 'ACTIVE', 'ADOLESCENT');
+SET @sql = N'';
+SELECT @sql = @sql + N'ALTER TABLE [' + s.name + N'].[' + t.name + N'] WITH CHECK CHECK CONSTRAINT ALL;' + CHAR(10)
+FROM sys.tables t
+JOIN sys.schemas s ON s.schema_id = t.schema_id;
+EXEC sp_executesql @sql;
 
 -- ============================================================
--- 2. COURSES
+-- 1) USERS
+--    1 admin + 1 manager + 2 consultants + 10 lecturers (STAFF) + 60 members
 -- ============================================================
+INSERT INTO users (
+        username, password, email, full_name, dob, gender, phone_number, job, [address],
+        created_at, updated_at, role, status, age_group
+)
+VALUES
+('admin', @pwd, 'admin@elearning.com', N'System Admin', '1990-01-01', 'MALE', '0900000001', N'Administrator', N'Ho Chi Minh City', @now, @now, 'ADMIN', 'ACTIVE', 'ADULT'),
+('manager01', @pwd, 'manager@elearning.com', N'Demo Manager', '1988-05-15', 'MALE', '0900000002', N'Course Manager', N'Ha Noi', @now, @now, 'MANAGER', 'ACTIVE', 'ADULT'),
+('consultant01', @pwd, 'consultant01@elearning.com', N'Consultant Demo 1', '1987-03-10', 'FEMALE', '0900000011', N'English Consultant', N'Ho Chi Minh City', @now, @now, 'CONSULTANT', 'ACTIVE', 'ADULT'),
+('consultant02', @pwd, 'consultant02@elearning.com', N'Consultant Demo 2', '1991-09-22', 'MALE', '0900000012', N'English Consultant', N'Ha Noi', @now, @now, 'CONSULTANT', 'ACTIVE', 'ADULT');
 
--- Course GUIDs
-DECLARE @c1 UNIQUEIDENTIFIER = '11111111-0000-0000-0000-000000000001';
-DECLARE @c2 UNIQUEIDENTIFIER = '11111111-0000-0000-0000-000000000002';
-DECLARE @c3 UNIQUEIDENTIFIER = '11111111-0000-0000-0000-000000000003';
-DECLARE @c4 UNIQUEIDENTIFIER = '11111111-0000-0000-0000-000000000004';
-DECLARE @c5 UNIQUEIDENTIFIER = '11111111-0000-0000-0000-000000000005';
+DECLARE @i INT = 1;
+WHILE @i <= 10
+BEGIN
+        INSERT INTO users (
+                username, password, email, full_name, dob, gender, phone_number, job, [address],
+                created_at, updated_at, role, status, age_group
+        )
+        VALUES (
+                'staff' + RIGHT('00' + CAST(@i AS VARCHAR(2)), 2),
+                @pwd,
+                'staff' + RIGHT('00' + CAST(@i AS VARCHAR(2)), 2) + '@elearning.com',
+                N'English Lecturer ' + CAST(@i AS NVARCHAR(10)),
+                DATEADD(DAY, -(@i * 400), CAST(@now AS DATE)),
+                CASE WHEN @i % 2 = 0 THEN 'FEMALE' ELSE 'MALE' END,
+                '0901' + RIGHT('000000' + CAST(@i AS VARCHAR(6)), 6),
+                N'English Lecturer',
+                CASE WHEN @i % 3 = 0 THEN N'Da Nang' WHEN @i % 3 = 1 THEN N'Ha Noi' ELSE N'Ho Chi Minh City' END,
+                @now,
+                @now,
+                'STAFF',
+                'ACTIVE',
+                CASE WHEN @i % 4 = 0 THEN 'EVERYONE' ELSE 'ADULT' END
+        );
 
--- Free course — Adults
-IF NOT EXISTS (SELECT 1 FROM course WHERE course_id = @c1)
-INSERT INTO course (course_id, course_name, quantity, duration, image, price, description, age_group, status, created_at, updated_at, staff_id)
-VALUES (@c1, N'English for Beginners', 50, 0, 'https://res.cloudinary.com/demo/image/upload/sample.jpg', 0,
-        N'Khóa học tiếng Anh cơ bản dành cho người mới bắt đầu. Bao gồm ngữ pháp, từ vựng và phát âm.',
-        'ADULT', 'AVAILABLE', @now, @now, 'staff01');
+        SET @i = @i + 1;
+END;
 
--- Paid course — Adults (299,000 VND)
-IF NOT EXISTS (SELECT 1 FROM course WHERE course_id = @c2)
-INSERT INTO course (course_id, course_name, quantity, duration, image, price, description, age_group, status, created_at, updated_at, staff_id)
-VALUES (@c2, N'IELTS Foundation', 30, 0, 'https://res.cloudinary.com/demo/image/upload/sample.jpg', 299000,
-        N'Lộ trình luyện thi IELTS từ nền tảng. Giúp học viên đạt band 5.5 - 6.0 trong 3 tháng.',
-        'ADULT', 'AVAILABLE', @now, @now, 'staff01');
+SET @i = 1;
+WHILE @i <= 60
+BEGIN
+        INSERT INTO users (
+                username, password, email, full_name, dob, gender, phone_number, job, [address],
+                created_at, updated_at, role, status, age_group
+        )
+        VALUES (
+                'member' + RIGHT('00' + CAST(@i AS VARCHAR(2)), 2),
+                @pwd,
+                'member' + RIGHT('00' + CAST(@i AS VARCHAR(2)), 2) + '@gmail.com',
+                N'Member Demo ' + CAST(@i AS NVARCHAR(10)),
+                DATEADD(DAY, -(@i * 220), CAST(@now AS DATE)),
+                CASE WHEN @i % 2 = 0 THEN 'FEMALE' ELSE 'MALE' END,
+                '0911' + RIGHT('000000' + CAST(@i AS VARCHAR(6)), 6),
+                N'Learner',
+                CASE WHEN @i % 4 = 0 THEN N'Can Tho' WHEN @i % 4 = 1 THEN N'Ha Noi' WHEN @i % 4 = 2 THEN N'Da Nang' ELSE N'Ho Chi Minh City' END,
+                DATEADD(DAY, -(@i * 8), @now),
+                DATEADD(DAY, -(@i * 8), @now),
+                'MEMBER',
+                'ACTIVE',
+                CASE WHEN @i % 5 = 0 THEN 'ADOLESCENT' ELSE 'ADULT' END
+        );
 
--- Paid course — Adults (499,000 VND)
-IF NOT EXISTS (SELECT 1 FROM course WHERE course_id = @c3)
-INSERT INTO course (course_id, course_name, quantity, duration, image, price, description, age_group, status, created_at, updated_at, staff_id)
-VALUES (@c3, N'Business English Advanced', 20, 0, 'https://res.cloudinary.com/demo/image/upload/sample.jpg', 499000,
-        N'Tiếng Anh thương mại nâng cao — email, thuyết trình, đàm phán chuyên nghiệp.',
-        'ADULT', 'AVAILABLE', @now, @now, 'staff02');
-
--- Free course — Teens
-IF NOT EXISTS (SELECT 1 FROM course WHERE course_id = @c4)
-INSERT INTO course (course_id, course_name, quantity, duration, image, price, description, age_group, status, created_at, updated_at, staff_id)
-VALUES (@c4, N'English for Teens', 40, 0, 'https://res.cloudinary.com/demo/image/upload/sample.jpg', 0,
-        N'Khóa học tiếng Anh thú vị và sinh động dành riêng cho học sinh THPT.',
-        'ADOLESCENT', 'AVAILABLE', @now, @now, 'staff02');
-
--- Paid course — Everyone (199,000 VND) — Pending approval
-IF NOT EXISTS (SELECT 1 FROM course WHERE course_id = @c5)
-INSERT INTO course (course_id, course_name, quantity, duration, image, price, description, age_group, status, created_at, updated_at, staff_id)
-VALUES (@c5, N'TOEIC 600+ Crash Course', 100, 0, 'https://res.cloudinary.com/demo/image/upload/sample.jpg', 199000,
-        N'Luyện thi TOEIC tăng tốc — chiến lược làm bài, nghe đọc toàn diện. Cam kết 600+ sau 6 tuần.',
-        'EVERYONE', 'PENDING', @now, @now, 'staff01');
-
--- ============================================================
--- 3. MODULES
--- ============================================================
-
-DECLARE @m1  UNIQUEIDENTIFIER = '22222222-0000-0000-0000-000000000001';
-DECLARE @m2  UNIQUEIDENTIFIER = '22222222-0000-0000-0000-000000000002';
-DECLARE @m3  UNIQUEIDENTIFIER = '22222222-0000-0000-0000-000000000003';
-DECLARE @m4  UNIQUEIDENTIFIER = '22222222-0000-0000-0000-000000000004';
-DECLARE @m5  UNIQUEIDENTIFIER = '22222222-0000-0000-0000-000000000005';
-DECLARE @m6  UNIQUEIDENTIFIER = '22222222-0000-0000-0000-000000000006';
-
--- Modules for Course 1 (English for Beginners)
-IF NOT EXISTS (SELECT 1 FROM module WHERE module_id = @m1)
-INSERT INTO module (module_id, module_name, status, created_at, updated_at, course_id)
-VALUES (@m1, N'Unit 1: Greetings & Introductions', 'AVAILABLE', @now, @now, @c1);
-
-IF NOT EXISTS (SELECT 1 FROM module WHERE module_id = @m2)
-INSERT INTO module (module_id, module_name, status, created_at, updated_at, course_id)
-VALUES (@m2, N'Unit 2: Numbers & Alphabet', 'AVAILABLE', @now, @now, @c1);
-
--- Modules for Course 2 (IELTS Foundation)
-IF NOT EXISTS (SELECT 1 FROM module WHERE module_id = @m3)
-INSERT INTO module (module_id, module_name, status, created_at, updated_at, course_id)
-VALUES (@m3, N'Module 1: IELTS Listening Strategies', 'AVAILABLE', @now, @now, @c2);
-
-IF NOT EXISTS (SELECT 1 FROM module WHERE module_id = @m4)
-INSERT INTO module (module_id, module_name, status, created_at, updated_at, course_id)
-VALUES (@m4, N'Module 2: IELTS Reading Techniques', 'AVAILABLE', @now, @now, @c2);
-
--- Modules for Course 3 (Business English)
-IF NOT EXISTS (SELECT 1 FROM module WHERE module_id = @m5)
-INSERT INTO module (module_id, module_name, status, created_at, updated_at, course_id)
-VALUES (@m5, N'Module 1: Professional Emails', 'AVAILABLE', @now, @now, @c3);
-
-IF NOT EXISTS (SELECT 1 FROM module WHERE module_id = @m6)
-INSERT INTO module (module_id, module_name, status, created_at, updated_at, course_id)
-VALUES (@m6, N'Module 2: Presentations & Public Speaking', 'AVAILABLE', @now, @now, @c3);
+        SET @i = @i + 1;
+END;
 
 -- ============================================================
--- 4. LESSONS
+-- 2) COURSES (50 courses, mostly paid)
 -- ============================================================
+DECLARE @courses TABLE (
+        course_idx INT PRIMARY KEY,
+        course_id UNIQUEIDENTIFIER,
+        course_name NVARCHAR(255),
+        price BIGINT,
+        status VARCHAR(20),
+        created_at DATETIME2
+);
 
-DECLARE @l1  UNIQUEIDENTIFIER = '33333333-0000-0000-0000-000000000001';
-DECLARE @l2  UNIQUEIDENTIFIER = '33333333-0000-0000-0000-000000000002';
-DECLARE @l3  UNIQUEIDENTIFIER = '33333333-0000-0000-0000-000000000003';
-DECLARE @l4  UNIQUEIDENTIFIER = '33333333-0000-0000-0000-000000000004';
-DECLARE @l5  UNIQUEIDENTIFIER = '33333333-0000-0000-0000-000000000005';
-DECLARE @l6  UNIQUEIDENTIFIER = '33333333-0000-0000-0000-000000000006';
-DECLARE @l7  UNIQUEIDENTIFIER = '33333333-0000-0000-0000-000000000007';
-DECLARE @l8  UNIQUEIDENTIFIER = '33333333-0000-0000-0000-000000000008';
+SET @i = 1;
+WHILE @i <= 50
+BEGIN
+        DECLARE @courseId UNIQUEIDENTIFIER = NEWID();
+        DECLARE @courseName NVARCHAR(255) = N'English Course ' + RIGHT('00' + CAST(@i AS NVARCHAR(2)), 2);
+        DECLARE @price BIGINT = CASE
+                WHEN @i % 7 = 0 THEN 0
+                WHEN @i % 5 = 0 THEN 199000
+                WHEN @i % 3 = 0 THEN 299000
+                WHEN @i % 2 = 0 THEN 399000
+                ELSE 499000
+        END;
+        DECLARE @status VARCHAR(20) = CASE WHEN @i % 10 = 0 THEN 'PENDING' ELSE 'AVAILABLE' END;
+        DECLARE @courseCreated DATETIME2 = DATEADD(DAY, (@i - 1) * 12, CAST('2025-01-01' AS DATETIME2));
+        DECLARE @staffId VARCHAR(255) = 'staff' + RIGHT('00' + CAST(((@i - 1) % 10) + 1 AS VARCHAR(2)), 2);
 
--- Lessons for Module 1 (Greetings)
-IF NOT EXISTS (SELECT 1 FROM lesson WHERE lesson_id = @l1)
-INSERT INTO lesson (lesson_id, lesson_name, duration, status, created_at, updated_at, module_id)
-VALUES (@l1, N'Lesson 1: Hello & Goodbye', 15, 'AVAILABLE', @now, @now, @m1);
+        INSERT INTO course (
+                course_id, course_name, quantity, duration, image, price, description,
+                age_group, status, created_at, updated_at, staff_id
+        )
+        VALUES (
+                @courseId,
+                @courseName,
+                30 + (@i % 70),
+                0,
+                'https://res.cloudinary.com/demo/image/upload/sample.jpg',
+                @price,
+                N'Demo course for reporting and dashboard analytics.',
+                CASE WHEN @i % 6 = 0 THEN 'ADOLESCENT' WHEN @i % 4 = 0 THEN 'EVERYONE' ELSE 'ADULT' END,
+                @status,
+                @courseCreated,
+                DATEADD(HOUR, 3, @courseCreated),
+                @staffId
+        );
 
-IF NOT EXISTS (SELECT 1 FROM lesson WHERE lesson_id = @l2)
-INSERT INTO lesson (lesson_id, lesson_name, duration, status, created_at, updated_at, module_id)
-VALUES (@l2, N'Lesson 2: Introducing Yourself', 20, 'AVAILABLE', @now, @now, @m1);
+        INSERT INTO @courses (course_idx, course_id, course_name, price, status, created_at)
+        VALUES (@i, @courseId, @courseName, @price, @status, @courseCreated);
 
--- Lessons for Module 2 (Numbers)
-IF NOT EXISTS (SELECT 1 FROM lesson WHERE lesson_id = @l3)
-INSERT INTO lesson (lesson_id, lesson_name, duration, status, created_at, updated_at, module_id)
-VALUES (@l3, N'Lesson 1: Numbers 1-100', 15, 'AVAILABLE', @now, @now, @m2);
-
-IF NOT EXISTS (SELECT 1 FROM lesson WHERE lesson_id = @l4)
-INSERT INTO lesson (lesson_id, lesson_name, duration, status, created_at, updated_at, module_id)
-VALUES (@l4, N'Lesson 2: The Alphabet & Spelling', 20, 'AVAILABLE', @now, @now, @m2);
-
--- Lessons for Module 3 (IELTS Listening)
-IF NOT EXISTS (SELECT 1 FROM lesson WHERE lesson_id = @l5)
-INSERT INTO lesson (lesson_id, lesson_name, duration, status, created_at, updated_at, module_id)
-VALUES (@l5, N'Lesson 1: Section 1 & 2 Tactics', 30, 'AVAILABLE', @now, @now, @m3);
-
-IF NOT EXISTS (SELECT 1 FROM lesson WHERE lesson_id = @l6)
-INSERT INTO lesson (lesson_id, lesson_name, duration, status, created_at, updated_at, module_id)
-VALUES (@l6, N'Lesson 2: Section 3 & 4 Academic Listening', 35, 'AVAILABLE', @now, @now, @m3);
-
--- Lessons for Module 5 (Business Emails)
-IF NOT EXISTS (SELECT 1 FROM lesson WHERE lesson_id = @l7)
-INSERT INTO lesson (lesson_id, lesson_name, duration, status, created_at, updated_at, module_id)
-VALUES (@l7, N'Lesson 1: Formal vs Informal Emails', 25, 'AVAILABLE', @now, @now, @m5);
-
-IF NOT EXISTS (SELECT 1 FROM lesson WHERE lesson_id = @l8)
-INSERT INTO lesson (lesson_id, lesson_name, duration, status, created_at, updated_at, module_id)
-VALUES (@l8, N'Lesson 2: Writing a Complaint Email', 25, 'AVAILABLE', @now, @now, @m5);
+        SET @i = @i + 1;
+END;
 
 -- ============================================================
--- 5. ENROLLMENTS
+-- 3) PAYMENTS + ENROLLMENTS
+--    Revenue timeline from 2025-01-01 to current month
 -- ============================================================
--- member01 enrolled in Course 1 (free) — LEARNING
-IF NOT EXISTS (SELECT 1 FROM enrollment WHERE member_id = 'member01' AND course_id = @c1)
+DECLARE @paidCourses TABLE (
+        row_no INT PRIMARY KEY,
+        course_id UNIQUEIDENTIFIER,
+        course_name NVARCHAR(255),
+        amount BIGINT
+);
+
+INSERT INTO @paidCourses (row_no, course_id, course_name, amount)
+SELECT
+        ROW_NUMBER() OVER (ORDER BY course_idx),
+        course_id,
+        course_name,
+        price
+FROM @courses
+WHERE price > 0 AND status = 'AVAILABLE';
+
+DECLARE @paidCount INT = (SELECT COUNT(*) FROM @paidCourses);
+DECLARE @monthStart DATE = '2025-01-01';
+DECLARE @monthEnd DATE = DATEFROMPARTS(YEAR(@now), MONTH(@now), 1);
+DECLARE @paymentSeq INT = 1;
+
+WHILE @monthStart <= @monthEnd
+BEGIN
+        DECLARE @k INT = 1;
+        WHILE @k <= 6
+        BEGIN
+                DECLARE @pick INT = ((@paymentSeq + @k) % @paidCount) + 1;
+                DECLARE @courseIdPaid UNIQUEIDENTIFIER;
+                DECLARE @courseNamePaid NVARCHAR(255);
+                DECLARE @amountPaid BIGINT;
+                DECLARE @memberId VARCHAR(255) = 'member' + RIGHT('00' + CAST(((@paymentSeq + @k - 1) % 60) + 1 AS VARCHAR(2)), 2);
+                DECLARE @createdAt DATETIME2 = DATEADD(DAY, @k * 4, CAST(@monthStart AS DATETIME2));
+                DECLARE @updatedAt DATETIME2 = DATEADD(HOUR, 2, @createdAt);
+                DECLARE @paymentStatus VARCHAR(20);
+                DECLARE @orderId VARCHAR(100) =
+                        'DEMO-' + FORMAT(@monthStart, 'yyyyMM') + '-' + RIGHT('0000' + CAST(@paymentSeq * 10 + @k AS VARCHAR(10)), 4);
+
+                SELECT @courseIdPaid = course_id, @courseNamePaid = course_name, @amountPaid = amount
+                FROM @paidCourses
+                WHERE row_no = @pick;
+
+                SET @paymentStatus = CASE WHEN @k <= 4 THEN 'SUCCESS' WHEN @k = 5 THEN 'FAILED' ELSE 'PENDING' END;
+
+                INSERT INTO payment (
+                        payment_id, order_id, request_id, amount, order_info, status,
+                        momo_trans_id, result_code, message, created_at, updated_at, member_id, course_id
+                )
+                VALUES (
+                        NEWID(),
+                        @orderId,
+                        @orderId,
+                        @amountPaid,
+                        N'Thanh toan khoa hoc: ' + @courseNamePaid,
+                        @paymentStatus,
+                        CASE WHEN @paymentStatus = 'SUCCESS' THEN CAST(3000000000 + @paymentSeq * 10 + @k AS VARCHAR(20)) ELSE NULL END,
+                        CASE WHEN @paymentStatus = 'SUCCESS' THEN 0 WHEN @paymentStatus = 'FAILED' THEN 1006 ELSE NULL END,
+                        CASE WHEN @paymentStatus = 'SUCCESS' THEN 'Successful.' WHEN @paymentStatus = 'FAILED' THEN 'Transaction declined.' ELSE NULL END,
+                        @createdAt,
+                        @updatedAt,
+                        @memberId,
+                        @courseIdPaid
+                );
+
+                IF @paymentStatus = 'SUCCESS'
+                   AND NOT EXISTS (
+                                SELECT 1
+                                FROM enrollment
+                                WHERE member_id = @memberId AND course_id = @courseIdPaid
+                   )
+                BEGIN
+                        INSERT INTO enrollment (enrollment_id, status, started_at, ended_at, member_id, course_id)
+                        VALUES (NEWID(), 'LEARNING', @updatedAt, DATEADD(DAY, 30, @updatedAt), @memberId, @courseIdPaid);
+                END;
+
+                SET @k = @k + 1;
+        END;
+
+        SET @paymentSeq = @paymentSeq + 1;
+        SET @monthStart = DATEADD(MONTH, 1, @monthStart);
+END;
+
+-- Some free-course enrollments for variety
 INSERT INTO enrollment (enrollment_id, status, started_at, ended_at, member_id, course_id)
-VALUES (NEWID(), 'LEARNING', @now, DATEADD(DAY, 14, @now), 'member01', @c1);
-
--- member02 enrolled in Course 1 (free) — COMPLETED
-IF NOT EXISTS (SELECT 1 FROM enrollment WHERE member_id = 'member02' AND course_id = @c1)
-INSERT INTO enrollment (enrollment_id, status, started_at, ended_at, member_id, course_id)
-VALUES (NEWID(), 'COMPLETED', DATEADD(DAY, -30, @now), DATEADD(DAY, -16, @now), 'member02', @c1);
-
--- member04 enrolled in Course 4 (free, teens) — LEARNING
-IF NOT EXISTS (SELECT 1 FROM enrollment WHERE member_id = 'member04' AND course_id = @c4)
-INSERT INTO enrollment (enrollment_id, status, started_at, ended_at, member_id, course_id)
-VALUES (NEWID(), 'LEARNING', @now, DATEADD(DAY, 14, @now), 'member04', @c4);
-
--- member03 enrolled in Course 2 (paid, post-payment) — LEARNING
-IF NOT EXISTS (SELECT 1 FROM enrollment WHERE member_id = 'member03' AND course_id = @c2)
-INSERT INTO enrollment (enrollment_id, status, started_at, ended_at, member_id, course_id)
-VALUES (NEWID(), 'LEARNING', @now, DATEADD(DAY, 14, @now), 'member03', @c2);
+SELECT TOP 40
+        NEWID(),
+        CASE WHEN ROW_NUMBER() OVER (ORDER BY c.course_id) % 3 = 0 THEN 'COMPLETED' ELSE 'LEARNING' END,
+        DATEADD(DAY, -20, @now),
+        DATEADD(DAY, 10, @now),
+        'member' + RIGHT('00' + CAST((ROW_NUMBER() OVER (ORDER BY c.course_id)) AS VARCHAR(2)), 2),
+        c.course_id
+FROM course c
+WHERE c.price = 0;
 
 -- ============================================================
--- 6. PAYMENTS
+-- SUMMARY
 -- ============================================================
+DECLARE @totalUsers INT = (SELECT COUNT(*) FROM users);
+DECLARE @totalStaff INT = (SELECT COUNT(*) FROM users WHERE role = 'STAFF');
+DECLARE @totalConsultants INT = (SELECT COUNT(*) FROM users WHERE role = 'CONSULTANT');
+DECLARE @totalMembers INT = (SELECT COUNT(*) FROM users WHERE role = 'MEMBER');
+DECLARE @totalCourses INT = (SELECT COUNT(*) FROM course);
+DECLARE @totalPayments INT = (SELECT COUNT(*) FROM payment);
+DECLARE @totalRevenue BIGINT = (SELECT COALESCE(SUM(amount), 0) FROM payment WHERE status = 'SUCCESS');
 
--- member03 paid for Course 2 (IELTS Foundation, 299,000đ) — SUCCESS
-IF NOT EXISTS (SELECT 1 FROM payment WHERE order_id = 'DEMO-ORDER-001')
-INSERT INTO payment (payment_id, order_id, request_id, amount, order_info, status, momo_trans_id, result_code, message, created_at, updated_at, member_id, course_id)
-VALUES (NEWID(), 'DEMO-ORDER-001', 'DEMO-ORDER-001', 299000,
-        N'Thanh toan khoa hoc: IELTS Foundation',
-        'SUCCESS', '3290000001', 0, 'Successful.', DATEADD(DAY, -1, @now), DATEADD(DAY, -1, @now),
-        'member03', @c2);
-
--- member01 paid for Course 3 (Business English, 499,000đ) — SUCCESS
-IF NOT EXISTS (SELECT 1 FROM payment WHERE order_id = 'DEMO-ORDER-002')
-INSERT INTO payment (payment_id, order_id, request_id, amount, order_info, status, momo_trans_id, result_code, message, created_at, updated_at, member_id, course_id)
-VALUES (NEWID(), 'DEMO-ORDER-002', 'DEMO-ORDER-002', 499000,
-        N'Thanh toan khoa hoc: Business English Advanced',
-        'SUCCESS', '3290000002', 0, 'Successful.', DATEADD(DAY, -3, @now), DATEADD(DAY, -3, @now),
-        'member01', @c3);
-
--- member02 attempted Course 2 payment but FAILED
-IF NOT EXISTS (SELECT 1 FROM payment WHERE order_id = 'DEMO-ORDER-003')
-INSERT INTO payment (payment_id, order_id, request_id, amount, order_info, status, momo_trans_id, result_code, message, created_at, updated_at, member_id, course_id)
-VALUES (NEWID(), 'DEMO-ORDER-003', 'DEMO-ORDER-003', 299000,
-        N'Thanh toan khoa hoc: IELTS Foundation',
-        'FAILED', NULL, 1006, 'Transaction declined.', DATEADD(DAY, -2, @now), DATEADD(DAY, -2, @now),
-        'member02', @c2);
-
--- member01 payment for TOEIC course is PENDING (not yet paid)
-IF NOT EXISTS (SELECT 1 FROM payment WHERE order_id = 'DEMO-ORDER-004')
-INSERT INTO payment (payment_id, order_id, request_id, amount, order_info, status, momo_trans_id, result_code, message, created_at, updated_at, member_id, course_id)
-VALUES (NEWID(), 'DEMO-ORDER-004', 'DEMO-ORDER-004', 199000,
-        N'Thanh toan khoa hoc: TOEIC 600+ Crash Course',
-        'PENDING', NULL, NULL, NULL, @now, @now,
-        'member01', @c5);
-
--- ============================================================
--- Summary
--- ============================================================
 PRINT '=== Seed complete ===';
-PRINT 'Users    : admin, manager01, staff01, staff02, consultant01, member01-04';
-PRINT 'Courses  : 5 (2 free, 2 paid AVAILABLE, 1 paid PENDING)';
-PRINT 'Modules  : 6';
-PRINT 'Lessons  : 8';
-PRINT 'Enrollments: 4';
-PRINT 'Payments : 4 (2 SUCCESS, 1 FAILED, 1 PENDING)';
-PRINT 'Password for all accounts: Test@1234';
+PRINT 'Default password for all users: 123456';
+PRINT 'Users      : ' + CAST(@totalUsers AS VARCHAR(20));
+PRINT 'Staff      : ' + CAST(@totalStaff AS VARCHAR(20));
+PRINT 'Consultants: ' + CAST(@totalConsultants AS VARCHAR(20));
+PRINT 'Members    : ' + CAST(@totalMembers AS VARCHAR(20));
+PRINT 'Courses    : ' + CAST(@totalCourses AS VARCHAR(20));
+PRINT 'Payments   : ' + CAST(@totalPayments AS VARCHAR(20));
+PRINT 'Revenue    : ' + CAST(@totalRevenue AS VARCHAR(30));
+PRINT 'Range      : 2025-01-01 -> now';

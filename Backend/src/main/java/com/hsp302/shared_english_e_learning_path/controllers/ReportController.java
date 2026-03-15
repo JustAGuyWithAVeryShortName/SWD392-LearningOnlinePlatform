@@ -7,6 +7,7 @@ import com.hsp302.shared_english_e_learning_path.services.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class ReportController {
     private final ReportService reportService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<ApiResponse<List<ReportResponse>>> getLineChartData(@RequestBody ReportRequest request) {
         List<ReportResponse> responses = reportService.getLineChartData(request);
         ApiResponse<List<ReportResponse>> apiResponse = ApiResponse.<List<ReportResponse>>builder()
@@ -29,6 +31,7 @@ public class ReportController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<ApiResponse<ReportResponse>> getStatCardData() {
         ReportResponse response = reportService.getStatCardData();
         ApiResponse<ReportResponse> apiResponse = ApiResponse.<ReportResponse>builder()

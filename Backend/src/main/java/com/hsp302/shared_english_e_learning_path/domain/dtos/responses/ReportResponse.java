@@ -6,7 +6,6 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,4 +24,6 @@ public class ReportResponse {
     int blogs;
     int events;
     int courses;
+    long revenue;
+    int paidCourses;
 }
